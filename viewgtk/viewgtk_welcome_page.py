@@ -68,9 +68,10 @@ class WelcomePageView(Gtk.ScrolledWindow):
         self.box.pack_end(self.footer, False, False, 0)
 
     def set_sidebar_visible(self, sidebar_visible):
-        if sidebar_visible:
-            self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the sidebar).')
-        else:
-            self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the "Worksheets" menu above).')
+        pass
+        #if sidebar_visible:
+        #    self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the sidebar).')
+        #else:
+        #    self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the "Worksheets" menu above).')
 
 
