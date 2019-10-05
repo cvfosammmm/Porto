@@ -1,0 +1,186 @@
+/*
+
+    worksheet view 
+
+*/
+
+.resultviewrevealer > box > box {
+    border-bottom: 1px solid mix(@borders, @theme_bg_color, 0.5);
+}
+.resulttextview label {
+    background-color: @theme_base_color;
+    color: blue;
+    font-family: monospace;
+    font-size: 14.5px;
+}
+.resultlatexview label {
+    background-color: @theme_base_color;
+    color: blue;
+    font-family: monospace;
+    font-size: 14.5px;
+}
+.resultviewseperator1 {
+    background-color: @theme_base_color;
+}
+.resulttextview {
+    background-color: @theme_base_color;
+    font-size: 14.5px;
+}
+.resultlatexview {
+    background-color: @theme_base_color;
+    font-size: 14.5px;
+}
+.resultimageview {
+    background-color: @theme_base_color;
+}
+.resultviewrevealer .mdresultview {
+}
+.resultviewrevealer.active .mdresultview {
+}
+textview.view border.right {
+    background-color: @theme_base_color;
+}
+textview.view border.left {
+    background-color: @theme_base_color;
+}
+.form-error {
+    color: @error_color;
+    font-size: 13px;
+}
+.form-description {
+    color: mix(@theme_fg_color, @theme_bg_color, 0.3);
+    font-size: 13px;
+}
+.worksheetview {
+    background-color: @theme_bg_color;
+}
+.worksheetview viewport {
+    border: none;
+}
+.welcomepageview {
+    background-color: @theme_bg_color;
+    border: none;
+}
+.welcomepageview box > label {
+    color: mix(@theme_fg_color, @theme_bg_color, 0.3);
+}
+.welcomepageview button.link label {
+    color: blue;
+}
+.welcomepageview viewport {
+    border: none;
+}
+textview {
+    font-size: 14.5px;
+}
+
+/*
+
+    cell states
+
+*/
+
+.cellviewcode .cellviewstatedisplay {
+    background-color: mix(@borders, @theme_bg_color, 0.5);
+}
+.cellviewcode.active .cellviewstatedisplay {
+    background-color: #0cb02f;
+}
+.cellviewmarkdown .cellviewstatedisplay {
+    background-color: mix(@borders, @theme_bg_color, 0.5);
+}
+.cellviewmarkdown.active .cellviewstatedisplay {
+    background-color: #0cb02f;
+}
+.resultviewrevealer .cellviewstatedisplay {
+    background-color: mix(@borders, @theme_bg_color, 0.5);
+}
+.resultviewrevealer.markdown .cellviewstatedisplay {
+    background-color: @theme_bg_color;
+}
+.resultviewrevealer.active .cellviewstatedisplay {
+    background-color: #0cb02f;
+}
+
+/*
+
+    worksheet list
+
+*/
+
+.wslist_top {
+    margin-top: 1px;
+}
+.wslist_top.sidebar {
+    background-color: @theme_base_color;
+}
+.wslist_top.hb {
+    padding: 9px;
+}
+.wslist_top.hb list row > revealer > box {
+    border-bottom: 1px solid mix(@borders, @theme_base_color, 0.68);
+}
+.wslist_top.hb list row > box {
+    border-bottom: 1px solid mix(@borders, @theme_base_color, 0.68);
+}
+.wslist_top.hb scrolledwindow {
+    border: 1px solid @borders;
+}
+.wslist_wrapper {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+.wslist_name {
+}
+.wslist_state {
+    font-size: 12px;
+    opacity: 0.5;
+}
+.wslist_folder {
+    font-size: 12px;
+    opacity: 0.5;
+}
+.wslist_icon {
+    padding-left: 9px;
+    padding-right: 12px;
+}
+.wslist_last_save {
+    font-size: 12px;
+    padding-right: 14px;
+    opacity: 0.5;
+}
+.wslist_header {
+    font-weight: bold;
+    color: mix(@theme_fg_color, @theme_base_color, 0.60);
+    padding-left: 9px;
+    padding-top: 7px;
+    padding-bottom: 6px;
+}
+.sidebar .wslist_header {
+    background: @theme_base_color;
+}
+.wslist_close_button {
+    margin-right: 3px;
+    border-width: 0px;
+    background: none;
+    box-shadow: none;
+    opacity: 0.5;
+}
+.wslist_close_button:hover {
+    opacity: 1;
+}
+.wslist_item {
+    padding: 0px;
+    margin: 0px;
+}
+
+/*
+
+    dialogs
+
+*/
+
+dialog {
+    background-repeat: no-repeat;
+    background-position: right bottom;
+}
