@@ -29,17 +29,12 @@ import model.model_notebook as model_notebook
 import model.model_cell as model_cell
 import model.model_kernelspecs as model_kernelspecs
 import viewgtk.viewgtk as view
-import viewgtk.viewgtk_dialogs_preferences as view_dialogs_preferences
-import viewgtk.viewgtk_dialogs_open_worksheet as viewgtk_dialogs_open_worksheet
-import viewgtk.viewgtk_dialogs_close_confirmation as viewgtk_dialogs_close_confirmation
 import viewgtk.viewgtk_welcome_page as viewgtk_welcome_page
 import controller.controller_notebook as notebookcontroller
 import controller.controller_worksheet_lists as wslistscontroller
-import controller.controller_settings as settingscontroller
 import controller.controller_shortcuts as shortcutscontroller
-import controller.controller_dialogs_create_worksheet as cwsdialogcontroller
-import controller.controller_dialogs_save_as as sadialogcontroller
 import backend.backend_controller as backendcontroller
+from app.service_locator import ServiceLocator
 
 
 class MainApplicationController(Gtk.Application):
@@ -51,9 +46,7 @@ class MainApplicationController(Gtk.Application):
         ''' Everything starts here. '''
         
         # load settings
-        self.settings = settingscontroller.Settings()
-        
-        self.construct_worksheet_menu()
+        self.settings = ServiceLocator.get_settings()
         
         # init compute queue
         self.backend_controller_markdown = backendcontroller.BackendControllerMarkdown()
@@ -70,14 +63,14 @@ class MainApplicationController(Gtk.Application):
         self.setup_kernel_changer()
 
         self.notebook = model_notebook.Notebook()
+        ServiceLocator.init_dialogs(self.main_window, self.notebook, self)
 
         # controllers
         self.worksheet_controllers = dict()
         self.notebook_controller = notebookcontroller.NotebookController(self.notebook, self.main_window, self)
         self.wslists_controller = wslistscontroller.WSListsController(self.main_window.sidebar, self.main_window.headerbar.hb_right.worksheet_chooser, self)
-        self.cws_dialog_controller = cwsdialogcontroller.ControllerDialogCreateWorksheet(self.notebook,
-                                                                                         self.main_window, self)
-        self.sa_dialog_controller = sadialogcontroller.ControllerDialogSaveAs(self.notebook, self.main_window, self)
+        self.shortcuts_controller = shortcutscontroller.ShortcutsController(self.main_window, self)
+        self.construct_worksheet_menu()
 
         # to watch for cursor movements
         self.cursor_position = {'cell': None, 'cell_position': None, 'cell_size': None, 'position': None}
@@ -102,9 +95,6 @@ class MainApplicationController(Gtk.Application):
         # watch changes in view
         self.observe_main_window()
 
-        # shortcuts controller
-        self.shortcuts_controller = shortcutscontroller.ShortcutsController(self.main_window, self)
-        
     '''
     *** main observer functions
     '''
@@ -262,18 +252,17 @@ class MainApplicationController(Gtk.Application):
     '''
     
     def on_create_ws_button_click(self, button_object=None):
-        self.cws_dialog_controller.show()
+        parameters = ServiceLocator.get_dialog('create_worksheet').run()
+        if parameters != None:
+            pathname, kernelname = parameters
+            self.notebook_controller.create_worksheet(pathname, kernelname)
 
     def on_open_ws_button_click(self, button_object=None):
-        dialog = viewgtk_dialogs_open_worksheet.OpenWorksheet(self.main_window)
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            filename = dialog.get_filename()
+        filename = ServiceLocator.get_dialog('open_worksheet').run()
+        if filename != None:
             if filename.split('.')[-1] == 'ipynb':
                 worksheet = model_worksheet.NormalWorksheet(filename)
                 self.activate_worksheet(worksheet)
-            else: pass
-        dialog.destroy()
 
     def activate_worksheet_by_pathname(self, pathname):
         for worksheet in self.notebook.open_worksheets:
@@ -430,92 +419,36 @@ class MainApplicationController(Gtk.Application):
         self.settings.set_value('window_state', 'paned_position', main_window.paned_position)
         self.settings.pickle()
         
-    def on_window_close(self, main_window, event=None):
+    def on_window_close(self, window=None, parameter=None):
+        self.save_quit()
+        return True
+
+    def on_quit_action(self, action=None, parameter=None):
+        self.save_quit()
+
+    def save_quit(self, accel_group=None, window=None, key=None, mask=None):
         ''' signal handler, ask user to save unsaved worksheets or discard changes '''
         
         worksheets = self.notebook.get_unsaved_worksheets()
-        if len(worksheets) == 0: 
-            self.save_window_state()
-            return False
+        active_worksheet = self.notebook.get_active_worksheet()
 
-        self.save_changes_dialog = viewgtk_dialogs_close_confirmation.CloseConfirmation(self.main_window, worksheets)
-        response = self.save_changes_dialog.run()
-        if response == Gtk.ResponseType.NO:
-            self.save_changes_dialog.destroy()
+        if len(worksheets) == 0 or active_worksheet == None or ServiceLocator.get_dialog('close_confirmation').run(worksheets)['all_save_to_close']: 
             self.save_window_state()
-            return False
-        elif response == Gtk.ResponseType.YES:
-            selected_worksheets = list()
-            if len(worksheets) == 1:
-                selected_worksheets.append(worksheets[0])
-            else:
-                dialog_worksheets = self.save_changes_dialog.worksheets
-                for child in self.save_changes_dialog.chooser.get_children():
-                    if child.get_child().get_active():
-                        selected_worksheets.append(dialog_worksheets[int(child.get_child().get_name()[30:])])
-            for worksheet in worksheets:
-                if worksheet in selected_worksheets:
-                    worksheet.save_to_disk()
-            self.save_changes_dialog.destroy()
-            self.save_window_state()
-            return False
-        else:
-            self.save_changes_dialog.destroy()
-            return True
+            self.quit()
 
     '''
     *** application menu
     '''
 
-    def on_appmenu_show_preferences_dialog(self, action, parameter=''):
-        ''' show preferences dialog. '''
-        
-        def on_button_toggle(button, preference_name):
-            self.settings.set_value('preferences', preference_name, button.get_active())
-            
-            if preference_name == 'pretty_print':
-                self.notebook.set_pretty_print(self.settings.get_value('preferences', 'pretty_print'))
-        
-        worksheet = self.notebook.get_active_worksheet()
-        dialog = view_dialogs_preferences.Preferences(self.main_window)
-        
-        dialog.option_pretty_print.set_active(self.settings.get_value('preferences', 'pretty_print'))
-        dialog.option_pretty_print.connect('toggled', on_button_toggle, 'pretty_print')
+    def show_shortcuts_window(self, action, parameter=''):
+        ServiceLocator.get_dialog('keyboard_shortcuts').run()
 
-        response = dialog.run()
-        del(dialog)
+    def show_preferences_dialog(self, action=None, parameter=''):
+        ServiceLocator.get_dialog('preferences').run()
 
-    def on_appmenu_show_shortcuts_window(self, action, parameter=''):
-        ''' show popup with a list of keyboard shortcuts. '''
-        
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file('./resources/shortcuts_window.ui')
-        self.shortcuts_window = self.builder.get_object('shortcuts-window')
-        self.shortcuts_window.set_transient_for(self.main_window)
-        self.shortcuts_window.show_all()
-        
-    def on_appmenu_show_about_dialog(self, action, parameter=''):
-        ''' show popup with some information about the app. '''
-        
-        self.about_dialog = Gtk.AboutDialog()
-        self.about_dialog.set_transient_for(self.main_window)
-        self.about_dialog.set_modal(True)
-        self.about_dialog.set_program_name('Porto')
-        self.about_dialog.set_version('0.0.1')
-        self.about_dialog.set_copyright('Copyright © 2017-2019 - the Porto developers')
-        self.about_dialog.set_comments('Porto is a notebook type interface to Python and SageMath. It is designed to make exploring mathematics easy and fun.')
-        self.about_dialog.set_license_type(Gtk.License.GPL_3_0)
-        self.about_dialog.set_website('https://www.cvfosammmm.org/porto')
-        self.about_dialog.set_website_label('https://www.cvfosammmm.org/porto')
-        self.about_dialog.set_authors(('Robert Griesel',))
-        self.about_dialog.show_all()
-        
-    def on_appmenu_quit(self, action=None, parameter=''):
-        ''' quit application, show save dialog if unsaved worksheets present. '''
-        
-        if not self.on_window_close(self.main_window):
-            self.quit()
-        
+    def show_about_dialog(self, action, parameter=''):
+        ServiceLocator.get_dialog('about').run()
+
     '''
     *** worksheet menu
     '''
@@ -549,16 +482,17 @@ class MainApplicationController(Gtk.Application):
         self.toggle_sidebar_action.connect('activate', self.toggle_sidebar)
         self.add_action(self.toggle_sidebar_action)
         preferences_action = Gio.SimpleAction.new('show_preferences_dialog', None)
-        preferences_action.connect('activate', self.on_appmenu_show_preferences_dialog)
+        preferences_action.connect('activate', self.show_preferences_dialog)
         self.add_action(preferences_action)
         quit_action = Gio.SimpleAction.new('quit', None)
-        quit_action.connect('activate', self.on_appmenu_quit)
+        quit_action.connect('activate', self.on_quit_action)
         self.add_action(quit_action)
+        self.shortcuts_controller.accel_group.connect(Gdk.keyval_from_name('q'), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.MASK, self.save_quit)
         show_about_dialog_action = Gio.SimpleAction.new('show_about_dialog', None)
-        show_about_dialog_action.connect('activate', self.on_appmenu_show_about_dialog)
+        show_about_dialog_action.connect('activate', self.show_about_dialog)
         self.add_action(show_about_dialog_action)
         show_shortcuts_window_action = Gio.SimpleAction.new('show_shortcuts_window', None)
-        show_shortcuts_window_action.connect('activate', self.on_appmenu_show_shortcuts_window)
+        show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
         self.add_action(show_shortcuts_window_action)
         
     def on_wsmenu_restart_kernel(self, action=None, parameter=None):
@@ -580,7 +514,7 @@ class MainApplicationController(Gtk.Application):
     def on_wsmenu_save_as(self, action=None, parameter=None):
         worksheet = self.notebook.get_active_worksheet()
         if worksheet != None:
-            self.sa_dialog_controller.show(worksheet)
+            ServiceLocator.get_dialog('save_as').run(worksheet)
 
     def on_wsmenu_save_all(self, action=None, parameter=None):
         for worksheet in self.notebook.open_worksheets:

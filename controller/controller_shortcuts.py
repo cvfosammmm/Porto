@@ -35,10 +35,6 @@ class ShortcutsController(object):
         
         self.setup_shortcuts()
 
-        '''show_shortcuts_window_action = Gio.SimpleAction.new('show_shortcuts_window', None)
-        show_shortcuts_window_action.connect('activate', self.on_appmenu_show_shortcuts_window)
-        self.main_controller.add_action(show_shortcuts_window_action)'''
-
     def setup_shortcuts(self):
     
         self.accel_group = Gtk.AccelGroup()
@@ -67,7 +63,6 @@ class ShortcutsController(object):
         self.accel_group.connect(Gdk.keyval_from_name('o'), c_mask, flags, self.shortcut_open_worksheet)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask | s_mask, flags, self.shortcut_save_as)
-        self.accel_group.connect(Gdk.keyval_from_name('q'), c_mask, flags, self.shortcut_quit)
 
         self.main_window.worksheet_view_wrapper.connect('key-press-event', self.on_worksheet_key_pressed)
 
@@ -154,16 +149,4 @@ class ShortcutsController(object):
     def shortcut_save_as(self, accel_group=None, window=None, key=None, mask=None):
         self.main_controller.on_wsmenu_save_as()
 
-    def shortcut_quit(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_appmenu_quit()
-
-    def on_appmenu_show_shortcuts_window(self, action, parameter=''):
-        ''' show popup with a list of keyboard shortcuts. '''
-        
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file('./resources/shortcuts_window.ui')
-        self.shortcuts_window = self.builder.get_object('shortcuts-window')
-        self.shortcuts_window.set_transient_for(self.main_window)
-        self.shortcuts_window.show_all()
-        
 

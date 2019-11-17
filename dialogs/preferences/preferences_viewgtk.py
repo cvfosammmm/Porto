@@ -22,7 +22,6 @@ from gi.repository import Gdk
 
 
 class Preferences(object):
-    ''' Preferences dialog. '''
 
     def __init__(self, main_window):
         builder = Gtk.Builder.new_from_string('<?xml version="1.0" encoding="UTF-8"?><interface><object class="GtkDialog" id="dialog"><property name="use-header-bar">1</property></object></interface>', -1)
@@ -46,7 +45,14 @@ class Preferences(object):
         self.notebook.set_show_tabs(True)
         self.notebook.set_show_border(False)
         self.topbox.pack_start(self.notebook, True, True, 0)
+
+        self.build_page_view()
+
+        self.notebook.append_page(self.page_view, Gtk.Label('View'))
         
+        self.dialog.show_all()
+
+    def build_page_view(self):
         self.page_view = Gtk.VBox()
         self.page_view.set_margin_start(18)
         self.page_view.set_margin_end(18)
@@ -55,10 +61,6 @@ class Preferences(object):
 
         self.option_pretty_print = Gtk.CheckButton("Pretty print results with LaTeX")
         self.page_view.pack_start(self.option_pretty_print, False, False, 0)
-        
-        self.notebook.append_page(self.page_view, Gtk.Label('View'))
-        
-        self.dialog.show_all()
     
     def run(self):
         return self.dialog.run()
@@ -68,5 +70,6 @@ class Preferences(object):
         
     def __del__(self):
         self.dialog.destroy()
+        
 
 

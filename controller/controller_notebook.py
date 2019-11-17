@@ -24,24 +24,22 @@ import os.path
 
 import model.model_worksheet as model_worksheet
 import viewgtk.viewgtk_worksheet as viewgtk_worksheet
-import viewgtk.viewgtk_dialogs_close_confirmation as viewgtk_dialogs_close_confirmation
 import controller.controller_worksheet as worksheetcontroller
-import controller.controller_dialogs_delete_worksheet as dwsdialogcontroller
+from app.service_locator import ServiceLocator
 
 
 class NotebookController(object):
 
     def __init__(self, notebook, main_window, main_controller):
-
+        self.settings = ServiceLocator.get_settings()
         self.notebook = notebook
         self.main_window = main_window
         self.main_controller = main_controller
-        self.dws_dialog_controller = dwsdialogcontroller.ControllerDialogDeleteWorksheet(self.notebook,
-                                                                                         self.main_window, self)
 
         self.notebook.set_pretty_print(self.main_controller.settings.get_value('preferences', 'pretty_print'))
 
         # observe worksheet
+        self.settings.register_observer(self)
         self.notebook.register_observer(self)
         self.notebook.register_observer(self.main_controller.backend_controller_code)
 
@@ -86,6 +84,11 @@ class NotebookController(object):
                 if worksheet.get_active_cell() != None: worksheet.set_active_cell(worksheet.get_active_cell())
                 self.main_controller.update_stop_button()
 
+        if change_code == 'settings_changed':
+            section, item, value = parameter
+            if (section, item) == ('preferences', 'pretty_print'):
+                self.notebook.set_pretty_print(self.settings.get_value('preferences', 'pretty_print'))
+
     def close_worksheet(self, worksheet, add_to_recently_opened=True):
         self.notebook.remove_worksheet(worksheet)
         self.notebook.recently_opened_worksheets.remove_worksheet_by_pathname(worksheet.pathname)
@@ -97,47 +100,19 @@ class NotebookController(object):
                 self.notebook.recently_opened_worksheets.add_item(item, notify=True, save=True)        
 
     def close_worksheet_after_modified_check(self, worksheet):
-        if worksheet.get_save_state() == 'modified':
-            self.save_changes_dialog = viewgtk_dialogs_close_confirmation.CloseConfirmation(self.main_window, [worksheet])
-            response = self.save_changes_dialog.run()
-            if response == Gtk.ResponseType.YES:
-                worksheet.save_to_disk()
-                self.save_changes_dialog.destroy()
-            elif response == Gtk.ResponseType.NO:
-                self.save_changes_dialog.destroy()
-            else:
-                self.save_changes_dialog.destroy()
-                return
-        self.close_worksheet(worksheet)
+        if worksheet.get_save_state() != 'modified' or ServiceLocator.get_dialog('close_confirmation').run([worksheet])['all_save_to_close']:
+            self.close_worksheet(worksheet)
 
     def close_all_worksheets_after_modified_check(self):
         worksheets = self.notebook.get_unsaved_worksheets()
-        if len(worksheets) > 0:
-            self.save_changes_dialog = viewgtk_dialogs_close_confirmation.CloseConfirmation(self.main_window, worksheets)
-            response = self.save_changes_dialog.run()
-            if response == Gtk.ResponseType.NO:
-                self.save_changes_dialog.destroy()
-            elif response == Gtk.ResponseType.YES:
-                selected_worksheets = list()
-                if len(worksheets) == 1:
-                    selected_worksheets.append(worksheets[0])
-                else:
-                    dialog_worksheets = self.save_changes_dialog.worksheets
-                    for child in self.save_changes_dialog.chooser.get_children():
-                        if child.get_child().get_active():
-                            selected_worksheets.append(dialog_worksheets[int(child.get_child().get_name()[30:])])
-                for worksheet in worksheets:
-                    if worksheet in selected_worksheets:
-                        worksheet.save_to_disk()
-                self.save_changes_dialog.destroy()
-            else:
-                self.save_changes_dialog.destroy()
-                return
-        for worksheet in list(self.notebook.open_worksheets.values()):
-            self.close_worksheet(worksheet)
+        active_worksheet = self.notebook.get_active_worksheet()
+
+        if len(worksheets) == 0 or active_worksheet == None or ServiceLocator.get_dialog('close_confirmation').run(worksheets)['all_save_to_close']: 
+            for worksheet in list(self.notebook.open_worksheets.values()):
+                self.close_worksheet(worksheet)
 
     def delete_worksheet(self, worksheet):
-        if self.dws_dialog_controller.show(worksheet):
+        if ServiceLocator.get_dialog('delete_worksheet').run(worksheet):
             self.close_worksheet(worksheet, add_to_recently_opened=False)
             worksheet.remove_from_disk()
 

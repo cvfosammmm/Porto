@@ -22,11 +22,15 @@ from gi.repository import Gtk
 import os.path
 import pickle
 
+from helpers.observable import *
 
-class Settings(object):
+
+class Settings(Observable):
     ''' Settings controller for saving application state. '''
     
     def __init__(self):
+        Observable.__init__(self)
+
         self.gtksettings = Gtk.Settings.get_default()
         
         self.pathname = os.path.expanduser('~') + '/.porto'
@@ -67,6 +71,7 @@ class Settings(object):
             section_dict = dict()
             self.data[section] = section_dict
         section_dict[item] = value
+        self.add_change_code('settings_changed', (section, item, value))
         
     def unpickle(self):
         if not os.path.isdir(self.pathname):

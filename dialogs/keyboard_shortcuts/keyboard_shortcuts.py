@@ -19,16 +19,25 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from dialogs.dialog import Dialog
 
-class OverwriteConfirmation(Gtk.MessageDialog):
+import os.path
 
-    def __init__(self, main_window, name, folder):
-        Gtk.MessageDialog.__init__(self, main_window, 0, Gtk.MessageType.QUESTION)
 
-        self.set_property('text', 'A file named »' + name + '« already exists. Do you want to replace it?')
-        self.format_secondary_markup('The file already exists in »' + folder + '«. Replacing it will overwrite its contents.')
+class KeyboardShortcutsDialog(Dialog):
 
-        self.add_buttons('_Cancel', Gtk.ResponseType.CANCEL, '_Replace', Gtk.ResponseType.YES)
-        self.set_default_response(Gtk.ResponseType.CANCEL)
+    def __init__(self, main_window):
+        self.main_window = main_window
 
+    def run(self):
+        self.setup()
+        self.view.show_all()
+        del(self.view)
+
+    def setup(self):
+        builder = Gtk.Builder()
+        builder.add_from_file(os.path.dirname(os.path.realpath(__file__)) + '/shortcuts_window.ui')
+        self.view = builder.get_object('shortcuts-window')
+        self.view.set_transient_for(self.main_window)
+        
 
