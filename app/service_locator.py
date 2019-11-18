@@ -33,6 +33,7 @@ class ServiceLocator(object):
 
     dialogs = dict()
     settings = None
+    main_window = None
 
     def init_dialogs(main_window, notebook, main_controller):
         settings = ServiceLocator.get_settings()
@@ -47,8 +48,14 @@ class ServiceLocator(object):
         ServiceLocator.dialogs['save_as'] = save_as_dialog.SaveAsDialog(notebook, main_window, main_controller)
         ServiceLocator.dialogs['select_folder'] = select_folder_dialog.SelectFolderDialog(main_window)
     
+    def init_main_window(main_window):
+        ServiceLocator.main_window = main_window
+
     def get_dialog(dialog_type):
         return ServiceLocator.dialogs[dialog_type]
+
+    def get_main_window():
+        return ServiceLocator.main_window
 
     def get_settings():
         if ServiceLocator.settings == None:

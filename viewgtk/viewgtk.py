@@ -24,6 +24,7 @@ from gi.repository import GLib
 
 import os, os.path
 
+import viewgtk.viewgtk_welcome_page as viewgtk_welcome_page
 import viewgtk.viewgtk_headerbars as viewgtk_headerbars
 import viewgtk.viewgtk_sidebar as viewgtk_sidebar
 
@@ -47,8 +48,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # window content
         self.sidebar = viewgtk_sidebar.Sidebar()
+        self.welcome_page_view = viewgtk_welcome_page.WelcomePageView()
         self.worksheet_views = dict()
         self.worksheet_view_wrapper = Gtk.Notebook()
+        self.worksheet_view_wrapper.append_page(self.welcome_page_view)
         self.worksheet_view_wrapper.set_show_border(False)
         self.worksheet_view_wrapper.set_show_tabs(False)
         self.worksheet_view_wrapper.set_size_request(763, -1)

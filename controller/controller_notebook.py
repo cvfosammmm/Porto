@@ -38,6 +38,9 @@ class NotebookController(object):
 
         self.notebook.set_pretty_print(self.main_controller.settings.get_value('preferences', 'pretty_print'))
 
+        self.window_mode = None
+        self.activate_welcome_page_mode()
+
         # observe worksheet
         self.settings.register_observer(self)
         self.notebook.register_observer(self)
@@ -48,7 +51,7 @@ class NotebookController(object):
         if change_code == 'new_worksheet':
             worksheet = parameter
 
-            self.main_controller.activate_worksheet_mode()
+            self.activate_worksheet_mode()
 
             # add worksheet view
             worksheet_view = viewgtk_worksheet.WorksheetView()
@@ -64,12 +67,14 @@ class NotebookController(object):
             del(self.main_window.worksheet_views[worksheet])
             self.main_controller.worksheet_controllers[worksheet].destruct()
             del(self.main_controller.worksheet_controllers[worksheet])
+            if self.notebook.get_active_worksheet() == None:
+                self.activate_welcome_page_mode()
 
         if change_code == 'changed_active_worksheet':
             worksheet = parameter
 
             if worksheet != None:
-                self.main_controller.activate_worksheet_mode()
+                self.activate_worksheet_mode()
 
                 # change title, subtitle in headerbar
                 self.main_controller.update_title(worksheet)
@@ -142,4 +147,19 @@ class NotebookController(object):
         if page_index >= 0:
             wswrapper.remove_page(page_index)
         
+    def activate_worksheet_mode(self):
+        if self.window_mode != 'worksheet':
+            self.window_mode = 'worksheet'
+            hb_right = self.main_window.headerbar.hb_right
+            hb_right.show_buttons()
+
+    def activate_welcome_page_mode(self):
+        if self.window_mode != 'welcome_page':
+            self.window_mode = 'welcome_page'
+            self.main_window.headerbar.set_title('Welcome to Porto')
+            self.main_window.headerbar.set_subtitle('')
+            hb_right = self.main_window.headerbar.hb_right
+            hb_right.hide_buttons()
+            self.set_worksheet_view(self.main_window.welcome_page_view)
+
 

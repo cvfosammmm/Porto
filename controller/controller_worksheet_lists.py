@@ -87,7 +87,6 @@ class WSListsController(object):
                 self.on_open_ws_hb_view_size_allocate()
 
                 if widget.open_worksheets_list_view.visible_items_count < 1:
-                    self.main_controller.activate_welcome_page_mode()
                     widget.open_worksheets_list_view_wrapper.hide()
                     widget.open_worksheets_label_revealer.set_reveal_child(False)
 

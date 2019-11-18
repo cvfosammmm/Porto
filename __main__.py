@@ -34,6 +34,7 @@ import controller.controller_notebook as notebookcontroller
 import controller.controller_worksheet_lists as wslistscontroller
 import controller.controller_shortcuts as shortcutscontroller
 import backend.backend_controller as backendcontroller
+from workspace.workspace import Workspace
 from app.service_locator import ServiceLocator
 
 
@@ -55,14 +56,21 @@ class MainApplicationController(Gtk.Application):
         
         # init view
         self.main_window = view.MainWindow(self)
+        ServiceLocator.init_main_window(self.main_window)
         self.main_window.set_default_size(self.settings.get_value('window_state', 'width'), 
                                           self.settings.get_value('window_state', 'height'))
-        self.welcome_page_view = viewgtk_welcome_page.WelcomePageView()
-        self.welcome_page_view.create_ws_link.connect('clicked', self.on_create_ws_button_click)
-        self.welcome_page_view.open_ws_link.connect('clicked', self.on_open_ws_button_click)
+        if self.settings.get_value('window_state', 'is_maximized'): self.main_window.maximize()
+        else: self.main_window.unmaximize()
+        if self.settings.get_value('window_state', 'is_fullscreen'): self.main_window.fullscreen()
+        else: self.main_window.unfullscreen()
+        self.main_window.show_all()
+
+        self.main_window.welcome_page_view.create_ws_link.connect('clicked', self.on_create_ws_button_click)
+        self.main_window.welcome_page_view.open_ws_link.connect('clicked', self.on_open_ws_button_click)
         self.setup_kernel_changer()
 
         self.notebook = model_notebook.Notebook()
+        self.workspace = Workspace()
         ServiceLocator.init_dialogs(self.main_window, self.notebook, self)
 
         # controllers
@@ -75,23 +83,6 @@ class MainApplicationController(Gtk.Application):
         # to watch for cursor movements
         self.cursor_position = {'cell': None, 'cell_position': None, 'cell_size': None, 'position': None}
 
-        if self.settings.get_value('window_state', 'is_maximized'): self.main_window.maximize()
-        else: self.main_window.unmaximize()
-        if self.settings.get_value('window_state', 'is_fullscreen'): self.main_window.fullscreen()
-        else: self.main_window.unfullscreen()
-        
-        self.main_window.show_all()
-        self.main_window.paned.set_position(self.settings.get_value('window_state', 'paned_position'))
-        self.window_mode = None
-        self.activate_welcome_page_mode()
-        if self.settings.get_value('window_state', 'sidebar_visible'):
-            self.show_sidebar()
-        else:
-            self.hide_sidebar()
-
-        # populate app
-        #self.notebook.populate_documentation()
-        
         # watch changes in view
         self.observe_main_window()
 
@@ -126,42 +117,6 @@ class MainApplicationController(Gtk.Application):
     '''
     *** reconstruct window when worksheet is open / no worksheet present
     '''
-
-    def activate_worksheet_mode(self):
-        if self.window_mode != 'worksheet':
-            self.window_mode = 'worksheet'
-            hb_right = self.main_window.headerbar.hb_right
-            hb_right.show_buttons()
-
-    def activate_welcome_page_mode(self):
-        if self.window_mode != 'welcome_page':
-            self.window_mode = 'welcome_page'
-            self.main_window.headerbar.set_title('Welcome to Porto')
-            self.main_window.headerbar.set_subtitle('')
-            hb_right = self.main_window.headerbar.hb_right
-            hb_right.hide_buttons()
-            self.notebook_controller.set_worksheet_view(self.welcome_page_view)
-
-    def show_sidebar(self):
-        self.main_window.sidebar.show_all()
-        self.main_window.headerbar.hb_left.show_all()
-        self.main_window.headerbar.hb_right.open_worksheets_button.hide()
-        self.welcome_page_view.set_sidebar_visible(True)
-
-    def hide_sidebar(self):
-        self.main_window.sidebar.hide()
-        self.main_window.headerbar.hb_left.hide()
-        self.main_window.headerbar.hb_right.open_worksheets_button.show_all()
-        self.welcome_page_view.set_sidebar_visible(False)
-
-    def toggle_sidebar(self, action, parameter=None):
-        sidebar_visible = not action.get_state().get_boolean()
-        action.set_state(GLib.Variant.new_boolean(sidebar_visible))
-        if sidebar_visible:
-            self.show_sidebar()
-        else:
-            self.hide_sidebar()
-        self.settings.set_value('window_state', 'sidebar_visible', sidebar_visible)
 
     def setup_kernel_changer(self):
         menu = self.main_window.headerbar.hb_right.change_kernel_menu
@@ -409,13 +364,12 @@ class MainApplicationController(Gtk.Application):
         return False
         
     def save_window_state(self):
-        ''' save window state variables '''
-
         main_window = self.main_window
         self.settings.set_value('window_state', 'width', main_window.current_width)
         self.settings.set_value('window_state', 'height', main_window.current_height)
         self.settings.set_value('window_state', 'is_maximized', main_window.is_maximized)
         self.settings.set_value('window_state', 'is_fullscreen', main_window.is_fullscreen)
+        self.settings.set_value('window_state', 'sidebar_visible', self.workspace.show_sidebar)
         self.settings.set_value('window_state', 'paned_position', main_window.paned_position)
         self.settings.pickle()
         
@@ -437,19 +391,6 @@ class MainApplicationController(Gtk.Application):
             self.quit()
 
     '''
-    *** application menu
-    '''
-
-    def show_shortcuts_window(self, action, parameter=''):
-        ServiceLocator.get_dialog('keyboard_shortcuts').run()
-
-    def show_preferences_dialog(self, action=None, parameter=''):
-        ServiceLocator.get_dialog('preferences').run()
-
-    def show_about_dialog(self, action, parameter=''):
-        ServiceLocator.get_dialog('about').run()
-
-    '''
     *** worksheet menu
     '''
     
@@ -461,12 +402,8 @@ class MainApplicationController(Gtk.Application):
         self.main_window.save_all_action.connect('activate', self.on_wsmenu_save_all)
         self.main_window.close_action.connect('activate', self.on_wsmenu_close)
         self.main_window.close_all_action.connect('activate', self.on_wsmenu_close_all)
-        self.main_window.toggle_sidebar_action.connect('activate', self.toggle_sidebar)
-        self.main_window.preferences_action.connect('activate', self.show_preferences_dialog)
         self.main_window.quit_action.connect('activate', self.on_quit_action)
         self.shortcuts_controller.accel_group.connect(Gdk.keyval_from_name('q'), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.MASK, self.save_quit)
-        self.main_window.show_about_dialog_action.connect('activate', self.show_about_dialog)
-        self.main_window.show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
         
     def on_wsmenu_restart_kernel(self, action=None, parameter=None):
         self.notebook.active_worksheet.restart_kernel()
