@@ -48,24 +48,6 @@ class HeaderBar(Gtk.Paned):
     def get_subtitle(self):
         return self.hb_right.get_subtitle()
         
-    def activate_stop_button(self):
-        self.hb_right.stop_button.set_sensitive(True)
-
-    def deactivate_stop_button(self):
-        self.hb_right.stop_button.set_sensitive(False)
-
-    def activate_up_button(self):
-        self.hb_right.up_button.set_sensitive(True)
-
-    def deactivate_up_button(self):
-        self.hb_right.up_button.set_sensitive(False)
-
-    def activate_down_button(self):
-        self.hb_right.down_button.set_sensitive(True)
-
-    def deactivate_down_button(self):
-        self.hb_right.down_button.set_sensitive(False)
-
     def activate_save_button(self):
         self.hb_right.save_button.set_sensitive(True)
 
@@ -130,6 +112,7 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.set_show_close_button(show_close_button)
         self.props.title = ''
         self.open_worksheets_number = 0
+        self.current_controls = None
         
         self.create_buttons()
         self.pack_buttons()
@@ -148,56 +131,6 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.open_worksheets_button.get_style_context().add_class("text-button")
         self.open_worksheets_button.get_style_context().add_class("image-button")
         self.open_worksheets_button.set_popover(self.worksheet_chooser)
-
-        self.add_cell_box = Gtk.HBox()
-        self.add_cell_box.get_style_context().add_class('linked')
-
-        self.add_codecell_button = Gtk.Button.new_from_icon_name('add-codecell-symbolic', Gtk.IconSize.BUTTON)
-        self.add_codecell_button.set_tooltip_text('Add code cell below (Alt+Return)')
-        self.add_codecell_button.set_focus_on_click(False)
-        self.add_cell_box.add(self.add_codecell_button)
-        self.add_markdowncell_button = Gtk.Button.new_from_icon_name('add-markdowncell-symbolic', Gtk.IconSize.BUTTON)
-        self.add_markdowncell_button.set_tooltip_text('Add markdown cell below (Ctrl+M)')
-        self.add_markdowncell_button.set_focus_on_click(False)
-        self.add_cell_box.add(self.add_markdowncell_button)
-        
-        self.move_cell_box = Gtk.HBox()
-        self.move_cell_box.get_style_context().add_class('linked')
-        self.up_button = Gtk.Button.new_from_icon_name('up-button-symbolic', Gtk.IconSize.BUTTON)
-        self.up_button.set_tooltip_text('Move cell up (Ctrl+Up)')
-        self.up_button.set_focus_on_click(False)
-        self.up_button.set_sensitive(False)
-        self.move_cell_box.add(self.up_button)
-        self.down_button = Gtk.Button.new_from_icon_name('down-button-symbolic', Gtk.IconSize.BUTTON)
-        self.down_button.set_tooltip_text('Move cell down (Ctrl+Down)')
-        self.down_button.set_focus_on_click(False)
-        self.down_button.set_sensitive(False)
-        self.move_cell_box.add(self.down_button)
-        self.delete_button = Gtk.Button.new_from_icon_name('edit-delete-symbolic', Gtk.IconSize.BUTTON)
-        self.delete_button.set_tooltip_text('Delete cell (Ctrl+Backspace)')
-        self.delete_button.set_focus_on_click(False)
-        self.move_cell_box.add(self.delete_button)
-
-        self.eval_box = Gtk.HBox()
-        self.eval_box.get_style_context().add_class('linked')
-        self.eval_button = Gtk.Button.new_from_icon_name('eval-button-symbolic', Gtk.IconSize.BUTTON)
-        self.eval_button.set_tooltip_text('Evaluate Cell (Shift+Return)')
-        self.eval_button.set_focus_on_click(False)
-        self.eval_box.add(self.eval_button)
-        self.eval_nc_button = Gtk.Button.new_from_icon_name('eval-nc-button-symbolic', Gtk.IconSize.BUTTON)
-        self.eval_nc_button.set_tooltip_text('Evaluate Cell, then Go to next Cell (Ctrl+Return)')
-        self.eval_nc_button.set_focus_on_click(False)
-        self.eval_box.add(self.eval_nc_button)
-        self.stop_button = Gtk.Button.new_from_icon_name('media-playback-stop-symbolic', Gtk.IconSize.BUTTON)
-        self.stop_button.set_tooltip_text('Stop Evaluation (Ctrl+H)')
-        self.stop_button.set_focus_on_click(False)
-        self.stop_button.set_sensitive(False)
-        self.eval_box.add(self.stop_button)
-
-        self.show_sidebar_button = Gtk.ToggleButton()
-        self.show_sidebar_button.set_image(Gtk.Image.new_from_icon_name('view-list-symbolic', Gtk.IconSize.MENU))
-        self.show_sidebar_button.set_tooltip_text('Show sidebar')
-        self.show_sidebar_button.set_focus_on_click(False)
 
         self.create_full_hamburger_menu()
         self.create_blank_hamburger_menu()
@@ -295,26 +228,26 @@ class HeaderBarRight(Gtk.HeaderBar):
 
     def pack_buttons(self):
         self.pack_start(self.open_worksheets_button)
-        self.pack_start(self.add_cell_box)
-        self.pack_start(self.move_cell_box)
-        self.pack_start(self.eval_box)
+        #self.pack_start(self.add_cell_box)
+        #self.pack_start(self.move_cell_box)
+        #self.pack_start(self.eval_box)
         self.pack_end(self.menu_button)
         self.pack_end(self.blank_menu_button)
         self.pack_end(self.save_button)
         self.show_all()
 
     def show_buttons(self):
-        self.add_cell_box.show_all()
-        self.move_cell_box.show_all()
-        self.eval_box.show_all()
+        #self.add_cell_box.show_all()
+        #self.move_cell_box.show_all()
+        #self.eval_box.show_all()
         self.menu_button.show_all()
         self.blank_menu_button.hide()
         self.save_button.show_all()
 
     def hide_buttons(self):
-        self.add_cell_box.hide()
-        self.move_cell_box.hide()
-        self.eval_box.hide()
+        #self.add_cell_box.hide()
+        #self.move_cell_box.hide()
+        #self.eval_box.hide()
         self.menu_button.hide()
         self.blank_menu_button.show_all()
         self.save_button.hide()

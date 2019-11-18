@@ -69,7 +69,6 @@ class WorksheetController(object):
             cell = parameter
 
             self.worksheet_view.remove_child_by_position(cell.get_worksheet_position())
-            self.main_controller.update_up_down_buttons()
         
         if change_code == 'new_active_cell':
             cell = parameter
@@ -78,7 +77,6 @@ class WorksheetController(object):
             cell_view = self.worksheet_view.get_child_by_position(child_position)
             cell_view.set_active()
             cell_view.grab_focus()
-            self.main_controller.update_up_down_buttons()
             
         if change_code == 'new_inactive_cell':
             cell = parameter
@@ -90,7 +88,7 @@ class WorksheetController(object):
             insert_mark = cell.get_iter_at_mark(cell.get_insert())
             selection_bound = cell.get_selection_bound()
             cell.move_mark(selection_bound, insert_mark)
-            
+
         if change_code == 'cell_moved':
             cell_view1_position = parameter['position']
             cell_view2_position = parameter['new_position']
@@ -104,12 +102,8 @@ class WorksheetController(object):
             cell_view1.grab_focus()
             GLib.idle_add(lambda: cell_view1.get_source_view().grab_focus())
 
-            self.main_controller.update_up_down_buttons()
-
         if change_code == 'busy_cell_count_changed':
             self.main_controller.update_subtitle(self.worksheet)
-            if self.worksheet == self.main_controller.notebook.active_worksheet:
-                self.main_controller.update_stop_button()
 
         if change_code == 'save_state_change':
             save_state = parameter
@@ -136,7 +130,6 @@ class WorksheetController(object):
 
         self.worksheet_view.add_child_at_position(cell_view, worksheet_position)
         self.worksheet_view.show_all()
-        self.main_controller.update_up_down_buttons()
 
     '''
     *** signal handlers: worksheets

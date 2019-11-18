@@ -25,6 +25,7 @@ import os, os.path
 import nbformat
 
 import model.model_cell as model_cell
+import worksheet.headerbar_controls.headerbar_controls as headerbar_controls
 from helpers.observable import Observable
 
 
@@ -58,6 +59,8 @@ class Worksheet(Observable):
         self.source_style_scheme = self.source_style_scheme_manager.get_scheme('sage')
 
         self.cursor_position = {'cell': None, 'cell_position': None, 'cell_size': None, 'position': None}
+
+        self.headerbar_controls = headerbar_controls.HeaderbarControls(self)
 
     def remove_all_cells(self):
         while len(self.cells) > 0:
@@ -305,6 +308,67 @@ class Worksheet(Observable):
 
     def shutdown_kernel(self):
         self.add_change_code('kernel_to_shutdown', None)
+
+    def evaluate_active_cell(self):
+        active_cell = self.active_cell
+        if not (isinstance(active_cell, model_cell.MarkdownCell) and active_cell.get_result() != None):
+            active_cell.evaluate()
+
+    def evaluate_active_cell_and_go_to_next(self):
+        active_cell = self.active_cell
+        if not (isinstance(active_cell, model_cell.MarkdownCell) and active_cell.get_result() != None):
+            active_cell.evaluate()
+
+        new_active_cell = self.get_next_visible_cell(active_cell)
+        if not new_active_cell == None:
+            self.set_active_cell(new_active_cell)
+            new_active_cell.place_cursor(new_active_cell.get_start_iter())
+        else:
+            self.create_cell()
+            new_active_cell = self.get_next_visible_cell(active_cell)
+            self.set_active_cell(new_active_cell)
+            new_active_cell.place_cursor(new_active_cell.get_start_iter())
+
+    def add_codecell_below_active_cell(self):
+        position = self.get_active_cell().get_worksheet_position() + 1
+        self.create_cell(position, '', activate=True, set_unmodified=False)
+
+    def add_markdowncell_below_active_cell(self):
+        position = self.get_active_cell().get_worksheet_position() + 1
+        self.create_markdowncell(position, '', activate=True, set_unmodified=False)
+
+    def move_cell_down(self):
+        position = self.get_active_cell().get_worksheet_position()
+        cell_count = self.get_cell_count()
+        if position < cell_count:
+            self.move_cell(position, position + 1)
+
+    def move_cell_up(self):
+        position = self.get_active_cell().get_worksheet_position()
+        cell_count = self.get_cell_count()
+        if position > 0:
+            self.move_cell(position, position - 1)
+
+    def delete_active_cell(self):
+        cell = self.worksheet.get_active_cell()
+        prev_cell = self.worksheet.get_prev_cell(cell)
+        if prev_cell != None: 
+            cell.remove_result()
+            self.worksheet.set_active_cell(prev_cell)
+            #prev_cell.place_cursor(prev_cell.get_iter_at_line(prev_cell.get_line_count() - 1))
+            prev_cell.place_cursor(prev_cell.get_start_iter())
+            self.worksheet.remove_cell(cell)
+        else:
+            next_cell = self.worksheet.get_next_cell(cell)
+            if next_cell != None:
+                cell.remove_result()
+                self.worksheet.set_active_cell(next_cell)
+                next_cell.place_cursor(next_cell.get_start_iter())
+                self.worksheet.remove_cell(cell)
+            else:
+                cell.remove_result()
+                self.worksheet.remove_cell(cell)
+                self.worksheet.create_cell('last', '', activate=True)
 
     def stop_evaluation(self):
         self.add_change_code('ws_evaluation_to_stop', None)

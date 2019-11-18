@@ -77,7 +77,7 @@ class MainApplicationController(Gtk.Application):
         self.worksheet_controllers = dict()
         self.notebook_controller = notebookcontroller.NotebookController(self.notebook, self.main_window, self)
         self.wslists_controller = wslistscontroller.WSListsController(self.main_window.sidebar, self.main_window.headerbar.hb_right.worksheet_chooser, self)
-        self.shortcuts_controller = shortcutscontroller.ShortcutsController(self.main_window, self)
+        self.shortcuts_controller = shortcutscontroller.ShortcutsController(self.notebook, self.main_window, self)
         self.construct_worksheet_menu()
 
         # to watch for cursor movements
@@ -96,14 +96,6 @@ class MainApplicationController(Gtk.Application):
         hb_left.open_ws_button.connect('clicked', self.on_open_ws_button_click)
         
         hb_right = self.main_window.headerbar.hb_right
-        hb_right.add_codecell_button.connect('clicked', self.on_add_codecell_button_click)
-        hb_right.add_markdowncell_button.connect('clicked', self.on_add_markdowncell_button_click)
-        hb_right.down_button.connect('clicked', self.on_down_button_click)
-        hb_right.up_button.connect('clicked', self.on_up_button_click)
-        hb_right.delete_button.connect('clicked', self.on_delete_button_click)
-        hb_right.eval_button.connect('clicked', self.on_eval_button_click)
-        hb_right.eval_nc_button.connect('clicked', self.on_eval_nc_button_click)
-        hb_right.stop_button.connect('clicked', self.on_stop_button_click)
         hb_right.save_button.connect('clicked', self.on_save_ws_button_click)
         hb_right.revert_button.connect('clicked', self.on_revert_ws_button_click)
         hb_right.worksheet_chooser.create_button.connect('clicked', self.on_create_ws_button_click)
@@ -112,7 +104,6 @@ class MainApplicationController(Gtk.Application):
         self.main_window.connect('size-allocate', self.on_window_size_allocate)
         self.main_window.connect('window-state-event', self.on_window_state_event)
         self.main_window.connect('delete-event', self.on_window_close)
-        self.main_window.sidebar.connect('size-allocate', self.on_ws_view_size_allocate)
     
     '''
     *** reconstruct window when worksheet is open / no worksheet present
@@ -128,13 +119,6 @@ class MainApplicationController(Gtk.Application):
     *** evaluation / save state indicators
     '''
     
-    def update_stop_button(self):
-        worksheet = self.notebook.active_worksheet
-        if worksheet.get_busy_cell_count() > 0:
-            self.main_window.headerbar.activate_stop_button()
-        else:
-            self.main_window.headerbar.deactivate_stop_button()
-            
     def update_save_button(self):
         worksheet = self.notebook.get_active_worksheet()
         if worksheet.get_save_state() == 'modified':
@@ -156,22 +140,6 @@ class MainApplicationController(Gtk.Application):
         elif isinstance(worksheet, model_worksheet.DocumentationWorksheet):
             self.main_window.delete_ws_action.set_enabled(False)
             
-    def update_up_down_buttons(self):
-        worksheet = self.notebook.get_active_worksheet()
-        if worksheet != None:
-            active_cell = worksheet.get_active_cell()
-            if active_cell != None:
-                cell_position = active_cell.get_worksheet_position()
-                cell_count = worksheet.get_cell_count()
-                if cell_position == cell_count - 1:
-                    self.main_window.headerbar.deactivate_down_button()
-                else:
-                    self.main_window.headerbar.activate_down_button()
-                if cell_position == 0:
-                    self.main_window.headerbar.deactivate_up_button()
-                else:
-                    self.main_window.headerbar.activate_up_button()
-
     def update_subtitle(self, worksheet):
         busy_cell_count = worksheet.get_busy_cell_count()
         if busy_cell_count > 0:
@@ -241,92 +209,6 @@ class MainApplicationController(Gtk.Application):
         self.notebook.set_active_worksheet(worksheet)
         self.wslists_controller.select_row_by_worksheet(worksheet)
 
-    def on_add_codecell_button_click(self, button_object=None):
-        ''' signal handler, add codecell below active cell '''
-        
-        worksheet = self.notebook.get_active_worksheet()
-        position = worksheet.get_active_cell().get_worksheet_position() + 1
-        worksheet.create_cell(position, '', activate=True, set_unmodified=False)
-                
-    def on_add_markdowncell_button_click(self, button_object=None):
-        ''' signal handler, add markdown cell below active cell '''
-        
-        worksheet = self.notebook.get_active_worksheet()
-        position = worksheet.get_active_cell().get_worksheet_position() + 1
-        worksheet.create_markdowncell(position, '', activate=True, set_unmodified=False)
-                
-    def on_down_button_click(self, button_object=None):
-        ''' signal handler, move active cell down '''
-        
-        worksheet = self.notebook.get_active_worksheet()
-        position = worksheet.get_active_cell().get_worksheet_position()
-        cell_count = worksheet.get_cell_count()
-        if position < cell_count:
-            worksheet.move_cell(position, position + 1)
-
-    def on_up_button_click(self, button_object=None):
-        ''' signal handler, move active cell up '''
-        
-        worksheet = self.notebook.get_active_worksheet()
-        position = worksheet.get_active_cell().get_worksheet_position()
-        cell_count = worksheet.get_cell_count()
-        if position > 0:
-            worksheet.move_cell(position, position - 1)
-            
-    def on_delete_button_click(self, button_object=None):
-        ''' signal handler, delete active cell '''
-        
-        worksheet = self.notebook.get_active_worksheet()
-        cell = worksheet.get_active_cell()
-        prev_cell = worksheet.get_prev_cell(cell)
-        if prev_cell != None: 
-            cell.remove_result()
-            worksheet.set_active_cell(prev_cell)
-            #prev_cell.place_cursor(prev_cell.get_iter_at_line(prev_cell.get_line_count() - 1))
-            prev_cell.place_cursor(prev_cell.get_start_iter())
-            worksheet.remove_cell(cell)
-        else:
-            next_cell = worksheet.get_next_cell(cell)
-            if next_cell != None:
-                cell.remove_result()
-                worksheet.set_active_cell(next_cell)
-                next_cell.place_cursor(next_cell.get_start_iter())
-                worksheet.remove_cell(cell)
-            else:
-                cell.remove_result()
-                worksheet.remove_cell(cell)
-                worksheet.create_cell('last', '', activate=True)
-            
-    def on_eval_button_click(self, button_object=None):
-        ''' signal handler, evaluate active cell '''
-
-        active_cell = self.notebook.active_worksheet.active_cell
-        if not (isinstance(active_cell, model_cell.MarkdownCell) and active_cell.get_result() != None):
-            active_cell.evaluate()
-        
-    def on_eval_nc_button_click(self, button_object=None):
-        ''' signal handler, evaluate active cell, go to next cell '''
-
-        worksheet = self.notebook.active_worksheet
-        active_cell = worksheet.active_cell
-
-        if not (isinstance(active_cell, model_cell.MarkdownCell) and active_cell.get_result() != None):
-            active_cell.evaluate()
-        new_active_cell = worksheet.get_next_visible_cell(active_cell)
-        if not new_active_cell == None:
-            worksheet.set_active_cell(new_active_cell)
-            new_active_cell.place_cursor(new_active_cell.get_start_iter())
-        else:
-            worksheet.create_cell()
-            new_active_cell = worksheet.get_next_visible_cell(active_cell)
-            worksheet.set_active_cell(new_active_cell)
-            new_active_cell.place_cursor(new_active_cell.get_start_iter())
-            
-    def on_stop_button_click(self, button_object=None):
-        ''' signal handler, stop evaluation '''
-
-        self.notebook.active_worksheet.stop_evaluation()
-
     def on_save_ws_button_click(self, button_object=None):
         ''' signal handler, save active worksheet to disk '''
         
@@ -350,12 +232,6 @@ class MainApplicationController(Gtk.Application):
             main_window.current_width, main_window.current_height = main_window.get_size()
             main_window.set_default_size(main_window.current_width, main_window.current_height)
 
-    def on_ws_view_size_allocate(self, paned, paned_size):
-        ''' signal handler, update worksheet/ws_list seperator position.
-            called on worksheet list size allocation. '''
-        
-        self.main_window.paned_position = self.main_window.paned.get_position()
-            
     def on_window_state_event(self, main_window, state_event):
         ''' signal handler, update window state variables '''
     
@@ -370,7 +246,7 @@ class MainApplicationController(Gtk.Application):
         self.settings.set_value('window_state', 'is_maximized', main_window.is_maximized)
         self.settings.set_value('window_state', 'is_fullscreen', main_window.is_fullscreen)
         self.settings.set_value('window_state', 'sidebar_visible', self.workspace.show_sidebar)
-        self.settings.set_value('window_state', 'paned_position', main_window.paned_position)
+        self.settings.set_value('window_state', 'paned_position', self.workspace.sidebar_position)
         self.settings.pickle()
         
     def on_window_close(self, window=None, parameter=None):

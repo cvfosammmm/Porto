@@ -87,7 +87,7 @@ class NotebookController(object):
                 self.main_window.active_worksheet_view = self.main_window.worksheet_views[worksheet]
                 self.set_worksheet_view(self.main_window.active_worksheet_view)
                 if worksheet.get_active_cell() != None: worksheet.set_active_cell(worksheet.get_active_cell())
-                self.main_controller.update_stop_button()
+                self.update_headerbar_controls()
 
         if change_code == 'settings_changed':
             section, item, value = parameter
@@ -146,7 +146,16 @@ class NotebookController(object):
         page_index = wswrapper.page_num(view)
         if page_index >= 0:
             wswrapper.remove_page(page_index)
-        
+
+    def update_headerbar_controls(self):
+        worksheet = self.notebook.active_worksheet
+        headerbar = self.main_window.headerbar.hb_right
+
+        if headerbar.current_controls != None:
+            headerbar.remove(headerbar.current_controls)
+        headerbar.current_controls = worksheet.headerbar_controls.view
+        headerbar.pack_start(worksheet.headerbar_controls.view)
+
     def activate_worksheet_mode(self):
         if self.window_mode != 'worksheet':
             self.window_mode = 'worksheet'

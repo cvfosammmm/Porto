@@ -60,7 +60,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.paned.pack1(self.sidebar, False, False)
         self.paned.pack2(self.worksheet_view_wrapper, True, False)
         self.paned.set_position(250)
-        self.paned_position = self.paned.get_position()
         self.add(self.paned)
 
         # sync paneds

@@ -29,7 +29,8 @@ import model.model_worksheet as model_worksheet
 class ShortcutsController(object):
     ''' Handle Keyboard shortcuts. '''
     
-    def __init__(self, main_window, main_application_controller):
+    def __init__(self, notebook, main_window, main_application_controller):
+        self.notebook = notebook
         self.main_controller = main_application_controller
         self.main_window = main_window
         
@@ -71,7 +72,7 @@ class ShortcutsController(object):
             self.shortcut_edit_markdown()
 
     def shortcut_edit_markdown(self, accel_group=None, window=None, key=None, mask=None):
-        worksheet = self.main_controller.notebook.active_worksheet
+        worksheet = self.notebook.active_worksheet
         if worksheet != None:
             cell = worksheet.get_active_cell()
             if isinstance(cell, model_cell.MarkdownCell) and cell.get_result() != None:
@@ -82,36 +83,50 @@ class ShortcutsController(object):
         return False
 
     def shortcut_eval(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_eval_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.evaluate_active_cell()
         return True
 
     def shortcut_eval_go_next(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_eval_nc_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.evaluate_active_cell_and_go_to_next()
         return True
 
     def shortcut_add_codecell_below(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_add_codecell_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.add_codecell_below_active_cell()
         return True
 
     def shortcut_eval_add(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_eval_button_click()
-        self.main_controller.on_add_codecell_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.evaluate_active_cell()
+            self.notebook.active_worksheet.add_codecell_below_active_cell()
         return True
 
     def shortcut_add_markdown_cell(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_add_markdowncell_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.add_markdowncell_below_active_cell()
+        return True
 
     def shortcut_stop_computation(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_stop_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.stop_evaluation()
+        return True
 
     def shortcut_delete_cell(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_delete_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.delete_active_cell()
+        return True
 
     def shortcut_move_cell_up(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_up_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.move_cell_up()
+        return True
 
     def shortcut_move_cell_down(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_down_button_click()
+        if self.notebook.active_worksheet != None:
+            self.notebook.active_worksheet.move_cell_down()
+        return True
 
     def shortcut_restart_kernel(self, accel_group=None, window=None, key=None, mask=None):
         self.main_controller.on_wsmenu_restart_kernel()

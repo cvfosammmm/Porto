@@ -32,7 +32,11 @@ class WorkspaceController(object):
         self.main_window.preferences_action.connect('activate', self.show_preferences_dialog)
         self.main_window.show_about_dialog_action.connect('activate', self.show_about_dialog)
         self.main_window.show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
+        self.main_window.sidebar.connect('size-allocate', self.on_sidebar_size_allocate)
 
+    def on_sidebar_size_allocate(self, paned, paned_size):
+        self.workspace.sidebar_position = self.main_window.paned.get_position()
+            
     def toggle_sidebar(self, action, parameter=None):
         show_sidebar = not action.get_state().get_boolean()
         action.set_state(GLib.Variant.new_boolean(show_sidebar))
