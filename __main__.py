@@ -166,7 +166,7 @@ class MainApplicationController(Gtk.Application):
     def setup_kernel_changer(self):
         menu = self.main_window.headerbar.hb_right.change_kernel_menu
         for name in self.kernelspecs.get_list_of_names():
-            item = Gio.MenuItem.new(self.kernelspecs.get_displayname(name), 'app.change_kernel::' + name)
+            item = Gio.MenuItem.new(self.kernelspecs.get_displayname(name), 'win.change_kernel::' + name)
             menu.append_item(item)
 
     '''
@@ -197,9 +197,9 @@ class MainApplicationController(Gtk.Application):
     def update_hamburger_menu(self):
         worksheet = self.notebook.get_active_worksheet()
         if isinstance(worksheet, model_worksheet.NormalWorksheet):
-            self.delete_ws_action.set_enabled(True)
+            self.main_window.delete_ws_action.set_enabled(True)
         elif isinstance(worksheet, model_worksheet.DocumentationWorksheet):
-            self.delete_ws_action.set_enabled(False)
+            self.main_window.delete_ws_action.set_enabled(False)
             
     def update_up_down_buttons(self):
         worksheet = self.notebook.get_active_worksheet()
@@ -454,53 +454,26 @@ class MainApplicationController(Gtk.Application):
     '''
     
     def construct_worksheet_menu(self):
-        self.restart_kernel_action = Gio.SimpleAction.new('restart_kernel', None)
-        self.restart_kernel_action.connect('activate', self.on_wsmenu_restart_kernel)
-        self.add_action(self.restart_kernel_action)
-        default = GLib.Variant.new_string('python3')
-        self.change_kernel_action = Gio.SimpleAction.new_stateful('change_kernel', GLib.VariantType('s'), default)
-        self.change_kernel_action.connect('activate', self.on_wsmenu_change_kernel)
-        self.add_action(self.change_kernel_action)
-        self.delete_ws_action = Gio.SimpleAction.new('delete_worksheet', None)
-        self.delete_ws_action.connect('activate', self.on_wsmenu_delete)
-        self.add_action(self.delete_ws_action)
-        self.save_as_action = Gio.SimpleAction.new('save_as', None)
-        self.save_as_action.connect('activate', self.on_wsmenu_save_as)
-        self.add_action(self.save_as_action)
-        self.save_all_action = Gio.SimpleAction.new('save_all', None)
-        self.save_all_action.connect('activate', self.on_wsmenu_save_all)
-        self.add_action(self.save_all_action)
-        self.close_action = Gio.SimpleAction.new('close_worksheet', None)
-        self.close_action.connect('activate', self.on_wsmenu_close)
-        self.add_action(self.close_action)
-        self.close_all_action = Gio.SimpleAction.new('close_all_worksheets', None)
-        self.close_all_action.connect('activate', self.on_wsmenu_close_all)
-        self.add_action(self.close_all_action)
-
-        sv_default = GLib.Variant.new_boolean(self.settings.get_value('window_state', 'sidebar_visible'))
-        self.toggle_sidebar_action = Gio.SimpleAction.new_stateful('toggle-sidebar', None, sv_default)
-        self.toggle_sidebar_action.connect('activate', self.toggle_sidebar)
-        self.add_action(self.toggle_sidebar_action)
-        preferences_action = Gio.SimpleAction.new('show_preferences_dialog', None)
-        preferences_action.connect('activate', self.show_preferences_dialog)
-        self.add_action(preferences_action)
-        quit_action = Gio.SimpleAction.new('quit', None)
-        quit_action.connect('activate', self.on_quit_action)
-        self.add_action(quit_action)
+        self.main_window.restart_kernel_action.connect('activate', self.on_wsmenu_restart_kernel)
+        self.main_window.change_kernel_action.connect('activate', self.on_wsmenu_change_kernel)
+        self.main_window.delete_ws_action.connect('activate', self.on_wsmenu_delete)
+        self.main_window.save_as_action.connect('activate', self.on_wsmenu_save_as)
+        self.main_window.save_all_action.connect('activate', self.on_wsmenu_save_all)
+        self.main_window.close_action.connect('activate', self.on_wsmenu_close)
+        self.main_window.close_all_action.connect('activate', self.on_wsmenu_close_all)
+        self.main_window.toggle_sidebar_action.connect('activate', self.toggle_sidebar)
+        self.main_window.preferences_action.connect('activate', self.show_preferences_dialog)
+        self.main_window.quit_action.connect('activate', self.on_quit_action)
         self.shortcuts_controller.accel_group.connect(Gdk.keyval_from_name('q'), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.MASK, self.save_quit)
-        show_about_dialog_action = Gio.SimpleAction.new('show_about_dialog', None)
-        show_about_dialog_action.connect('activate', self.show_about_dialog)
-        self.add_action(show_about_dialog_action)
-        show_shortcuts_window_action = Gio.SimpleAction.new('show_shortcuts_window', None)
-        show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
-        self.add_action(show_shortcuts_window_action)
+        self.main_window.show_about_dialog_action.connect('activate', self.show_about_dialog)
+        self.main_window.show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
         
     def on_wsmenu_restart_kernel(self, action=None, parameter=None):
         self.notebook.active_worksheet.restart_kernel()
         
     def on_wsmenu_change_kernel(self, action=None, parameter=None):
         if parameter != None:
-            self.change_kernel_action.set_state(parameter)
+            self.main_window.change_kernel_action.set_state(parameter)
             worksheet = self.notebook.active_worksheet
             if worksheet.get_kernelname() != parameter.get_string():
                 worksheet.set_kernelname(parameter.get_string())

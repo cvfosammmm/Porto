@@ -19,6 +19,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import Gio
+from gi.repository import GLib
 
 import os, os.path
 
@@ -65,5 +67,33 @@ class MainWindow(Gtk.ApplicationWindow):
         self.css_provider.load_from_path(os.getcwd() + '/resources/style_gtk.css')
         self.style_context = Gtk.StyleContext()
         self.style_context.add_provider_for_screen(self.get_screen(), self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+        # actions
+        self.restart_kernel_action = Gio.SimpleAction.new('restart_kernel', None)
+        self.add_action(self.restart_kernel_action)
+        default = GLib.Variant.new_string('python3')
+        self.change_kernel_action = Gio.SimpleAction.new_stateful('change_kernel', GLib.VariantType('s'), default)
+        self.add_action(self.change_kernel_action)
+        self.delete_ws_action = Gio.SimpleAction.new('delete_worksheet', None)
+        self.add_action(self.delete_ws_action)
+        self.save_as_action = Gio.SimpleAction.new('save_as', None)
+        self.add_action(self.save_as_action)
+        self.save_all_action = Gio.SimpleAction.new('save_all', None)
+        self.add_action(self.save_all_action)
+        self.close_action = Gio.SimpleAction.new('close_worksheet', None)
+        self.add_action(self.close_action)
+        self.close_all_action = Gio.SimpleAction.new('close_all_worksheets', None)
+        self.add_action(self.close_all_action)
+        sv_default = GLib.Variant.new_boolean(app.settings.get_value('window_state', 'sidebar_visible'))
+        self.toggle_sidebar_action = Gio.SimpleAction.new_stateful('toggle-sidebar', None, sv_default)
+        self.add_action(self.toggle_sidebar_action)
+        self.preferences_action = Gio.SimpleAction.new('show_preferences_dialog', None)
+        self.add_action(self.preferences_action)
+        self.quit_action = Gio.SimpleAction.new('quit', None)
+        self.add_action(self.quit_action)
+        self.show_about_dialog_action = Gio.SimpleAction.new('show_about_dialog', None)
+        self.add_action(self.show_about_dialog_action)
+        self.show_shortcuts_window_action = Gio.SimpleAction.new('show_shortcuts_window', None)
+        self.add_action(self.show_shortcuts_window_action)
 
 

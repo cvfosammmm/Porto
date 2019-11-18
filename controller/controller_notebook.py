@@ -76,7 +76,7 @@ class NotebookController(object):
                 self.main_controller.update_subtitle(worksheet)
                 self.main_controller.update_save_button()
                 self.main_controller.update_hamburger_menu()
-                self.main_controller.change_kernel_action.set_state(GLib.Variant.new_string(worksheet.get_kernelname()))
+                self.main_window.change_kernel_action.set_state(GLib.Variant.new_string(worksheet.get_kernelname()))
 
                 # change worksheet_view
                 self.main_window.active_worksheet_view = self.main_window.worksheet_views[worksheet]

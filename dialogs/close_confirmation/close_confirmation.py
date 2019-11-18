@@ -35,8 +35,6 @@ class CloseConfirmationDialog(Dialog):
     def run(self, worksheets):
         self.setup(worksheets)
 
-        worksheets_not_save_to_close = list()
-
         response = self.view.run()
         if response == Gtk.ResponseType.NO:
             all_save_to_close = True
@@ -54,10 +52,9 @@ class CloseConfirmationDialog(Dialog):
             all_save_to_close = True
         else:
             all_save_to_close = False
-            worksheets_not_save_to_close = worksheets
 
         self.close()
-        return {'all_save_to_close': all_save_to_close, 'worksheets_not_save_to_close': worksheets_not_save_to_close}
+        return {'all_save_to_close': all_save_to_close}
 
     def setup(self, worksheets):
         self.view = Gtk.MessageDialog(self.main_window, 0, Gtk.MessageType.QUESTION)
