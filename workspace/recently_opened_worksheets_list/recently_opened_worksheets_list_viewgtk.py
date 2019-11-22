@@ -27,7 +27,7 @@ import os.path
 import helpers.helpers as helpers
 
 
-class WorksheetListView(Gtk.ListBox):
+class WorksheetListRecentView(Gtk.ListBox):
 
     def __init__(self):
         Gtk.ListBox.__init__(self)
@@ -35,49 +35,6 @@ class WorksheetListView(Gtk.ListBox):
         self.items = dict()
         self.selected_row = None
         self.visible_items_count = 0
-
-
-class WorksheetListOpenView(WorksheetListView):
-        
-    def __init__(self):
-        WorksheetListView.__init__(self)
-        
-    def add_item(self, item):
-        try: item = self.items[item.get_worksheet()]
-        except KeyError:
-            self.items[item.get_worksheet()] = item
-            self.prepend(item)
-        else: item.set_last_save(item.last_saved)
-        self.visible_items_count += 1
-        self.show_all()
-        
-    def remove_item_by_worksheet(self, worksheet):
-        try: item = self.items[worksheet]
-        except KeyError:
-            pass
-        else:
-            del(self.items[worksheet])
-            self.remove(item)
-        self.visible_items_count -= 1
-        self.show_all()
-        
-    def get_row_index_by_worksheet(self, worksheet):
-        index = 0
-        for row in self.get_children():
-            if row.get_worksheet() == worksheet:
-                return index
-            index += 1
-            
-    def get_item_by_worksheet(self, worksheet):
-        try: item = self.items[worksheet]
-        except KeyError: pass
-        else: return item
-
-
-class WorksheetListRecentView(WorksheetListView):
-
-    def __init__(self):
-        WorksheetListView.__init__(self)
         
     def add_item(self, item):
         try: item = self.items[item.pathname]
@@ -134,9 +91,8 @@ class WorksheetListRecentView(WorksheetListView):
 
 
 class WorksheetListViewItem(Gtk.ListBoxRow):
-    ''' Link in sidebar to activate worksheets or documentation, show some data about it '''
 
-    def __init__(self, pathname, kernelname, last_saved=None, last_accessed=None):
+    def __init__(self, pathname, kernelname, last_saved=None):
         Gtk.ListBoxRow.__init__(self)
         self.get_style_context().add_class('wslist_item')
 
@@ -147,7 +103,6 @@ class WorksheetListViewItem(Gtk.ListBoxRow):
         
         self.worksheet_name = pathname
         self.last_saved = last_saved
-        self.last_accessed = last_accessed
         
         self.name = Gtk.Label()
         self.name.set_justify(Gtk.Justification.LEFT)
@@ -172,20 +127,6 @@ class WorksheetListViewItem(Gtk.ListBoxRow):
         if self.icon_type != None:
             self.set_icon_type(self.icon_type)
 
-    def set_kernelname(self, kernelname):
-        self.kernelname = kernelname
-        if self.icon_normal != None: self.icon_stack.remove(self.icon_normal)
-        if self.icon_active != None: self.icon_stack.remove(self.icon_active)
-        self.icon_normal = Gtk.Image.new_from_file('./resources/images/' + self.kernelname + '_icon_2.png')
-        self.icon_normal.get_style_context().add_class('wslist_icon')
-        self.icon_active = Gtk.Image.new_from_file('./resources/images/' + self.kernelname + '_icon_4.png')
-        self.icon_active.get_style_context().add_class('wslist_icon')
-        self.icon_stack.add_named(self.icon_normal, 'normal')
-        self.icon_stack.add_named(self.icon_active, 'active')
-        self.show_all()
-        if self.icon_type != None:
-            self.set_icon_type(self.icon_type)
-        
     def set_icon_type(self, icon_type='normal'):
         self.icon_type = icon_type
         self.icon_stack.set_visible_child_name(icon_type)
@@ -194,8 +135,8 @@ class WorksheetListViewItem(Gtk.ListBoxRow):
 class RecentWorksheetListViewItem(WorksheetListViewItem):
     ''' Link in sidebar to activate worksheet, show some data about it '''
     
-    def __init__(self, pathname, kernelname, last_saved, last_accessed=None):
-        WorksheetListViewItem.__init__(self, pathname, kernelname, last_saved, None)
+    def __init__(self, pathname, kernelname, last_saved):
+        WorksheetListViewItem.__init__(self, pathname, kernelname, last_saved)
 
         self.pathname = pathname
         self.statebox = Gtk.HBox()
@@ -260,51 +201,4 @@ class RecentWorksheetListViewItem(WorksheetListViewItem):
     def set_folder(self, new_folder):
         self.folder.set_text(helpers.shorten_folder(new_folder, 18))
         
-
-class OpenWorksheetListViewItem(WorksheetListViewItem):
-    ''' Link in sidebar to activate worksheet, show some data about it '''
-    
-    def __init__(self, worksheet, last_saved, last_accessed=None):
-        WorksheetListViewItem.__init__(self, worksheet.get_pathname(), worksheet.kernelname, last_saved, None)
-
-        self.worksheet = worksheet
-
-        self.statebox = Gtk.HBox()
-        self.state = Gtk.Label()
-        self.state.set_justify(Gtk.Justification.LEFT)
-        self.state.set_xalign(0)
-        self.state.set_hexpand(False)
-        self.state.get_style_context().add_class('wslist_state')
-        self.statebox.pack_start(self.state, True, True, 0)
-
-        self.topbox = Gtk.HBox()
-        self.close_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.MENU)
-        self.close_button.get_style_context().add_class('wslist_close_button')
-        self.close_button.set_can_focus(False)
-        self.close_button.set_tooltip_text('Close Worksheet')
-        
-        self.textbox = Gtk.VBox()
-        self.textbox.pack_start(self.name, False, False, 0)
-        self.textbox.pack_start(self.statebox, True, True, 0)
-        
-        self.topbox.pack_start(self.textbox, False, False, 0)
-        self.topbox.pack_end(self.close_button, False, False, 0)
-
-        self.box.pack_end(self.topbox, True, True, 0)
-        self.box.get_style_context().add_class('wslist_wrapper')
-        self.add(self.box)
-        
-        self.set_name(self.worksheet_name)
-        self.set_state('idle.')
-        
-    def set_name(self, new_name):
-        self.worksheet_name = new_name
-        self.name.set_text(self.worksheet_name)
-        
-    def set_state(self, new_state):
-        self.state.set_text(new_state)
-        
-    def get_worksheet(self):
-        return self.worksheet
-
 

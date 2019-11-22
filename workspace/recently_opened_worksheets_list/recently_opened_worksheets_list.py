@@ -18,17 +18,22 @@
 import pickle
 import os.path
 
+import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_controller as ro_controller
+import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_presenter as ro_presenter
 from helpers.observable import Observable
-import model.model_worksheet as model_worksheet
 
 
-class RecentlyOpenedWorksheets(Observable):
+class RecentlyOpenedWorksheetsList(Observable):
 
-    def __init__(self):
+    def __init__(self, workspace):
         Observable.__init__(self)
 
+        self.workspace = workspace
         self.pathname = os.path.expanduser('~') + '/.porto'
         self.items = list()
+
+        self.presenter = ro_presenter.RecentlyOpenedWorksheetsListPresenter(workspace, self)
+        self.controller = ro_controller.RecentlyOpenedWorksheetsListController(workspace, self)
 
     def get_by_pathname(self, pathname):
         for item in self.items:

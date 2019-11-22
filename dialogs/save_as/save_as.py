@@ -23,7 +23,6 @@ from gi.repository import Gtk
 import dialogs.save_as.save_as_viewgtk as save_as_viewgtk
 from dialogs.dialog import Dialog
 import helpers.helpers as helpers
-import model.model_worksheet as model_worksheet
 import app.service_locator as service_locator
 
 import os.path
@@ -31,10 +30,9 @@ import os.path
 
 class SaveAsDialog(Dialog):
 
-    def __init__(self, notebook, main_window, main_controller):
-        self.notebook = notebook
+    def __init__(self, workspace, main_window):
+        self.workspace = workspace
         self.main_window = main_window
-        self.main_controller = main_controller
 
     def run(self, worksheet):
         self.current_name = None
@@ -59,9 +57,9 @@ class SaveAsDialog(Dialog):
                 new_path = self.current_folder + '/' + self.current_filename
                 old_path = self.worksheet.get_pathname()
 
-                overwrite = self.notebook.get_worksheet_by_pathname(new_path)
+                overwrite = self.workspace.get_worksheet_by_pathname(new_path)
                 if overwrite != None and old_path != new_path:
-                    self.main_controller.notebook_controller.close_worksheet(overwrite)
+                    self.workspace.controller.close_worksheet(overwrite)
 
                 self.worksheet.save_as(new_path)
                 return_value = True

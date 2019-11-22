@@ -15,22 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-import model.model_cell as model_cell
-
 
 class HeaderbarControlsController(object):
 
-    def __init__(self, worksheet, view):
+    def __init__(self, worksheet, button_box, save_button):
         self.worksheet = worksheet
-        self.view = view
-        self.view.add_codecell_button.connect('clicked', self.on_add_codecell_button_click)
-        self.view.add_markdowncell_button.connect('clicked', self.on_add_markdowncell_button_click)
-        self.view.down_button.connect('clicked', self.on_down_button_click)
-        self.view.up_button.connect('clicked', self.on_up_button_click)
-        self.view.delete_button.connect('clicked', self.on_delete_button_click)
-        self.view.eval_button.connect('clicked', self.on_eval_button_click)
-        self.view.eval_nc_button.connect('clicked', self.on_eval_nc_button_click)
-        self.view.stop_button.connect('clicked', self.on_stop_button_click)
+        self.button_box = button_box
+        self.save_button = save_button
+        self.button_box.add_codecell_button.connect('clicked', self.on_add_codecell_button_click)
+        self.button_box.add_markdowncell_button.connect('clicked', self.on_add_markdowncell_button_click)
+        self.button_box.down_button.connect('clicked', self.on_down_button_click)
+        self.button_box.up_button.connect('clicked', self.on_up_button_click)
+        self.button_box.delete_button.connect('clicked', self.on_delete_button_click)
+        self.button_box.eval_button.connect('clicked', self.on_eval_button_click)
+        self.button_box.eval_nc_button.connect('clicked', self.on_eval_nc_button_click)
+        self.button_box.stop_button.connect('clicked', self.on_stop_button_click)
+        self.save_button.connect('clicked', self.on_save_ws_button_click)
 
     def on_add_codecell_button_click(self, button_object=None):
         self.worksheet.add_codecell_below_active_cell()
@@ -56,4 +56,7 @@ class HeaderbarControlsController(object):
     def on_stop_button_click(self, button_object=None):
         self.worksheet.stop_evaluation()
 
+    def on_save_ws_button_click(self, button_object=None):
+        self.worksheet.save_to_disk()
+        
 

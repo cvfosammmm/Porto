@@ -20,11 +20,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 
-class ButtonBox(Gtk.HBox):
+class ButtonBox(object):
 
     def __init__(self):
-        Gtk.HBox.__init__(self)
-
         self.add_cell_box = Gtk.HBox()
         self.add_cell_box.get_style_context().add_class('linked')
 
@@ -36,7 +34,8 @@ class ButtonBox(Gtk.HBox):
         self.add_markdowncell_button.set_tooltip_text('Add markdown cell below (Ctrl+M)')
         self.add_markdowncell_button.set_focus_on_click(False)
         self.add_cell_box.add(self.add_markdowncell_button)
-        
+        self.add_cell_box.show_all()
+
         self.move_cell_box = Gtk.HBox()
         self.move_cell_box.get_style_context().add_class('linked')
         self.up_button = Gtk.Button.new_from_icon_name('up-button-symbolic', Gtk.IconSize.BUTTON)
@@ -53,6 +52,7 @@ class ButtonBox(Gtk.HBox):
         self.delete_button.set_tooltip_text('Delete cell (Ctrl+Backspace)')
         self.delete_button.set_focus_on_click(False)
         self.move_cell_box.add(self.delete_button)
+        self.move_cell_box.show_all()
 
         self.eval_box = Gtk.HBox()
         self.eval_box.get_style_context().add_class('linked')
@@ -69,10 +69,32 @@ class ButtonBox(Gtk.HBox):
         self.stop_button.set_focus_on_click(False)
         self.stop_button.set_sensitive(False)
         self.eval_box.add(self.stop_button)
+        self.eval_box.show_all()
 
-        self.pack_start(self.add_cell_box, False, False, 0)
-        self.pack_start(self.move_cell_box, False, False, 0)
-        self.pack_start(self.eval_box, False, False, 0)
+
+class SaveButton(Gtk.Button):
+
+    def __init__(self):
+        Gtk.Button.__init__(self)
+
+        self.set_label('Save')
+        self.set_tooltip_text('Save the currently opened file')
+        self.set_focus_on_click(False)
 
         self.show_all()
+
+
+class Title(Gtk.VBox):
+
+    def __init__(self):
+        Gtk.VBox.__init__(self)
+
+        self.title_label = Gtk.Label()
+        self.title_label.get_style_context().add_class('title')
+        self.subtitle_label = Gtk.Label()
+        self.subtitle_label.get_style_context().add_class('subtitle')
+        self.pack_start(self.title_label, False, False, 0)
+        self.pack_start(self.subtitle_label, False, False, 0)
+        self.show_all()
+
 

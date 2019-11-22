@@ -20,7 +20,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gio
 
-import viewgtk.viewgtk_worksheet_list as viewgtk_worksheet_list
+import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_viewgtk as viewgtk_worksheet_list
 
 
 class HeaderBar(Gtk.Paned):
@@ -39,37 +39,6 @@ class HeaderBar(Gtk.Paned):
         self.pack1(self.hb_left, False, False)
         self.pack2(self.hb_right, True, False)
         
-    def set_title(self, text):
-        self.hb_right.set_title(text)
-
-    def set_subtitle(self, text):
-        self.hb_right.set_subtitle(text)
-
-    def get_subtitle(self):
-        return self.hb_right.get_subtitle()
-        
-    def activate_save_button(self):
-        self.hb_right.save_button.set_sensitive(True)
-
-    def deactivate_save_button(self):
-        self.hb_right.save_button.set_sensitive(False)
-
-    def activate_revert_button(self):
-        self.hb_right.revert_button.set_sensitive(True)
-
-    def deactivate_revert_button(self):
-        self.hb_right.revert_button.set_sensitive(False)
-
-    def activate_documentation_mode(self):
-        if self.hb_right.save_button.get_parent() == None:
-            self.hb_right.remove(self.hb_right.revert_button)
-            self.hb_right.pack_end(self.hb_right.save_button)
-
-    def deactivate_documentation_mode(self):
-        if self.hb_right.revert_button.get_parent() == None:
-            self.hb_right.remove(self.hb_right.save_button)
-            self.hb_right.pack_end(self.hb_right.revert_button)
-
 
 class HeaderBarLeft(Gtk.HeaderBar):
 
@@ -91,12 +60,6 @@ class HeaderBarLeft(Gtk.HeaderBar):
         self.open_ws_button.set_focus_on_click(False)
         self.pack_start(self.open_ws_button)
 
-        self.search_button = Gtk.Button.new_from_icon_name('system-search-symbolic', Gtk.IconSize.BUTTON)
-        self.search_button.set_tooltip_text('Search')
-        self.search_button.set_focus_on_click(False)
-        #self.search_button.set_sensitive(False)
-        #self.pack_end(self.search_button)
-
     def do_get_request_mode(self):
         return Gtk.SizeRequestMode.CONSTANT_SIZE
                      
@@ -113,7 +76,15 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.props.title = ''
         self.open_worksheets_number = 0
         self.current_controls = None
+        self.current_add_cell_box = None
+        self.current_move_cell_box = None
+        self.current_eval_box = None
+        self.current_save_button = None
         
+        self.welcome_title = Gtk.Label('Welcome to Porto')
+        self.welcome_title.get_style_context().add_class('title')
+        self.welcome_title.show_all()
+
         self.create_buttons()
         self.pack_buttons()
 
@@ -135,16 +106,6 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.create_full_hamburger_menu()
         self.create_blank_hamburger_menu()
         
-        self.save_button = Gtk.Button()
-        self.save_button.set_label('Save')
-        self.save_button.set_tooltip_text('Save the currently opened file')
-        self.save_button.set_focus_on_click(False)
-
-        self.revert_button = Gtk.Button()
-        self.revert_button.set_label('Revert Changes')
-        self.revert_button.set_tooltip_text('Set worksheet back to it\'s original state')
-        self.revert_button.set_focus_on_click(False)
-
     def create_full_hamburger_menu(self):
         self.menu_button = Gtk.MenuButton()
         image = Gtk.Image.new_from_icon_name('open-menu-symbolic', Gtk.IconSize.BUTTON)
@@ -228,29 +189,17 @@ class HeaderBarRight(Gtk.HeaderBar):
 
     def pack_buttons(self):
         self.pack_start(self.open_worksheets_button)
-        #self.pack_start(self.add_cell_box)
-        #self.pack_start(self.move_cell_box)
-        #self.pack_start(self.eval_box)
         self.pack_end(self.menu_button)
         self.pack_end(self.blank_menu_button)
-        self.pack_end(self.save_button)
         self.show_all()
 
     def show_buttons(self):
-        #self.add_cell_box.show_all()
-        #self.move_cell_box.show_all()
-        #self.eval_box.show_all()
         self.menu_button.show_all()
         self.blank_menu_button.hide()
-        self.save_button.show_all()
 
     def hide_buttons(self):
-        #self.add_cell_box.hide()
-        #self.move_cell_box.hide()
-        #self.eval_box.hide()
         self.menu_button.hide()
         self.blank_menu_button.show_all()
-        self.save_button.hide()
 
     def increment_worksheets_number(self):
         self.open_worksheets_number += 1
@@ -279,8 +228,6 @@ class WorksheetChooser(Gtk.Popover):
 
         self.box = Gtk.VBox()
 
-        self.open_worksheets_list_view = viewgtk_worksheet_list.WorksheetListOpenView()
-        self.open_worksheets_list_view.set_can_focus(False)
         self.open_worksheets_label_revealer = Gtk.Revealer()
         self.open_worksheets_label = Gtk.Label('Open Worksheets')
         self.open_worksheets_label.set_xalign(0)
@@ -300,7 +247,6 @@ class WorksheetChooser(Gtk.Popover):
         self.recent_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 
         self.open_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.open_worksheets_list_view_wrapper.add(self.open_worksheets_list_view)
         self.open_worksheets_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
         self.recent_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
         self.recent_worksheets_list_view_wrapper.add(self.recent_worksheets_list_view)

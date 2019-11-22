@@ -22,6 +22,8 @@ from gi.repository import GtkSource
 import result_factory.result_factory as result_factory
 from helpers.observable import Observable
 import backend.backend_markdown as backend_markdown
+import cell.cell_controller as cell_controller
+import cell.cell_viewgtk as cell_view
 
 
 class Cell(GtkSource.Buffer, Observable):
@@ -101,7 +103,10 @@ class CodeCell(Cell):
         # syntax highlighting
         self.set_language(self.get_worksheet().get_source_language_code())
         self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
-    
+
+        self.view = cell_view.CellViewCode(self)
+        self.controller = cell_controller.CodeCellController(self, self.view, worksheet.controller)
+
     def evaluate(self):
         self.remove_result()
         self.stop_evaluation()
@@ -140,6 +145,9 @@ class MarkdownCell(Cell):
         # syntax highlighting
         self.set_language(self.get_worksheet().get_source_language_markdown())
         self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
+
+        self.view = cell_view.CellViewMarkdown(self)
+        self.controller = cell_controller.MarkdownCellController(self, self.view, worksheet.controller)
 
     def evaluate(self):
         self.remove_result()

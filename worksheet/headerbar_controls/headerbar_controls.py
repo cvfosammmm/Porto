@@ -17,13 +17,17 @@
 
 import worksheet.headerbar_controls.headerbar_controls_viewgtk as headerbar_controls_viewgtk
 import worksheet.headerbar_controls.headerbar_controls_controller as headerbar_controls_controller
+import worksheet.headerbar_controls.headerbar_controls_presenter as headerbar_controls_presenter
 
 
 class HeaderbarControls(object):
 
     def __init__(self, worksheet):
         self.worksheet = worksheet
-        self.view = headerbar_controls_viewgtk.ButtonBox()
-        self.controller = headerbar_controls_controller.HeaderbarControlsController(worksheet, self.view)
+        self.button_box = headerbar_controls_viewgtk.ButtonBox()
+        self.save_button = headerbar_controls_viewgtk.SaveButton()
+        self.title = headerbar_controls_viewgtk.Title()
+        self.presenter = headerbar_controls_presenter.HeaderbarControlsPresenter(worksheet, self.button_box, self.save_button, self.title)
+        self.controller = headerbar_controls_controller.HeaderbarControlsController(worksheet, self.button_box, self.save_button)
 
 

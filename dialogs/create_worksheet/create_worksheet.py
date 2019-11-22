@@ -30,10 +30,9 @@ import os.path
 
 class CreateWorksheetDialog(Dialog):
 
-    def __init__(self, main_window, notebook, main_controller):
+    def __init__(self, main_window):
         self.main_window = main_window
-        self.notebook = notebook
-        self.main_controller = main_controller
+        self.kernelspecs = service_locator.ServiceLocator.get_kernelspecs()
 
     def run(self):
         self.current_kernelname = None
@@ -78,12 +77,12 @@ class CreateWorksheetDialog(Dialog):
         self.view.folder_entry.connect('clicked', self.on_folder_button_click)
 
         first_button = None
-        for language in self.main_controller.kernelspecs.get_list_of_names():
-            name = self.main_controller.kernelspecs.get_displayname(language)
+        for language in self.kernelspecs.get_list_of_names():
+            name = self.kernelspecs.get_displayname(language)
             self.view.language_buttons[name] = Gtk.RadioButton()
             if first_button == None: first_button = self.view.language_buttons[name]
             box = Gtk.HBox()
-            icon = self.main_controller.kernelspecs.get_menu_icon(language)
+            icon = self.kernelspecs.get_menu_icon(language)
             icon.set_margin_left(0)
             icon.set_margin_right(10)
             box.pack_start(icon, False, False, 0)
@@ -137,7 +136,7 @@ class CreateWorksheetDialog(Dialog):
 
     def on_language_button_toggled(self, button, language):
         if button.get_active():
-            self.view.css_provider.load_from_data(('dialog { background-image: url(\'' + self.main_controller.kernelspecs.get_background_path(language) + '\'); }').encode('utf-8'))
+            self.view.css_provider.load_from_data(('dialog { background-image: url(\'' + self.kernelspecs.get_background_path(language) + '\'); }').encode('utf-8'))
             self.current_kernelname = language
 
 

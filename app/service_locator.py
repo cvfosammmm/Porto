@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 import app.settings as settingscontroller
+import app.kernelspecs as kernelspecs
 
 import dialogs.about.about as about_dialog
 import dialogs.close_confirmation.close_confirmation as close_confirmation_dialog
@@ -27,6 +28,7 @@ import dialogs.overwrite_confirmation.overwrite_confirmation as overwrite_confir
 import dialogs.preferences.preferences as preferences_dialog
 import dialogs.save_as.save_as as save_as_dialog
 import dialogs.select_folder.select_folder as select_folder_dialog
+import backend.backend_controller as backendcontroller
 
 
 class ServiceLocator(object):
@@ -34,28 +36,46 @@ class ServiceLocator(object):
     dialogs = dict()
     settings = None
     main_window = None
+    backend_controller_code = None
+    backend_controller_markdown = None
+    kernelspecs = None
 
-    def init_dialogs(main_window, notebook, main_controller):
+    def init_dialogs(main_window, workspace):
         settings = ServiceLocator.get_settings()
         ServiceLocator.dialogs['about'] = about_dialog.AboutDialog(main_window)
         ServiceLocator.dialogs['close_confirmation'] = close_confirmation_dialog.CloseConfirmationDialog(main_window)
-        ServiceLocator.dialogs['create_worksheet'] = create_worksheet_dialog.CreateWorksheetDialog(main_window, notebook, main_controller)
+        ServiceLocator.dialogs['create_worksheet'] = create_worksheet_dialog.CreateWorksheetDialog(main_window)
         ServiceLocator.dialogs['delete_worksheet'] = delete_worksheet_dialog.DeleteWorksheetDialog(main_window)
         ServiceLocator.dialogs['keyboard_shortcuts'] = keyboard_shortcuts_dialog.KeyboardShortcutsDialog(main_window)
         ServiceLocator.dialogs['open_worksheet'] = open_worksheet_dialog.OpenWorksheetDialog(main_window)
         ServiceLocator.dialogs['overwrite_confirmation'] = overwrite_confirmation_dialog.OverwriteConfirmationDialog(main_window)
         ServiceLocator.dialogs['preferences'] = preferences_dialog.PreferencesDialog(main_window, settings)
-        ServiceLocator.dialogs['save_as'] = save_as_dialog.SaveAsDialog(notebook, main_window, main_controller)
+        ServiceLocator.dialogs['save_as'] = save_as_dialog.SaveAsDialog(workspace, main_window)
         ServiceLocator.dialogs['select_folder'] = select_folder_dialog.SelectFolderDialog(main_window)
     
     def init_main_window(main_window):
         ServiceLocator.main_window = main_window
 
+    def get_main_window():
+        return ServiceLocator.main_window
+
     def get_dialog(dialog_type):
         return ServiceLocator.dialogs[dialog_type]
 
-    def get_main_window():
-        return ServiceLocator.main_window
+    def get_backend_controller_markdown():
+        if ServiceLocator.backend_controller_markdown == None:
+            ServiceLocator.backend_controller_markdown = backendcontroller.BackendControllerMarkdown()
+        return ServiceLocator.backend_controller_markdown
+        
+    def get_backend_controller_code():
+        if ServiceLocator.backend_controller_code == None:
+            ServiceLocator.backend_controller_code = backendcontroller.BackendControllerCode()
+        return ServiceLocator.backend_controller_code
+
+    def get_kernelspecs():
+        if ServiceLocator.kernelspecs == None:
+            ServiceLocator.kernelspecs = kernelspecs.Kernelspecs()
+        return ServiceLocator.kernelspecs
 
     def get_settings():
         if ServiceLocator.settings == None:

@@ -19,7 +19,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import viewgtk.viewgtk_worksheet_list as viewgtk_worksheet_list
+import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_viewgtk as viewgtk_worksheet_list
 
 
 class Sidebar(Gtk.VBox):
@@ -31,8 +31,6 @@ class Sidebar(Gtk.VBox):
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.set_size_request(260, 500)
         
-        self.open_worksheets_list_view = viewgtk_worksheet_list.WorksheetListOpenView()
-        self.open_worksheets_list_view.set_can_focus(False)
         self.open_worksheets_label_revealer = Gtk.Revealer()
         self.open_worksheets_label = Gtk.Label('Open Worksheets')
         self.open_worksheets_label.set_xalign(0)
@@ -52,7 +50,6 @@ class Sidebar(Gtk.VBox):
         self.recent_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 
         self.open_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.open_worksheets_list_view_wrapper.add(self.open_worksheets_list_view)
         self.open_worksheets_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
         self.recent_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
         self.recent_worksheets_list_view_wrapper.add(self.recent_worksheets_list_view)

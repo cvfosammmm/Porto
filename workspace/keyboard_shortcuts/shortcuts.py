@@ -22,17 +22,16 @@ from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import Gtk
 
-import model.model_cell as model_cell
-import model.model_worksheet as model_worksheet
+import cell.cell as model_cell
+from app.service_locator import ServiceLocator
 
 
-class ShortcutsController(object):
+class Shortcuts(object):
     ''' Handle Keyboard shortcuts. '''
     
-    def __init__(self, notebook, main_window, main_application_controller):
-        self.notebook = notebook
-        self.main_controller = main_application_controller
-        self.main_window = main_window
+    def __init__(self, workspace):
+        self.main_window = ServiceLocator.get_main_window()
+        self.workspace = workspace
         
         self.setup_shortcuts()
 
@@ -72,7 +71,7 @@ class ShortcutsController(object):
             self.shortcut_edit_markdown()
 
     def shortcut_edit_markdown(self, accel_group=None, window=None, key=None, mask=None):
-        worksheet = self.notebook.active_worksheet
+        worksheet = self.workspace.active_worksheet
         if worksheet != None:
             cell = worksheet.get_active_cell()
             if isinstance(cell, model_cell.MarkdownCell) and cell.get_result() != None:
@@ -83,53 +82,53 @@ class ShortcutsController(object):
         return False
 
     def shortcut_eval(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.evaluate_active_cell()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.evaluate_active_cell()
         return True
 
     def shortcut_eval_go_next(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.evaluate_active_cell_and_go_to_next()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.evaluate_active_cell_and_go_to_next()
         return True
 
     def shortcut_add_codecell_below(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.add_codecell_below_active_cell()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.add_codecell_below_active_cell()
         return True
 
     def shortcut_eval_add(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.evaluate_active_cell()
-            self.notebook.active_worksheet.add_codecell_below_active_cell()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.evaluate_active_cell()
+            self.workspace.active_worksheet.add_codecell_below_active_cell()
         return True
 
     def shortcut_add_markdown_cell(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.add_markdowncell_below_active_cell()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.add_markdowncell_below_active_cell()
         return True
 
     def shortcut_stop_computation(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.stop_evaluation()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.stop_evaluation()
         return True
 
     def shortcut_delete_cell(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.delete_active_cell()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.delete_active_cell()
         return True
 
     def shortcut_move_cell_up(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.move_cell_up()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.move_cell_up()
         return True
 
     def shortcut_move_cell_down(self, accel_group=None, window=None, key=None, mask=None):
-        if self.notebook.active_worksheet != None:
-            self.notebook.active_worksheet.move_cell_down()
+        if self.workspace.active_worksheet != None:
+            self.workspace.active_worksheet.move_cell_down()
         return True
 
     def shortcut_restart_kernel(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_wsmenu_restart_kernel()
+        self.workspace.controller.on_wsmenu_restart_kernel()
 
     def shortcut_page_up(self, accel_group=None, window=None, key=None, mask=None):
         try: worksheet_view = self.main_window.active_worksheet_view
@@ -150,18 +149,17 @@ class ShortcutsController(object):
         return True
 
     def shortcut_create_worksheet(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_create_ws_button_click()
+        self.workspace.controller.on_create_ws_button_click()
 
     def shortcut_open_worksheet(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_open_ws_button_click()
+        self.workspace.controller.on_open_ws_button_click()
 
     def shortcut_save(self, accel_group=None, window=None, key=None, mask=None):
-        worksheet = self.main_controller.notebook.get_active_worksheet()
+        worksheet = self.workspace.get_active_worksheet()
         if worksheet != None:
-            if isinstance(worksheet, model_worksheet.NormalWorksheet):
-                worksheet.save_to_disk()
+            worksheet.save_to_disk()
 
     def shortcut_save_as(self, accel_group=None, window=None, key=None, mask=None):
-        self.main_controller.on_wsmenu_save_as()
+        self.workspace.controller.on_wsmenu_save_as()
 
 
