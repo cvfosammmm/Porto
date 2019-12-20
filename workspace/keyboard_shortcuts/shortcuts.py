@@ -64,6 +64,8 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask | s_mask, flags, self.shortcut_save_as)
 
+        self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
+
         self.main_window.worksheet_view_wrapper.connect('key-press-event', self.on_worksheet_key_pressed)
 
     def on_worksheet_key_pressed(self, worksheet_wrapper, event, user_data=None):

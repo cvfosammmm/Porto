@@ -33,6 +33,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         Gtk.Window.__init__(self, application=app)
+        self.app = app
         self.set_size_request(1000, 550)
         Gtk.IconTheme.append_search_path(Gtk.IconTheme.get_default(), os.path.dirname(__file__) + '/../resources/icons')
         self.add_events(Gdk.EventMask.KEY_PRESS_MASK)

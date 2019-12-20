@@ -19,13 +19,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
-from gi.repository import GLib
-from gi.repository import Gio
 
 import sys
 
 import workspace.workspace_viewgtk as view
-import workspace.keyboard_shortcuts.shortcuts as shortcutscontroller
 from workspace.workspace import Workspace
 from app.service_locator import ServiceLocator
 
@@ -57,9 +54,7 @@ class MainApplicationController(Gtk.Application):
         ServiceLocator.init_dialogs(self.main_window, self.workspace)
 
         # controllers
-        self.shortcuts_controller = shortcutscontroller.Shortcuts(self.workspace)
         self.main_window.quit_action.connect('activate', self.on_quit_action)
-        self.shortcuts_controller.accel_group.connect(Gdk.keyval_from_name('q'), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.MASK, self.save_quit)
 
         # watch changes in view
         self.observe_main_window()

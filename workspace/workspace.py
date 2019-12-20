@@ -21,6 +21,7 @@ import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list
 import workspace.open_worksheets_list.open_worksheets_list as open_worksheets_list
 import worksheet.worksheet as model_worksheet
 import workspace.headerbar.headerbar as headerbar_model
+import workspace.keyboard_shortcuts.shortcuts as shortcuts
 from helpers.observable import Observable
 from app.service_locator import ServiceLocator
 
@@ -41,6 +42,8 @@ class Workspace(Observable):
         self.presenter = workspace_presenter.WorkspacePresenter(self)
         self.controller = workspace_controller.WorkspaceController(self)
         self.headerbar = headerbar_model.Headerbar(self)
+        self.shortcuts = shortcuts.Shortcuts(self)
+
         self.set_pretty_print(self.settings.get_value('preferences', 'pretty_print'))
 
     def add_worksheet(self, worksheet):
