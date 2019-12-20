@@ -145,4 +145,8 @@ class Workspace(Observable):
     def set_pretty_print(self, value):
         self.add_change_code('set_pretty_print', value)
 
+    def shutdown_all_kernels(self):
+        for worksheet in self.open_worksheets:
+            worksheet.shutdown_kernel_now()
+
 

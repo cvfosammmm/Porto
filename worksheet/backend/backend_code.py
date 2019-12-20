@@ -132,7 +132,7 @@ class BackendCode(Observable):
         self.stop_evaluation(worksheet)
         shutdown_func_id = GObject.timeout_add(50, self.restart_for_real, worksheet)
 
-    def shutdown_all(self):
+    def shutdown_now(self):
         keys = list(self.kernels.keys())
         for worksheet in keys:
             try: kernel = self.kernels[worksheet]

@@ -51,6 +51,9 @@ class WorksheetEvaluator(object):
         if change_code == 'kernel_to_shutdown':
             self.backend_code.shutdown(self.worksheet)
         
+        if change_code == 'kernel_to_shutdown_now':
+            self.backend_code.shutdown_now()
+        
         if change_code == 'ws_evaluation_to_stop':
             self.backend_code.stop_evaluation(self.worksheet)
         

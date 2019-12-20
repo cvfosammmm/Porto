@@ -102,6 +102,7 @@ class MainApplicationController(Gtk.Application):
 
         if len(worksheets) == 0 or active_worksheet == None or ServiceLocator.get_dialog('close_confirmation').run(worksheets)['all_save_to_close']: 
             self.save_window_state()
+            self.workspace.shutdown_all_kernels()
             self.quit()
 
     def do_startup(self):

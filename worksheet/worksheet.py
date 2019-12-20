@@ -319,6 +319,9 @@ class Worksheet(Observable):
     def shutdown_kernel(self):
         self.add_change_code('kernel_to_shutdown', None)
 
+    def shutdown_kernel_now(self):
+        self.add_change_code('kernel_to_shutdown_now', None)
+
     def evaluate_active_cell(self):
         active_cell = self.active_cell
         if not (isinstance(active_cell, model_cell.MarkdownCell) and active_cell.get_result() != None):
