@@ -27,6 +27,7 @@ import nbformat
 import worksheet.worksheet_viewgtk as worksheet_viewgtk
 import worksheet.worksheet_controller as worksheet_controller
 import worksheet.worksheet_presenter as worksheet_presenter
+import worksheet.worksheet_evaluator as worksheet_evaluator
 import worksheet.worksheet_list_item.worksheet_list_item as list_item_model
 import worksheet.headerbar_controls.headerbar_controls as headerbar_controls
 import cell.cell as model_cell
@@ -68,6 +69,7 @@ class Worksheet(Observable):
         self.view = worksheet_viewgtk.WorksheetView()
         self.presenter = worksheet_presenter.WorksheetPresenter(self, self.view)
         self.controller = worksheet_controller.WorksheetController(self, self.view)
+        self.evaluator = worksheet_evaluator.WorksheetEvaluator(self)
         self.headerbar_controls = headerbar_controls.HeaderbarControls(self)
 
     def remove_all_cells(self):

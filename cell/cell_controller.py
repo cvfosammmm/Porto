@@ -27,12 +27,12 @@ from app.service_locator import ServiceLocator
 
 class CellController(object):
 
-    def __init__(self, cell, cell_view, worksheet_controller):
+    def __init__(self, cell, cell_view, worksheet):
 
         self.cell = cell
         self.cell_view = cell_view
 
-        self.worksheet_controller = worksheet_controller
+        self.worksheet = worksheet
 
         # observe cell
         result = cell.get_result()
@@ -80,7 +80,7 @@ class CellController(object):
     def on_scroll(self, scrolled_window, event):
 
         if(abs(event.delta_y) > 0):
-            adjustment = self.worksheet_controller.worksheet_view.get_vadjustment()
+            adjustment = self.worksheet.view.get_vadjustment()
 
             page_size = adjustment.get_page_size()
             scroll_unit = pow (page_size, 2.0 / 3.0)
@@ -104,9 +104,9 @@ class CellController(object):
         return False
 
     def revealer_on_size_allocate(self, result_view_revealer, allocation):
-        cell = self.worksheet_controller.worksheet.get_active_cell()
+        cell = self.worksheet.get_active_cell()
         if cell != None and result_view_revealer.autoscroll_on_reveal == True:
-            worksheet_view = self.worksheet_controller.view
+            worksheet_view = self.worksheet.view
             cell_view_position = cell.get_worksheet_position()
             cell_view = worksheet_view.get_child_by_position(cell_view_position)
             x, cell_position = cell_view.translate_coordinates(worksheet_view.box, 0, 0)
@@ -190,7 +190,7 @@ class CellController(object):
         return False
     
     def on_cursor_movement(self, cell=None, mark=None, user_data=None):
-        self.worksheet_controller.scroll_to_cursor(self.cell, check_if_position_changed=True)
+        self.worksheet.controller.scroll_to_cursor(self.cell, check_if_position_changed=True)
 
     def on_paste(self, cell=None, clipboard=None, user_data=None):
         ''' hack to prevent some gtk weirdness. '''
@@ -206,7 +206,7 @@ class CellController(object):
             self.cell.get_worksheet().set_active_cell(self.cell)
         if self.cell_view.text_widget.get_reveal_child():
             self.cell_view.text_entry.grab_focus()
-            self.worksheet_controller.scroll_to_cursor(cell_view.text_entry.get_buffer(), check_if_position_changed=True)
+            self.worksheet.controller.scroll_to_cursor(cell_view.text_entry.get_buffer(), check_if_position_changed=True)
         return False
     
     def on_source_view_focus_in(self, source_view, event=None):
@@ -218,7 +218,7 @@ class CellController(object):
         return False
     
     def on_size_allocate(self, text_field, allocation=None):
-        self.worksheet_controller.scroll_to_cursor(text_field.get_buffer(), check_if_position_changed=True)
+        self.worksheet.controller.scroll_to_cursor(text_field.get_buffer(), check_if_position_changed=True)
         
     '''
     *** helpers: cell
@@ -231,10 +231,8 @@ class CellController(object):
 
 class CodeCellController(CellController):
 
-    def __init__(self, cell, cell_view, worksheet_controller):
-        CellController.__init__(self, cell, cell_view, worksheet_controller)
-
-        self.cell.register_observer(ServiceLocator.get_backend_controller_code())
+    def __init__(self, cell, cell_view, worksheet):
+        CellController.__init__(self, cell, cell_view, worksheet)
 
     def add_result_view(self, result, show_animation=False):
         cell_view_position = self.cell.get_worksheet_position()
@@ -261,7 +259,7 @@ class CodeCellController(CellController):
 
     def result_on_scroll(self, scrolled_window, event):
         if(abs(event.delta_y) > 0):
-            adjustment = self.worksheet_controller.worksheet_view.get_vadjustment()
+            adjustment = self.worksheet.view.get_vadjustment()
 
             page_size = adjustment.get_page_size()
             scroll_unit = pow (page_size, 2.0 / 3.0)
@@ -272,11 +270,9 @@ class CodeCellController(CellController):
 
 class MarkdownCellController(CellController):
 
-    def __init__(self, cell, cell_view, worksheet_controller):
-        CellController.__init__(self, cell, cell_view, worksheet_controller)
+    def __init__(self, cell, cell_view, worksheet):
+        CellController.__init__(self, cell, cell_view, worksheet)
 
-        self.cell.register_observer(ServiceLocator.get_backend_controller_markdown())
-        
     def add_result_view(self, result, show_animation=False):
         cell_view_position = self.cell.get_worksheet_position()
                 

@@ -40,7 +40,7 @@ class BackendCode(Observable):
             result = kernel.get_result()
             if result:
                 if result.result_message == 'evaluation_stopped':
-                    self.add_change_code('cell_evaluation_stopped', result)
+                    self.add_change_code('cell_evaluation_stopped', result.cell)
 
                 elif len(result.result_list) > 0:
                     for result_msg in result.result_list:
@@ -66,7 +66,7 @@ class BackendCode(Observable):
                             if result_msg['content'].get('execution_state', '') == 'idle':
                                 self.add_change_code('kernel_started', result.worksheet)
                                 if result.cell != None:
-                                    self.add_change_code('cell_evaluation_stopped', result)
+                                    self.add_change_code('cell_evaluation_stopped', result.cell)
                             elif result_msg['content'].get('execution_state', '') == 'idle':
                                 self.add_change_code('kernel_started', result.worksheet)
                             else:

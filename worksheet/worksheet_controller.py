@@ -21,7 +21,6 @@ from gi.repository import GLib
 
 import cell.cell as model_cell
 import cell.cell_controller as cellcontroller
-from app.service_locator import ServiceLocator
 
 
 class WorksheetController(object):
@@ -32,8 +31,6 @@ class WorksheetController(object):
 
         # to watch for cursor movements
         self.cursor_position = {'cell': None, 'cell_position': None, 'cell_size': None, 'position': None}
-
-        worksheet.register_observer(ServiceLocator.get_backend_controller_code())
 
         self.worksheet_view.viewport.connect('scroll-event', self.on_scroll)
 

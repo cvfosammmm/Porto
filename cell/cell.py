@@ -21,7 +21,7 @@ from gi.repository import GtkSource
 
 import result_factory.result_factory as result_factory
 from helpers.observable import Observable
-import backend.backend_markdown as backend_markdown
+import worksheet.backend.backend_markdown as backend_markdown
 import cell.cell_controller as cell_controller
 import cell.cell_viewgtk as cell_view
 
@@ -95,7 +95,8 @@ class CodeCell(Cell):
 
     def __init__(self, worksheet):
         Cell.__init__(self, worksheet)
-        
+        self.register_observer(worksheet.evaluator)
+
         # possible states: idle, ready_for_evaluation, queued_for_evaluation
         # evaluation_in_progress, evaluation_to_stop
         self.state = 'idle'
@@ -105,7 +106,7 @@ class CodeCell(Cell):
         self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
 
         self.view = cell_view.CellViewCode(self)
-        self.controller = cell_controller.CodeCellController(self, self.view, worksheet.controller)
+        self.controller = cell_controller.CodeCellController(self, self.view, worksheet)
 
     def evaluate(self):
         self.remove_result()
@@ -137,6 +138,7 @@ class MarkdownCell(Cell):
 
     def __init__(self, worksheet):
         Cell.__init__(self, worksheet)
+        self.register_observer(worksheet.evaluator)
 
         # possible states: edit, display, ready_for_evaluation, queued_for_evaluation
         # evaluation_in_progress, evaluation_to_stop
@@ -147,7 +149,7 @@ class MarkdownCell(Cell):
         self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
 
         self.view = cell_view.CellViewMarkdown(self)
-        self.controller = cell_controller.MarkdownCellController(self, self.view, worksheet.controller)
+        self.controller = cell_controller.MarkdownCellController(self, self.view, worksheet)
 
     def evaluate(self):
         self.remove_result()

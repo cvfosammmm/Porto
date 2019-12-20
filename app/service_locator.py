@@ -28,7 +28,6 @@ import dialogs.overwrite_confirmation.overwrite_confirmation as overwrite_confir
 import dialogs.preferences.preferences as preferences_dialog
 import dialogs.save_as.save_as as save_as_dialog
 import dialogs.select_folder.select_folder as select_folder_dialog
-import backend.backend_controller as backendcontroller
 
 
 class ServiceLocator(object):
@@ -36,8 +35,6 @@ class ServiceLocator(object):
     dialogs = dict()
     settings = None
     main_window = None
-    backend_controller_code = None
-    backend_controller_markdown = None
     kernelspecs = None
 
     def init_dialogs(main_window, workspace):
@@ -61,16 +58,6 @@ class ServiceLocator(object):
 
     def get_dialog(dialog_type):
         return ServiceLocator.dialogs[dialog_type]
-
-    def get_backend_controller_markdown():
-        if ServiceLocator.backend_controller_markdown == None:
-            ServiceLocator.backend_controller_markdown = backendcontroller.BackendControllerMarkdown()
-        return ServiceLocator.backend_controller_markdown
-        
-    def get_backend_controller_code():
-        if ServiceLocator.backend_controller_code == None:
-            ServiceLocator.backend_controller_code = backendcontroller.BackendControllerCode()
-        return ServiceLocator.backend_controller_code
 
     def get_kernelspecs():
         if ServiceLocator.kernelspecs == None:

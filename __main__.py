@@ -50,7 +50,6 @@ class MainApplicationController(Gtk.Application):
         self.main_window.show_all()
 
         self.workspace = Workspace()
-        self.workspace.register_observer(ServiceLocator.get_backend_controller_code())
         ServiceLocator.init_dialogs(self.main_window, self.workspace)
 
         # controllers
@@ -111,5 +110,4 @@ class MainApplicationController(Gtk.Application):
 
 main_controller = MainApplicationController()
 exit_status = main_controller.run(sys.argv)
-ServiceLocator.get_backend_controller_code().backend_code.shutdown_all()
 sys.exit(exit_status)
