@@ -32,6 +32,7 @@ import worksheet.worksheet_list_item.worksheet_list_item as list_item_model
 import worksheet.headerbar_controls.headerbar_controls as headerbar_controls
 import cell.cell as model_cell
 from helpers.observable import Observable
+from app.service_locator import ServiceLocator
 
 
 class Worksheet(Observable):
@@ -47,6 +48,7 @@ class Worksheet(Observable):
         self.busy_cells = set()
         self.modified_cells = set()
         self.kernel_state = None
+        self.result_factory = ServiceLocator.get_result_factory()
 
         self.save_state = 'saved'
         try: self.last_saved = datetime.datetime.fromtimestamp(os.path.getmtime(pathname))
@@ -186,6 +188,7 @@ class Worksheet(Observable):
                 self.set_kernelname('python3')
             else:
                 self.set_kernelname(kernelspec['name'])
+            self.set_kernel_state('kernel_to_start')
             is_first_cell = True
             for cell in nb.cells:
                 if cell.cell_type == 'markdown':
@@ -202,11 +205,15 @@ class Worksheet(Observable):
                     try: output = cell.outputs[0]
                     except IndexError: pass
                     else:
-                        try: data = output['data']
-                        except KeyError: pass
-                        else:
-                            new_cell.set_result_blob(data)
-                            new_cell.parse_result_blob()
+                        if output['output_type'] == 'error':
+                            result = self.result_factory.get_error_from_nbformat_dict(output)
+                            new_cell.set_result(result)
+                        elif output['output_type'] == 'execute_result':
+                            try: data = output['data']
+                            except KeyError: pass
+                            else:
+                                result = self.result_factory.get_result_from_blob(data)
+                                new_cell.set_result(result)
                         #TODO load errors
         self.set_save_state('saved')
         
@@ -223,11 +230,7 @@ class Worksheet(Observable):
                     )
                     result = cell.get_result()
                     if result != None:
-                        output = nbformat.v4.new_output(
-                            output_type='execute_result',
-                            data=result.export_nbformat(),
-                            execution_count=0
-                        )
+                        output = result.export_nbformat()
                         cell_node.outputs = [output]
                     nb.cells.append(cell_node)
 

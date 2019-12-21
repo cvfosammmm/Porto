@@ -25,6 +25,7 @@ import queue
 import time
 
 from helpers.observable import Observable
+from app.service_locator import ServiceLocator
 
 
 class BackendCode(Observable):
@@ -33,6 +34,7 @@ class BackendCode(Observable):
         Observable.__init__(self)
         self.kernels = dict()
         self.continue_fetching = True
+        self.result_factory = ServiceLocator.get_result_factory()
         self.fetch_func_id = GObject.timeout_add(50, self.fetch_results)
 
     def fetch_results(self):
@@ -45,10 +47,10 @@ class BackendCode(Observable):
                 elif len(result.result_list) > 0:
                     for result_msg in result.result_list:
                         msg_type = result_msg['header']['msg_type']
-                        #print(msg_type)
 
                         if msg_type == 'error':
-                            print(result_msg['content'].get('evalue', ''))
+                            result_object = self.result_factory.get_error_from_result_message(result_msg)
+                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
 
                         if msg_type == 'execute_input' and result.cell != None:
                             self.add_change_code('evaluation_started', result)
@@ -60,7 +62,8 @@ class BackendCode(Observable):
 
                         if msg_type == 'execute_result':
                             data = result_msg['content'].get('data', None)
-                            self.add_change_code('evaluation_result', {'cell': result.cell, 'data': data})
+                            result_object = self.result_factory.get_result_from_blob(data)
+                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
 
                         if msg_type == 'status':
                             if result_msg['content'].get('execution_state', '') == 'idle':

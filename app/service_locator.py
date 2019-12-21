@@ -17,6 +17,7 @@
 
 import app.settings as settingscontroller
 import app.kernelspecs as kernelspecs
+import result_factory.result_factory as result_factory
 
 import dialogs.about.about as about_dialog
 import dialogs.close_confirmation.close_confirmation as close_confirmation_dialog
@@ -29,6 +30,8 @@ import dialogs.preferences.preferences as preferences_dialog
 import dialogs.save_as.save_as as save_as_dialog
 import dialogs.select_folder.select_folder as select_folder_dialog
 
+import re
+
 
 class ServiceLocator(object):
 
@@ -36,6 +39,8 @@ class ServiceLocator(object):
     settings = None
     main_window = None
     kernelspecs = None
+    result_factory = None
+    ansi_escape_regex = re.compile('\\x1B\[[0-9]*[;]*[0-9]*m')
 
     def init_dialogs(main_window, workspace):
         settings = ServiceLocator.get_settings()
@@ -68,5 +73,13 @@ class ServiceLocator(object):
         if ServiceLocator.settings == None:
             ServiceLocator.settings = settingscontroller.Settings()
         return ServiceLocator.settings
+
+    def get_result_factory():
+        if ServiceLocator.result_factory == None:
+            ServiceLocator.result_factory = result_factory.ResultFactory()
+        return ServiceLocator.result_factory
+
+    def get_ansi_escape_regex():
+        return ServiceLocator.ansi_escape_regex
 
 

@@ -18,6 +18,7 @@
 import worksheet.backend.backend_code as backend_code
 import worksheet.backend.backend_markdown as backend_markdown
 import cell.cell as cell_model
+from app.service_locator import ServiceLocator
 
 
 class WorksheetEvaluator(object):
@@ -26,16 +27,19 @@ class WorksheetEvaluator(object):
         self.worksheet = worksheet
         self.worksheet.register_observer(self)
 
+        self.result_factory = ServiceLocator.get_result_factory()
+
         self.backend_code = backend_code.BackendCode()
         self.backend_code.register_observer(self)
 
         self.markdown_compute_queue = backend_markdown.ComputeQueue()
         self.markdown_compute_queue.register_observer(self)
 
-        self.worksheet.set_kernel_state('starting')
-        self.backend_code.start_kernel(worksheet)
-
     def change_notification(self, change_code, notifying_object, parameter):
+
+        if change_code == 'kernel_state_changed' and parameter == 'kernel_to_start':
+            self.backend_code.start_kernel(self.worksheet)
+            self.worksheet.set_kernel_state('starting')
 
         '''if change_code == 'set_pretty_print':
             value = parameter
@@ -65,7 +69,15 @@ class WorksheetEvaluator(object):
                 self.markdown_compute_queue.add_query(query)
             else:
                 self.backend_code.run_cell(self.worksheet, cell)
-            
+
+        if change_code == 'cell_state_change' and parameter == 'ready_for_evaluation_quickly_please':
+            cell = notifying_object
+            if isinstance(cell, cell_model.MarkdownCell):
+                result_blob = backend_markdown.evaluate_markdown(cell.get_all_text())
+                cell.set_result(self.result_factory.get_markdown_result_from_blob(result_blob))
+            else:
+                self.backend_code.run_cell(self.worksheet, cell)
+
         if change_code == 'cell_state_change' and parameter == 'evaluation_to_stop':
             cell = notifying_object
             if isinstance(cell, cell_model.MarkdownCell):
@@ -83,11 +95,8 @@ class WorksheetEvaluator(object):
 
         if change_code == 'evaluation_result':
             cell = parameter['cell']
-            data = parameter['data']
+            cell.set_result(parameter['result'])
             cell.change_state('idle')
-            if data != None:
-                cell.set_result_blob(data)
-                cell.parse_result_blob()
 
         if change_code == 'cell_evaluation_stopped':
             cell = parameter
@@ -99,8 +108,8 @@ class WorksheetEvaluator(object):
 
         if change_code == 'evaluation_finished':
             result_blob = parameter
-            result_blob['cell'].change_state('edit')
-            result_blob['cell'].set_result_blob(result_blob['result_blob'])
-            result_blob['cell'].parse_result_blob()
+            result = self.result_factory.get_markdown_result_from_blob(result_blob['result_blob'])
+            result_blob['cell'].set_result(result)
             result_blob['cell'].change_state('display')
+
 

@@ -19,9 +19,8 @@ import gi
 gi.require_version('GtkSource', '3.0')
 from gi.repository import GtkSource
 
-import result_factory.result_factory as result_factory
 from helpers.observable import Observable
-import worksheet.backend.backend_markdown as backend_markdown
+from app.service_locator import ServiceLocator
 import cell.cell_controller as cell_controller
 import cell.cell_viewgtk as cell_view
 
@@ -38,7 +37,6 @@ class Cell(GtkSource.Buffer, Observable):
         self.set_modified(False)
         self.set_highlight_matching_brackets(False)
 
-        self.result_blob = None
         self.result = None
 
     def first_set_text(self, text, activate=False, set_unmodified=True):
@@ -56,9 +54,6 @@ class Cell(GtkSource.Buffer, Observable):
         if self.state != 'idle':
             self.change_state('evaluation_to_stop')
 
-    def set_result_blob(self, result_blob):
-        self.result_blob = result_blob
-        
     def set_result(self, result, show_animation=True):
         ''' set new result object. '''
 
@@ -113,16 +108,6 @@ class CodeCell(Cell):
         self.stop_evaluation()
         self.change_state('ready_for_evaluation')
 
-    def parse_result_blob(self):
-        text = self.result_blob.get('text/plain', None)
-        image = self.result_blob.get('image/png', None)
-
-        if image != None:
-            self.set_result(result_factory.ResultImage(image))
-
-        elif text != None:
-            self.set_result(result_factory.ResultText(text))
-
     def change_state(self, state):
         self.state = state
         self.add_change_code('cell_state_change', self.state)
@@ -157,12 +142,9 @@ class MarkdownCell(Cell):
         self.change_state('ready_for_evaluation')
 
     def evaluate_now(self):
-        result_blob = backend_markdown.evaluate_markdown(self.get_all_text())
-        self.set_result_blob(result_blob)
-        self.parse_result_blob()
-
-    def parse_result_blob(self):
-        self.set_result(result_factory.MarkdownResult(self.result_blob))
+        self.remove_result()
+        self.stop_evaluation()
+        self.change_state('ready_for_evaluation_quickly_please')
 
     def change_state(self, state):
         self.state = state
