@@ -31,6 +31,7 @@ import dialogs.save_as.save_as as save_as_dialog
 import dialogs.select_folder.select_folder as select_folder_dialog
 
 import re
+import os.path
 
 
 class ServiceLocator(object):
@@ -41,6 +42,7 @@ class ServiceLocator(object):
     kernelspecs = None
     result_factory = None
     ansi_escape_regex = re.compile('\\x1B\[[0-9]*[;]*[0-9]*m')
+    base_path = os.path.dirname(os.path.realpath(__file__ + '/..')) + '/'
 
     def init_dialogs(main_window, workspace):
         settings = ServiceLocator.get_settings()
@@ -81,5 +83,8 @@ class ServiceLocator(object):
 
     def get_ansi_escape_regex():
         return ServiceLocator.ansi_escape_regex
+
+    def get_base_path():
+        return ServiceLocator.base_path
 
 

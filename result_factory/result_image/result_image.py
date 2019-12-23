@@ -43,7 +43,7 @@ class ResultImage(Result):
         self.show_all()
 
     def export_nbformat(self):
-        output = nbformat.v4.new_output(
+        return nbformat.v4.new_output(
             output_type='execute_result',
             data={'image/png': self.image_base64},
             execution_count=0

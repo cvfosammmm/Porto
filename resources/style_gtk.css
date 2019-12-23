@@ -28,6 +28,9 @@
     font-family: monospace;
     font-size: 14.5px;
 }
+.resulthtmlview {
+    background-color: @theme_base_color;
+}
 .resultviewseperator1 {
     background-color: @theme_base_color;
 }

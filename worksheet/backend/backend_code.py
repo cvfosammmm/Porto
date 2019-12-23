@@ -65,6 +65,11 @@ class BackendCode(Observable):
                             result_object = self.result_factory.get_result_from_blob(data)
                             self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
 
+                        if msg_type == 'display_data':
+                            data = result_msg['content'].get('data', None)
+                            result_object = self.result_factory.get_result_from_blob(data)
+                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
+
                         if msg_type == 'status':
                             if result_msg['content'].get('execution_state', '') == 'idle':
                                 self.add_change_code('kernel_started', result.worksheet)
@@ -254,7 +259,6 @@ class Kernel():
             try: result = self.client.get_iopub_msg(timeout=1)
             except queue.Empty: pass
             else:
-                #print(result)
                 try: query_id = result['parent_header']['msg_id']
                 except KeyError: pass
                 else:

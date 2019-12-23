@@ -67,7 +67,7 @@ class ResultText(Result):
         return self.result_text
 
     def export_nbformat(self):
-        output = nbformat.v4.new_output(
+        return nbformat.v4.new_output(
             output_type='execute_result',
             data={'text/plain': self.result_text},
             execution_count=0

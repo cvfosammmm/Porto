@@ -17,6 +17,7 @@
 
 from result_factory.result_error.result_error import ResultError
 from result_factory.result_image.result_image import ResultImage
+from result_factory.result_html.result_html import ResultHtml
 from result_factory.result_markdown.result_markdown import MarkdownResult
 from result_factory.result_text.result_text import ResultText
 
@@ -43,12 +44,16 @@ class ResultFactory():
     def get_result_from_blob(self, blob):
         text = blob.get('text/plain', None)
         image = blob.get('image/png', None)
+        html = blob.get('text/html', None)
 
         if image != None:
             return ResultImage(image)
-
+        elif html != None:
+            return ResultHtml(html)
         elif text != None:
             return ResultText(text)
+        else:
+            print(blob)
 
     def get_markdown_result_from_blob(self, blob):
         return MarkdownResult(blob)

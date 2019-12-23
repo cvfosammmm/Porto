@@ -37,7 +37,7 @@ class MainApplicationController(Gtk.Application):
         
         # load settings
         self.settings = ServiceLocator.get_settings()
-        
+
         # init view
         self.main_window = view.MainWindow(self)
         ServiceLocator.init_main_window(self.main_window)

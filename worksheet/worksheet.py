@@ -208,13 +208,12 @@ class Worksheet(Observable):
                         if output['output_type'] == 'error':
                             result = self.result_factory.get_error_from_nbformat_dict(output)
                             new_cell.set_result(result)
-                        elif output['output_type'] == 'execute_result':
+                        elif output['output_type'] == 'execute_result' or output['output_type'] == 'display_data':
                             try: data = output['data']
                             except KeyError: pass
                             else:
                                 result = self.result_factory.get_result_from_blob(data)
                                 new_cell.set_result(result)
-                        #TODO load errors
         self.set_save_state('saved')
         
     def save_to_disk(self):
