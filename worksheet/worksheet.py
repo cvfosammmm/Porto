@@ -231,7 +231,6 @@ class Worksheet(Observable):
                     if result != None:
                         output = result.export_nbformat()
                         cell_node.outputs = [output]
-                    nb.cells.append(cell_node)
 
                 elif isinstance(cell, model_cell.MarkdownCell):
                     result = cell.get_result()
@@ -240,7 +239,7 @@ class Worksheet(Observable):
                         source=cell.get_all_text(),
                         metadata=metadata
                     )
-                    nb.cells.append(cell_node)
+                nb.cells.append(cell_node)
 
             kernelspec_meta = {'name': self.kernelname, 'display_name': self.kernelname, 'language': self.kernelname}
             nb.metadata['kernelspec'] = kernelspec_meta
