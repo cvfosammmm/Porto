@@ -53,7 +53,6 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('Return'), m1_mask | s_mask, flags, self.shortcut_eval_add)
         self.accel_group.connect(Gdk.keyval_from_name('m'), c_mask, flags, self.shortcut_add_markdown_cell)
         self.accel_group.connect(Gdk.keyval_from_name('h'), c_mask, flags, self.shortcut_stop_computation)
-        self.accel_group.connect(Gdk.keyval_from_name('BackSpace'), c_mask, flags, self.shortcut_delete_cell)
         self.accel_group.connect(Gdk.keyval_from_name('Up'), c_mask, flags, self.shortcut_move_cell_up)
         self.accel_group.connect(Gdk.keyval_from_name('Down'), c_mask, flags, self.shortcut_move_cell_down)
         self.accel_group.connect(Gdk.keyval_from_name('r'), c_mask, flags, self.shortcut_restart_kernel)
@@ -112,11 +111,6 @@ class Shortcuts(object):
     def shortcut_stop_computation(self, accel_group=None, window=None, key=None, mask=None):
         if self.workspace.active_worksheet != None:
             self.workspace.active_worksheet.stop_evaluation()
-        return True
-
-    def shortcut_delete_cell(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.delete_active_cell()
         return True
 
     def shortcut_move_cell_up(self, accel_group=None, window=None, key=None, mask=None):

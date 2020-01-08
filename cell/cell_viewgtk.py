@@ -34,7 +34,7 @@ class CellView(Gtk.HBox):
 
         self.state_display = CellViewStateDisplay()
 
-        self.pack_start(self.state_display, False, False, 0) #TODO
+        self.pack_start(self.state_display, False, False, 0)
 
         self.vbox = Gtk.VBox()
 

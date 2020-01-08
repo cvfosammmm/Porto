@@ -57,13 +57,6 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
-                <property name="accelerator">&lt;ctrl&gt;BackSpace</property>
-                <property name="title" translatable="yes">Delete Cell</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;Up</property>
                 <property name="title" translatable="yes">Move cell up(ward(s))</property>
               </object>
