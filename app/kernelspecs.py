@@ -28,7 +28,6 @@ class Kernelspecs():
     def __init__(self):
         self.installed_kernels = dict()
         self.fetch_kernelspecs()
-        self.get_kernelspec_icon_path('python3')
 
     def fetch_kernelspecs(self):
         self.installed_kernels = jupyter_client.kernelspec.find_kernel_specs()
@@ -39,7 +38,11 @@ class Kernelspecs():
         return 'python3'
 
     def get_list_of_names(self):
-        return list(self.installed_kernels.keys())
+        list_of_names = ['python3']
+        for name in self.installed_kernels.keys():
+            if name not in ['python3']:
+                list_of_names.append(name)
+        return list_of_names
 
     def get_displayname(self, name):
         try: return self.installed_kernels[name].display_name
