@@ -50,7 +50,8 @@ class MainApplicationController(Gtk.Application):
         self.main_window.show_all()
 
         self.workspace = Workspace()
-        ServiceLocator.init_dialogs(self.main_window, self.workspace)
+        kernelspecs = ServiceLocator.get_kernelspecs()
+        ServiceLocator.init_dialogs(self.main_window, self.workspace, kernelspecs)
 
         # controllers
         self.main_window.quit_action.connect('activate', self.on_quit_action)

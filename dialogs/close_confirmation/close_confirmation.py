@@ -21,7 +21,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from dialogs.dialog import Dialog
-import app.service_locator as service_locator
 
 import os.path
 

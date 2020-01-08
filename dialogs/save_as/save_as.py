@@ -23,16 +23,17 @@ from gi.repository import Gtk
 import dialogs.save_as.save_as_viewgtk as save_as_viewgtk
 from dialogs.dialog import Dialog
 import helpers.helpers as helpers
-import app.service_locator as service_locator
 
 import os.path
 
 
 class SaveAsDialog(Dialog):
 
-    def __init__(self, workspace, main_window):
+    def __init__(self, workspace, main_window, overwrite_confirmation_dialog, select_folder_dialog):
         self.workspace = workspace
         self.main_window = main_window
+        self.overwrite_confirmation_dialog = overwrite_confirmation_dialog
+        self.select_folder_dialog = select_folder_dialog
 
     def run(self, worksheet):
         self.current_name = None
@@ -72,7 +73,7 @@ class SaveAsDialog(Dialog):
     def check_overwrite(self):
         if self.current_folder == None or self.current_filename == None: return False
         if os.path.isfile(self.current_folder + '/' + self.current_filename):
-            return service_locator.ServiceLocator.get_dialog('overwrite_confirmation').run(self.current_filename, self.current_folder)
+            return self.overwrite_confirmation_dialog.run(self.current_filename, self.current_folder)
         return True
 
     def setup(self):
@@ -105,7 +106,7 @@ class SaveAsDialog(Dialog):
         self.current_filename = filename
 
     def on_folder_button_click(self, button):
-        folder = service_locator.ServiceLocator.get_dialog('select_folder').run(self.current_folder)
+        folder = self.select_folder_dialog.run(self.current_folder)
         if folder != None:
             self.set_current_folder(folder)
 

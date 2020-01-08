@@ -23,16 +23,17 @@ from gi.repository import GLib, Gtk
 from dialogs.dialog import Dialog
 import helpers.helpers as helpers
 import dialogs.create_worksheet.create_worksheet_viewgtk as create_worksheet_viewgtk
-import app.service_locator as service_locator
 
 import os.path
 
 
 class CreateWorksheetDialog(Dialog):
 
-    def __init__(self, main_window):
+    def __init__(self, main_window, kernelspecs, overwrite_confirmation_dialog, select_folder_dialog):
         self.main_window = main_window
-        self.kernelspecs = service_locator.ServiceLocator.get_kernelspecs()
+        self.kernelspecs = kernelspecs
+        self.overwrite_confirmation_dialog = overwrite_confirmation_dialog
+        self.select_folder_dialog = select_folder_dialog
 
     def run(self):
         self.current_kernelname = None
@@ -66,7 +67,7 @@ class CreateWorksheetDialog(Dialog):
     def check_overwrite(self):
         if self.current_folder == None or self.current_filename == None: return False
         if os.path.isfile(self.current_folder + '/' + self.current_filename):
-            return service_locator.ServiceLocator.get_dialog('overwrite_confirmation').run(self.current_filename, self.current_folder)
+            return self.overwrite_confirmation_dialog.run(self.current_filename, self.current_folder)
         return True
 
     def setup(self):
@@ -130,7 +131,7 @@ class CreateWorksheetDialog(Dialog):
         self.current_filename = filename
 
     def on_folder_button_click(self, button):
-        folder = service_locator.ServiceLocator.get_dialog('select_folder').run(self.current_folder)
+        folder = self.select_folder_dialog.run(self.current_folder)
         if folder != None:
             self.set_current_folder(folder)
 
