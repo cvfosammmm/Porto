@@ -39,6 +39,7 @@ class WorksheetView(Gtk.ScrolledWindow):
         
         # fill worksheet with white background
         self.footer = Gtk.HBox()
+        self.footer.set_size_request(-1, 100)
         self.footer.pack_start(Gtk.DrawingArea(), True, True, 0)
         self.box.pack_end(self.footer, True, True, 0)
 
