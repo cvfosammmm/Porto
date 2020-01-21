@@ -69,7 +69,7 @@ class Kernelspecs():
             icon.get_style_context().add_class('wslist_icon')
             return icon
         filename = self.get_kernelspec_icon_path(name)
-        if os.path.isfile(filename):
+        if filename != None and os.path.isfile(filename):
             icon = self.get_icon_from_resource_dir(filename, 30)
             icon.get_style_context().add_class('wslist_icon')
             return icon
@@ -86,7 +86,7 @@ class Kernelspecs():
             icon.get_style_context().add_class('wslist_icon')
             return icon
         filename = self.get_kernelspec_icon_path(name)
-        if os.path.isfile(filename):
+        if filename != None and os.path.isfile(filename):
             icon = self.get_icon_from_resource_dir(filename, 30)
             icon.get_style_context().add_class('wslist_icon')
             return icon
@@ -100,7 +100,10 @@ class Kernelspecs():
         return './resources/images/' + name + '_icon_3.png'
 
     def get_kernelspec_icon_path(self, name):
-        return self.installed_kernels[name].resource_dir + '/logo-64x64.png'
+        if name in self.installed_kernels:
+            return self.installed_kernels[name].resource_dir + '/logo-64x64.png'
+        else:
+            return None
 
     def get_icon_from_filename(self, filename):
         return Gtk.Image.new_from_file(filename)
