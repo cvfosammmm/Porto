@@ -4,9 +4,6 @@
 
 */
 
-.resultviewrevealer > box > box {
-    border-bottom: 1px solid mix(@borders, @theme_bg_color, 0.5);
-}
 .resulttextview label {
     background-color: @theme_base_color;
     color: blue;
@@ -31,8 +28,11 @@
 .resulthtmlview {
     background-color: @theme_base_color;
 }
-.resultviewseperator1 {
+.resultviewseparator {
     background-color: @theme_base_color;
+}
+.cellborder {
+    background-color: @borders;
 }
 .resulttextview {
     background-color: @theme_base_color;

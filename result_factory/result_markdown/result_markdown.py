@@ -41,8 +41,6 @@ class MarkdownResult(Gtk.HBox):
         self.centerbox = Gtk.VBox()
 
         self.contentwrap = Gtk.VBox()
-        self.contentwrap.set_margin_top(16)
-        self.contentwrap.set_margin_bottom(22)
         self.contentwrap.set_margin_left(12)
         self.contentwrap.set_margin_right(6)
         self.contentwrap.pack_start(self.content, False, False, 0)
@@ -65,13 +63,13 @@ class MarkdownResult(Gtk.HBox):
 <meta charset="utf-8" />
 <style>
 body { width: 750px; font-family: nimbus sans l, cantarell, sans-serif; margin: 0px; color: ''' + helpers.theme_color_to_css(self.get_style_context(), 'theme_fg_color') + '''; background-color: ''' + helpers.theme_color_to_css(self.get_style_context(), 'theme_bg_color') + '''; }
-p { font-size: 16px; font-family: nimbus sans l, Source Serif Pro, Nimbus Roman No9 L, nimbus sans l, lora, linux libertine display o, liberation serif, freeserif, libertine, cantarell, sans-serif; margin-top: 12px; margin-bottom: 3px; line-height: 135%; }
-h1 { font-size: 30px; font-weight: bold; margin-top: 21px; }
-h2 { font-size: 24px; font-weight: bold; margin-top: 21px; margin-bottom: 1px; }
-h3 { font-size: 20px; font-weight: bold; margin-top: 20px; margin-bottom: 3px; }
-h4 { font-size: 16px; font-weight: bold; margin-top: 22px; margin-bottom: 3px; font-style: italic; }
-h5 { font-size: 16px; margin-top: 22px; margin-bottom: 3px; }
-h6 { font-size: 16px; margin-top: 22px; margin-bottom: 3px; }
+p { font-size: 16px; font-family: nimbus sans l, Source Serif Pro, Nimbus Roman No9 L, nimbus sans l, lora, linux libertine display o, liberation serif, freeserif, libertine, cantarell, sans-serif; margin-top: 8px; margin-bottom: 5px; line-height: 135%; }
+h1 { font-size: 30px; font-weight: bold; margin-top: 17px; margin-bottom: 2px; }
+h2 { font-size: 24px; font-weight: bold; margin-top: 17px; margin-bottom: 3px; }
+h3 { font-size: 20px; font-weight: bold; margin-top: 16px; margin-bottom: 5px; }
+h4 { font-size: 16px; font-weight: bold; margin-top: 18px; margin-bottom: 5px; font-style: italic; }
+h5 { font-size: 16px; margin-top: 18px; margin-bottom: 5px; }
+h6 { font-size: 16px; margin-top: 18px; margin-bottom: 5px; }
 
 math {font-size: 19px; font-family: STIX Math}
 </style>
