@@ -37,11 +37,9 @@ class WorksheetView(Gtk.ScrolledWindow):
         self.add(self.box)
         self.viewport = self.get_children().pop()
         
-        # fill worksheet with white background
-        self.footer = Gtk.HBox()
-        self.footer.set_size_request(-1, 100)
-        self.footer.pack_start(Gtk.DrawingArea(), True, True, 0)
-        self.box.pack_end(self.footer, True, True, 0)
+        # add padding to the top and bottom
+        self.box.set_margin_top(10)
+        self.box.set_margin_bottom(100)
 
         # contains all types of cell view, result views, ...
         self.children = list()
