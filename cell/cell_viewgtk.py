@@ -77,7 +77,6 @@ class CellViewCode(CellView):
         self.text_widget_sw.set_propagate_natural_width(False)
         self.text_widget_sw.set_overlay_scrolling(False)
         self.text_widget_sw.set_size_request(768, -1)
-        self.text_widget_sw.set_margin_right(9)
 
         self.box_to_prevent_scrolling = Gtk.HBox()
 
@@ -114,7 +113,15 @@ class CellViewCode(CellView):
         self.result_view_revealer = ResultViewRevealerCode(self)
         self.vbox.pack_start(self.result_view_revealer, False, False, 0)
 
-        self.set_center_widget(self.vbox)
+        self.hbox = Gtk.HBox()
+        self.border_left = CellBorder()
+        self.border_left.set_size_request(1, -1)
+        self.hbox.pack_start(self.border_left, False, False, 0)
+        self.hbox.pack_start(self.vbox, False, False, 0)
+        self.border_right = CellBorder()
+        self.border_right.set_size_request(1, -1)
+        self.hbox.pack_start(self.border_right, False, False, 0)
+        self.set_center_widget(self.hbox)
 
         self.line_height = 20
         self.size = {'width': self.get_allocated_width(), 'height': self.get_allocated_height()}
@@ -148,7 +155,6 @@ class CellViewMarkdown(CellView):
         self.text_widget_sw.set_propagate_natural_width(False)
         self.text_widget_sw.set_overlay_scrolling(False)
         self.text_widget_sw.set_size_request(768, -1)
-        self.text_widget_sw.set_margin_right(9)
 
         self.box_to_prevent_scrolling = Gtk.HBox()
 
@@ -272,7 +278,6 @@ class ResultViewRevealer(Gtk.EventBox):
         self.revealer = Gtk.Revealer()
 
         self.superbox = Gtk.VBox()
-        self.superbox.set_margin_right(9)
 
     def set_result(self, result_view):
         if self.result_view != None:
@@ -419,7 +424,6 @@ class CellBorder(Gtk.DrawingArea):
         Gtk.DrawingArea.__init__(self)
 
         self.get_style_context().add_class('cellborder')
-        self.set_margin_right(9)
 
         self.connect('draw', self.draw)
         self.opacity = 0

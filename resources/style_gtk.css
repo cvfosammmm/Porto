@@ -108,24 +108,15 @@ textview {
 */
 
 .cellviewcode .cellviewstatedisplay {
-    background-color: mix(@borders, @theme_bg_color, 0.5);
+    background-color: @theme_bg_color;
 }
 .cellviewcode.active .cellviewstatedisplay {
     background-color: #26a269;
 }
 .cellviewmarkdown .cellviewstatedisplay {
-    background-color: mix(@borders, @theme_bg_color, 0.5);
-}
-.cellviewmarkdown.active .cellviewstatedisplay {
-    background-color: #26a269;
-}
-.resultviewrevealer .cellviewstatedisplay {
-    background-color: mix(@borders, @theme_bg_color, 0.5);
-}
-.resultviewrevealer.markdown .cellviewstatedisplay {
     background-color: @theme_bg_color;
 }
-.resultviewrevealer.active .cellviewstatedisplay {
+.cellviewmarkdown.active .cellviewstatedisplay {
     background-color: #26a269;
 }
 
