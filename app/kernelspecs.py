@@ -54,7 +54,7 @@ class Kernelspecs():
             icon = self.get_icon_from_filename(filename)
             return icon
         filename = self.get_kernelspec_icon_path(name)
-        if os.path.isfile(filename):
+        if filename != None and os.path.isfile(filename):
             icon = self.get_icon_from_resource_dir(filename, 16)
             return icon
         filename = './resources/images/placeholder_icon_1.png'

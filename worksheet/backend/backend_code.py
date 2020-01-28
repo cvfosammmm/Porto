@@ -162,9 +162,7 @@ class Query():
 class Kernel():
 
     def __init__(self, kernel_name, worksheet):
-        self.kernel_spec = jupyter_client.kernelspec.KernelSpecManager().get_kernel_spec(kernel_name)
-
-        self.query_queue = list()#queue.Queue()
+        self.query_queue = list()
         self.query_queue_lock = thread.allocate_lock()
         self.results_temp = dict()
         self.results_temp_lock = thread.allocate_lock()
