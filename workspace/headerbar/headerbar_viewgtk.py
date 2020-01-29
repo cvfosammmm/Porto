@@ -82,7 +82,7 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.current_move_cell_box = None
         self.current_eval_box = None
         self.current_save_button = None
-        
+
         self.welcome_title = Gtk.Label('Welcome to Porto')
         self.welcome_title.get_style_context().add_class('title')
         self.welcome_title.show_all()

@@ -59,11 +59,11 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('Page_Up'), 0, flags, self.shortcut_page_up)
         self.accel_group.connect(Gdk.keyval_from_name('Page_Down'), 0, flags, self.shortcut_page_down)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
-        self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask | s_mask, flags, self.shortcut_save_as)
 
         self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
         self.main_window.app.set_accels_for_action('win.open_worksheet', ['<Control>o'])
         self.main_window.app.set_accels_for_action('win.create_worksheet', ['<Control>n'])
+        self.main_window.app.set_accels_for_action('win.save_as', ['<Control><Shift>s'])
 
         self.main_window.worksheet_view_wrapper.connect('key-press-event', self.on_worksheet_key_pressed)
 
@@ -148,8 +148,5 @@ class Shortcuts(object):
         worksheet = self.workspace.get_active_worksheet()
         if worksheet != None:
             worksheet.save_to_disk()
-
-    def shortcut_save_as(self, accel_group=None, window=None, key=None, mask=None):
-        self.workspace.controller.on_wsmenu_save_as()
 
 
