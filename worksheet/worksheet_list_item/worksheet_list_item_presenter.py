@@ -25,6 +25,7 @@ class WorksheetListItemPresenter(object):
         self.item = item
         self.item.register_observer(self)
         self.worksheet.register_observer(self)
+        self.update_subtitle()
 
     def change_notification(self, change_code, notifying_object, parameter):
 
