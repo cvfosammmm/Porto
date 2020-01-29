@@ -43,7 +43,7 @@ class OpenWorksheetsListController(object):
     def on_open_worksheets_list_selected(self, wslist_view, wslist_item_view):
         if wslist_item_view != None:
             worksheet = wslist_item_view.get_worksheet()
-            self.workspace.activate_worksheet(worksheet)
+            self.workspace.set_active_worksheet(worksheet)
             GLib.idle_add(self.scroll_row_on_screen, wslist_view, wslist_item_view)
 
     def scroll_row_on_screen(self, view, row):

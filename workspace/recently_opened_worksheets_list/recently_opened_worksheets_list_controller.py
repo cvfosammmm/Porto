@@ -39,10 +39,8 @@ class RecentlyOpenedWorksheetsListController(object):
 
     def on_recent_worksheets_list_click(self, wslist_view, wslist_item_view):
         if wslist_item_view != None:
-            '''for widget in [self.sidebar, self.hbchooser]:
-                widget.open_worksheets_list_view.unselect_all()'''
             pathname = wslist_item_view.pathname
-            self.workspace.activate_worksheet_by_pathname(pathname)
+            self.workspace.controller.open_ws_action(None, pathname)
             self.hbchooser.popdown()
 
     def select_row_by_worksheet(self, worksheet):

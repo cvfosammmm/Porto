@@ -46,6 +46,7 @@ class WelcomePageView(Gtk.ScrolledWindow):
         self.create_ws_link.set_can_focus(False)
         self.create_ws_link.set_tooltip_text('')
         self.open_ws_link = Gtk.LinkButton('action://win.placeholder', 'Open Worksheet(s)')
+        self.open_ws_link.set_action_name('win.open_worksheet')
         self.open_ws_link.set_can_focus(False)
         self.open_ws_link.set_tooltip_text('')
         self.welcome_links.pack_start(self.create_ws_link, False, False, 0)

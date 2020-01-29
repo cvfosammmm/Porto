@@ -29,6 +29,7 @@ import dialogs.overwrite_confirmation.overwrite_confirmation as overwrite_confir
 import dialogs.preferences.preferences as preferences_dialog
 import dialogs.save_as.save_as as save_as_dialog
 import dialogs.select_folder.select_folder as select_folder_dialog
+import dialogs.kernel_missing.kernel_missing as kernel_missing_dialog
 
 import re
 import os.path
@@ -48,6 +49,7 @@ class ServiceLocator(object):
         settings = ServiceLocator.get_settings()
         ServiceLocator.dialogs['about'] = about_dialog.AboutDialog(main_window)
         ServiceLocator.dialogs['close_confirmation'] = close_confirmation_dialog.CloseConfirmationDialog(main_window)
+        ServiceLocator.dialogs['kernel_missing'] = kernel_missing_dialog.KernelMissingDialog(main_window)
         ServiceLocator.dialogs['overwrite_confirmation'] = overwrite_confirmation_dialog.OverwriteConfirmationDialog(main_window)
         ServiceLocator.dialogs['select_folder'] = select_folder_dialog.SelectFolderDialog(main_window)
         ServiceLocator.dialogs['create_worksheet'] = create_worksheet_dialog.CreateWorksheetDialog(main_window, kernelspecs, ServiceLocator.dialogs['overwrite_confirmation'], ServiceLocator.dialogs['select_folder'])

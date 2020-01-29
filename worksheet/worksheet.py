@@ -74,6 +74,8 @@ class Worksheet(Observable):
         self.evaluator = worksheet_evaluator.WorksheetEvaluator(self)
         self.headerbar_controls = headerbar_controls.HeaderbarControls(self)
 
+        self.load_from_disk()
+
     def remove_all_cells(self):
         while len(self.cells) > 0:
             self.remove_cell(self.cells[0])
@@ -183,11 +185,10 @@ class Worksheet(Observable):
     def load_from_disk(self):
         nb = nbformat.read(self.pathname, nbformat.current_nbformat)
         if self.get_cell_count() == 0:
-            try: kernelspec = nb.metadata['kernelspec']
-            except KeyError:
-                self.set_kernelname('python3')
-            else:
-                self.set_kernelname(kernelspec['name'])
+            kernelname = nb.metadata['kernelspec']['name']
+            if not ServiceLocator.get_kernelspecs().is_installed(kernelname):
+                raise KernelMissing(kernelname)
+            self.set_kernelname(kernelname)
             self.set_kernel_state('kernel_to_start')
             is_first_cell = True
             for cell in nb.cells:
@@ -409,5 +410,12 @@ class Worksheet(Observable):
 
     def get_modified_cell_count(self):
         return len(self.modified_cells)
+
+
+class KernelMissing(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
 
 

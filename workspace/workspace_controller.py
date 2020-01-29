@@ -45,12 +45,9 @@ class WorkspaceController(object):
         self.main_window.delete_ws_action.connect('activate', self.on_wsmenu_delete)
         self.main_window.close_action.connect('activate', self.on_wsmenu_close)
         self.main_window.close_all_action.connect('activate', self.on_wsmenu_close_all)
+        self.main_window.open_action.connect('activate', self.open_ws_action)
 
         self.main_window.welcome_page_view.create_ws_link.connect('clicked', self.on_create_ws_button_click)
-        self.main_window.welcome_page_view.open_ws_link.connect('clicked', self.on_open_ws_button_click)
-
-        self.main_window.headerbar.hb_left.open_ws_button.connect('clicked', self.on_open_ws_button_click)
-        self.main_window.headerbar.hb_right.worksheet_chooser.open_button.connect('clicked', self.on_open_ws_button_click)
 
         self.settings.register_observer(self)
 
@@ -64,12 +61,21 @@ class WorkspaceController(object):
     def on_sidebar_size_allocate(self, paned, paned_size):
         self.workspace.sidebar_position = self.main_window.paned.get_position()
             
-    def on_open_ws_button_click(self, button_object=None):
-        filename = ServiceLocator.get_dialog('open_worksheet').run()
-        if filename != None:
-            if filename.split('.')[-1] == 'ipynb':
-                worksheet = model_worksheet.Worksheet(filename)
-                self.workspace.activate_worksheet(worksheet)
+    def open_ws_action(self, action=None, pathname=None):
+        if pathname == None:
+            pathname = ServiceLocator.get_dialog('open_worksheet').run()
+        if pathname != None:
+            worksheet = self.workspace.get_worksheet_by_pathname(pathname)
+            if worksheet == None:
+                if pathname.split('.')[-1] == 'ipynb':
+                    try:
+                        worksheet = model_worksheet.Worksheet(pathname)
+                    except model_worksheet.KernelMissing as e:
+                        ServiceLocator.get_dialog('kernel_missing').run(str(e))
+                    else:
+                        self.workspace.add_worksheet(worksheet)
+            if worksheet != None:
+                self.workspace.set_active_worksheet(worksheet)
 
     def on_create_ws_button_click(self, button_object=None):
         parameters = ServiceLocator.get_dialog('create_worksheet').run()

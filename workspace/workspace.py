@@ -54,36 +54,20 @@ class Workspace(Observable):
         self.recently_opened_worksheets.add_item(item)
         self.add_change_code('new_worksheet', worksheet)
 
+    def get_worksheet_by_pathname(self, pathname):
+        for worksheet in self.open_worksheets:
+            if worksheet.pathname == pathname:
+                return worksheet
+        return None
+
     def create_worksheet(self, pathname, kernelname):
         self.recently_opened_worksheets.remove_worksheet_by_pathname(pathname)
         self.remove_worksheet_by_pathname(pathname)
 
         worksheet = model_worksheet.Worksheet(pathname)
         worksheet.set_kernelname(kernelname)
-        worksheet.save_to_disk()
-        self.activate_worksheet(worksheet)
         worksheet.create_cell(0, '', activate=True)
         worksheet.save_to_disk()
-
-    def activate_worksheet(self, worksheet):
-        if not worksheet in self.open_worksheets:
-            self.add_worksheet(worksheet)
-            worksheet.load_from_disk()
-        self.set_active_worksheet(worksheet)
-
-    def activate_worksheet_by_pathname(self, pathname):
-        for worksheet in self.open_worksheets:
-            if worksheet.pathname == pathname:
-                self.set_active_worksheet(worksheet)
-                return
-        worksheet = model_worksheet.Worksheet(pathname)
-        try:
-            worksheet.load_from_disk()
-        except FileNotFoundError:
-            self.recently_opened_worksheets.remove_worksheet_by_pathname(pathname)
-        else:
-            self.add_worksheet(worksheet)
-            self.set_active_worksheet(worksheet)
 
     def set_active_worksheet(self, worksheet):
         if worksheet != self.active_worksheet:

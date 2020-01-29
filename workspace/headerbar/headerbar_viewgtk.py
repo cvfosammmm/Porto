@@ -58,6 +58,7 @@ class HeaderBarLeft(Gtk.HeaderBar):
         self.open_ws_button = Gtk.Button.new_from_icon_name('document-open-symbolic', Gtk.IconSize.BUTTON)
         self.open_ws_button.set_tooltip_text('Open worksheet')
         self.open_ws_button.set_focus_on_click(False)
+        self.open_ws_button.set_action_name('win.open_worksheet')
         self.pack_start(self.open_ws_button)
 
     def do_get_request_mode(self):
@@ -263,6 +264,7 @@ class WorksheetChooser(Gtk.Popover):
         self.button_box.set_margin_bottom(3)
         self.create_button = Gtk.Button.new_with_label('Create Worksheet')
         self.open_button = Gtk.Button.new_with_label('Open Worksheet')
+        self.open_button.set_action_name('win.open_worksheet')
         self.button_box.pack_start(self.open_button, False, False, 0)
         self.button_box.pack_start(self.create_button, False, False, 0)
         self.box.pack_start(self.button_box, False, False, 0)
