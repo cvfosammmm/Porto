@@ -21,10 +21,10 @@ import result_factory.result_factory as result_factory
 
 import dialogs.about.about as about_dialog
 import dialogs.close_confirmation.close_confirmation as close_confirmation_dialog
-import dialogs.create_worksheet.create_worksheet as create_worksheet_dialog
-import dialogs.delete_worksheet.delete_worksheet as delete_worksheet_dialog
+import dialogs.create_notebook.create_notebook as create_notebook_dialog
+import dialogs.delete_notebook.delete_notebook as delete_notebook_dialog
 import dialogs.keyboard_shortcuts.keyboard_shortcuts as keyboard_shortcuts_dialog
-import dialogs.open_worksheet.open_worksheet as open_worksheet_dialog
+import dialogs.open_notebook.open_notebook as open_notebook_dialog
 import dialogs.overwrite_confirmation.overwrite_confirmation as overwrite_confirmation_dialog
 import dialogs.preferences.preferences as preferences_dialog
 import dialogs.save_as.save_as as save_as_dialog
@@ -52,11 +52,11 @@ class ServiceLocator(object):
         ServiceLocator.dialogs['kernel_missing'] = kernel_missing_dialog.KernelMissingDialog(main_window)
         ServiceLocator.dialogs['overwrite_confirmation'] = overwrite_confirmation_dialog.OverwriteConfirmationDialog(main_window)
         ServiceLocator.dialogs['select_folder'] = select_folder_dialog.SelectFolderDialog(main_window)
-        ServiceLocator.dialogs['create_worksheet'] = create_worksheet_dialog.CreateWorksheetDialog(main_window, kernelspecs, ServiceLocator.dialogs['overwrite_confirmation'], ServiceLocator.dialogs['select_folder'])
+        ServiceLocator.dialogs['create_notebook'] = create_notebook_dialog.CreateNotebookDialog(main_window, kernelspecs, ServiceLocator.dialogs['overwrite_confirmation'], ServiceLocator.dialogs['select_folder'])
         ServiceLocator.dialogs['save_as'] = save_as_dialog.SaveAsDialog(workspace, main_window, ServiceLocator.dialogs['overwrite_confirmation'], ServiceLocator.dialogs['select_folder'])
-        ServiceLocator.dialogs['delete_worksheet'] = delete_worksheet_dialog.DeleteWorksheetDialog(main_window)
+        ServiceLocator.dialogs['delete_notebook'] = delete_notebook_dialog.DeleteNotebookDialog(main_window)
         ServiceLocator.dialogs['keyboard_shortcuts'] = keyboard_shortcuts_dialog.KeyboardShortcutsDialog(main_window)
-        ServiceLocator.dialogs['open_worksheet'] = open_worksheet_dialog.OpenWorksheetDialog(main_window)
+        ServiceLocator.dialogs['open_notebook'] = open_notebook_dialog.OpenNotebookDialog(main_window)
         ServiceLocator.dialogs['preferences'] = preferences_dialog.PreferencesDialog(main_window, settings)
     
     def init_main_window(main_window):

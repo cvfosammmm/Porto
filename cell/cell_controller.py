@@ -27,12 +27,12 @@ from app.service_locator import ServiceLocator
 
 class CellController(object):
 
-    def __init__(self, cell, cell_view, worksheet):
+    def __init__(self, cell, cell_view, notebook):
 
         self.cell = cell
         self.cell_view = cell_view
 
-        self.worksheet = worksheet
+        self.notebook = notebook
 
         # observe cell
         result = cell.get_result()
@@ -60,10 +60,10 @@ class CellController(object):
             self.add_result_view(parameter['result'], show_animation=parameter['show_animation'])
 
         if change_code == 'cell_state_change':
-            try: worksheet_view = self.cell.get_worksheet().view
+            try: notebook_view = self.cell.get_notebook().view
             except KeyError: return
-            child_position = self.cell.get_worksheet_position()
-            cell_view = worksheet_view.get_child_by_position(child_position)
+            child_position = self.cell.get_notebook_position()
+            cell_view = notebook_view.get_child_by_position(child_position)
 
             if cell_view != None:
                 if parameter == 'idle': cell_view.state_display.show_nothing()
@@ -80,7 +80,7 @@ class CellController(object):
     def on_scroll(self, scrolled_window, event):
 
         if(abs(event.delta_y) > 0):
-            adjustment = self.worksheet.view.get_vadjustment()
+            adjustment = self.notebook.view.get_vadjustment()
 
             page_size = adjustment.get_page_size()
             scroll_unit = pow (page_size, 2.0 / 3.0)
@@ -93,104 +93,104 @@ class CellController(object):
         if click_event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             cell_view = result_view_revealer.cell_view
             cell = cell_view.get_cell()
-            worksheet = cell.get_worksheet()
+            notebook = cell.get_notebook()
             cell.remove_result()
-            worksheet.set_active_cell(cell)
+            notebook.set_active_cell(cell)
         elif click_event.type == Gdk.EventType.BUTTON_PRESS:
             cell_view = result_view_revealer.cell_view
             cell = cell_view.get_cell()
-            worksheet = cell.get_worksheet()
-            worksheet.set_active_cell(cell)
+            notebook = cell.get_notebook()
+            notebook.set_active_cell(cell)
         return False
 
     def revealer_on_size_allocate(self, result_view_revealer, allocation):
-        cell = self.worksheet.get_active_cell()
+        cell = self.notebook.get_active_cell()
         if cell != None and result_view_revealer.autoscroll_on_reveal == True:
-            worksheet_view = self.worksheet.view
-            cell_view_position = cell.get_worksheet_position()
-            cell_view = worksheet_view.get_child_by_position(cell_view_position)
-            x, cell_position = cell_view.translate_coordinates(worksheet_view.box, 0, 0)
-            x, result_position = result_view_revealer.translate_coordinates(worksheet_view.box, 0, 0)
+            notebook_view = self.notebook.view
+            cell_view_position = cell.get_notebook_position()
+            cell_view = notebook_view.get_child_by_position(cell_view_position)
+            x, cell_position = cell_view.translate_coordinates(notebook_view.box, 0, 0)
+            x, result_position = result_view_revealer.translate_coordinates(notebook_view.box, 0, 0)
             
             last_allocation = result_view_revealer.allocation
             result_view_revealer.allocation = allocation
             if cell_position > result_position:
-                worksheet_view.scroll(allocation.height - last_allocation.height)
+                notebook_view.scroll(allocation.height - last_allocation.height)
 
     def observe_keyboard_keypress_events(self, widget, event):
 
         # switch cells with arrow keys: upward
         if event.keyval == Gdk.keyval_from_name('Up') and event.state == 0:
-            worksheet = self.cell.get_worksheet()
+            notebook = self.cell.get_notebook()
             cell = self.cell
             if isinstance(cell, model_cell.MarkdownCell) and cell.get_result() != None:
-                prev_cell = worksheet.get_prev_cell(cell)
+                prev_cell = notebook.get_prev_cell(cell)
                 if not prev_cell == None:
-                    worksheet.set_active_cell(prev_cell)
+                    notebook.set_active_cell(prev_cell)
                     prev_cell.controller.place_cursor_on_last_line()
                     return True
 
-            if cell.get_worksheet_position() > 0:
+            if cell.get_notebook_position() > 0:
                 if cell.get_iter_at_mark(cell.get_insert()).get_offset() == 0:
-                    prev_cell = worksheet.get_prev_cell(cell)
+                    prev_cell = notebook.get_prev_cell(cell)
                     if not prev_cell == None:
-                        worksheet.set_active_cell(prev_cell)
+                        notebook.set_active_cell(prev_cell)
                         prev_cell.controller.place_cursor_on_last_line()
                         return True
         
         # switch cells with arrow keys: downward
         if event.keyval == Gdk.keyval_from_name('Down') and event.state == 0:
-            worksheet = self.cell.get_worksheet()
+            notebook = self.cell.get_notebook()
             cell = self.cell
             
             if isinstance(cell, model_cell.MarkdownCell) and cell.get_result() != None:
-                next_cell = worksheet.get_next_cell(cell)
+                next_cell = notebook.get_next_cell(cell)
                 if not next_cell == None:
-                    worksheet.set_active_cell(next_cell)
+                    notebook.set_active_cell(next_cell)
                     next_cell.place_cursor(next_cell.get_start_iter())
                     return True
                 
-            if cell.get_worksheet_position() < worksheet.get_cell_count() - 1:
+            if cell.get_notebook_position() < notebook.get_cell_count() - 1:
                 if cell.get_char_count() == (cell.get_iter_at_mark(cell.get_insert()).get_offset()):
-                    next_cell = worksheet.get_next_cell(cell)
+                    next_cell = notebook.get_next_cell(cell)
                     if not next_cell == None:
-                        worksheet.set_active_cell(next_cell)
+                        notebook.set_active_cell(next_cell)
                         next_cell.place_cursor(next_cell.get_start_iter())
                         return True
 
         if event.keyval == Gdk.keyval_from_name('BackSpace') and event.state == 0:
-            worksheet = self.cell.get_worksheet()
+            notebook = self.cell.get_notebook()
             cell = self.cell
 
             if isinstance(cell, model_cell.CodeCell) and cell.get_char_count() == 0:
-                prev_cell = worksheet.get_prev_cell(cell)
+                prev_cell = notebook.get_prev_cell(cell)
                 if not prev_cell == None:
-                    worksheet.set_active_cell(prev_cell)
+                    notebook.set_active_cell(prev_cell)
                     prev_cell.controller.place_cursor_on_last_line()
                     cell.remove_result()
-                    worksheet.remove_cell(cell)
+                    notebook.remove_cell(cell)
                     return True
 
             if isinstance(cell, model_cell.MarkdownCell):
                 if cell.get_result() != None or cell.get_char_count() == 0:
-                    prev_cell = worksheet.get_prev_cell(cell)
-                    next_cell = worksheet.get_next_cell(cell)
+                    prev_cell = notebook.get_prev_cell(cell)
+                    next_cell = notebook.get_next_cell(cell)
                     if not prev_cell == None: 
-                        worksheet.set_active_cell(prev_cell)
+                        notebook.set_active_cell(prev_cell)
                         prev_cell.controller.place_cursor_on_last_line()
                     elif not next_cell == None:
-                        worksheet.set_active_cell(next_cell)
+                        notebook.set_active_cell(next_cell)
                         next_cell.place_cursor(next_cell.get_start_iter())
                     else:
-                        worksheet.create_cell('last', '', activate=True)
+                        notebook.create_cell('last', '', activate=True)
                     cell.remove_result()
-                    worksheet.remove_cell(cell)
+                    notebook.remove_cell(cell)
                     return True
         
         return False
     
     def on_cursor_movement(self, cell=None, mark=None, user_data=None):
-        self.worksheet.controller.scroll_to_cursor(self.cell, check_if_position_changed=True)
+        self.notebook.controller.scroll_to_cursor(self.cell, check_if_position_changed=True)
 
     def on_paste(self, cell=None, clipboard=None, user_data=None):
         ''' hack to prevent some gtk weirdness. '''
@@ -203,22 +203,22 @@ class CellController(object):
         ''' activate cell on click '''
 
         if self.cell.is_active_cell() == False:
-            self.cell.get_worksheet().set_active_cell(self.cell)
+            self.cell.get_notebook().set_active_cell(self.cell)
         if self.cell_view.text_widget.get_reveal_child():
             self.cell_view.text_entry.grab_focus()
-            self.worksheet.controller.scroll_to_cursor(cell_view.text_entry.get_buffer(), check_if_position_changed=True)
+            self.notebook.controller.scroll_to_cursor(cell_view.text_entry.get_buffer(), check_if_position_changed=True)
         return False
     
     def on_source_view_focus_in(self, source_view, event=None):
         ''' activate cell on click '''
 
         if self.cell.is_active_cell() == False:
-            self.cell.get_worksheet().set_active_cell(self.cell)
+            self.cell.get_notebook().set_active_cell(self.cell)
             return True
         return False
     
     def on_size_allocate(self, text_field, allocation=None):
-        self.worksheet.controller.scroll_to_cursor(text_field.get_buffer(), check_if_position_changed=True)
+        self.notebook.controller.scroll_to_cursor(text_field.get_buffer(), check_if_position_changed=True)
         
     '''
     *** helpers: cell
@@ -231,11 +231,11 @@ class CellController(object):
 
 class CodeCellController(CellController):
 
-    def __init__(self, cell, cell_view, worksheet):
-        CellController.__init__(self, cell, cell_view, worksheet)
+    def __init__(self, cell, cell_view, notebook):
+        CellController.__init__(self, cell, cell_view, notebook)
 
     def add_result_view(self, result, show_animation=False):
-        cell_view_position = self.cell.get_worksheet_position()
+        cell_view_position = self.cell.get_notebook_position()
                 
         # check if cell view is still present
         if cell_view_position >= 0:
@@ -259,7 +259,7 @@ class CodeCellController(CellController):
 
     def result_on_scroll(self, scrolled_window, event):
         if(abs(event.delta_y) > 0):
-            adjustment = self.worksheet.view.get_vadjustment()
+            adjustment = self.notebook.view.get_vadjustment()
 
             page_size = adjustment.get_page_size()
             scroll_unit = pow (page_size, 2.0 / 3.0)
@@ -270,11 +270,11 @@ class CodeCellController(CellController):
 
 class MarkdownCellController(CellController):
 
-    def __init__(self, cell, cell_view, worksheet):
-        CellController.__init__(self, cell, cell_view, worksheet)
+    def __init__(self, cell, cell_view, notebook):
+        CellController.__init__(self, cell, cell_view, notebook)
 
     def add_result_view(self, result, show_animation=False):
-        cell_view_position = self.cell.get_worksheet_position()
+        cell_view_position = self.cell.get_notebook_position()
                 
         # check if cell view is still present
         if cell_view_position >= 0:
@@ -305,15 +305,15 @@ class MarkdownCellController(CellController):
         if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             cell_view = self.cell_view
             cell = cell_view.get_cell()
-            worksheet = cell.get_worksheet()
+            notebook = cell.get_notebook()
             cell.remove_result()
-            worksheet.set_active_cell(cell)
+            notebook.set_active_cell(cell)
             return True
         elif event.type == Gdk.EventType.BUTTON_PRESS:
             cell_view = self.cell_view
             cell = cell_view.get_cell()
-            worksheet = cell.get_worksheet()
-            worksheet.set_active_cell(cell)
+            notebook = cell.get_notebook()
+            notebook.set_active_cell(cell)
             return False
 
 

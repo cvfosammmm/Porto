@@ -96,12 +96,12 @@ class MainApplicationController(Gtk.Application):
         self.save_quit()
 
     def save_quit(self, accel_group=None, window=None, key=None, mask=None):
-        ''' signal handler, ask user to save unsaved worksheets or discard changes '''
+        ''' signal handler, ask user to save unsaved notebooks or discard changes '''
         
-        worksheets = self.workspace.get_unsaved_worksheets()
-        active_worksheet = self.workspace.get_active_worksheet()
+        notebooks = self.workspace.get_unsaved_notebooks()
+        active_notebook = self.workspace.get_active_notebook()
 
-        if len(worksheets) == 0 or active_worksheet == None or ServiceLocator.get_dialog('close_confirmation').run(worksheets)['all_save_to_close']: 
+        if len(notebooks) == 0 or active_notebook == None or ServiceLocator.get_dialog('close_confirmation').run(notebooks)['all_save_to_close']: 
             self.save_window_state()
             self.workspace.shutdown_all_kernels()
             self.quit()

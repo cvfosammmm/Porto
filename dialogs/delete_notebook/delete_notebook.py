@@ -23,23 +23,28 @@ from gi.repository import Gtk
 from dialogs.dialog import Dialog
 
 
-class KernelMissingDialog(Dialog):
-    ''' This dialog is asking users to save unsaved notebooks or discard their changes. '''
+class DeleteNotebookDialog(Dialog):
 
     def __init__(self, main_window):
         self.main_window = main_window
 
-    def run(self, kernelname):
-        self.setup(kernelname)
-
+    def run(self, notebook):
+        self.setup(notebook)
         response = self.view.run()
+        if response == Gtk.ResponseType.YES:
+            return_value = True
+        else:
+            return_value = False
         self.close()
+        return return_value
 
-    def setup(self, kernelname):
-        self.view = Gtk.MessageDialog(self.main_window, 0, Gtk.MessageType.ERROR)
-
-        self.view.set_property('text', 'Kernel »' + kernelname + '« is missing.')
-        self.view.format_secondary_markup('The notebook you want to open uses the »' + kernelname + '« kernel, which does not seem to be installed on this system.')
-        self.view.add_buttons('_Close', Gtk.ResponseType.OK)
+    def setup(self, notebook):
+        self.view = Gtk.MessageDialog(self.main_window, 0, Gtk.MessageType.QUESTION)
+        self.view.set_property('text', 'Are you sure you want to delete »' + notebook.get_name() + '«?')
+        self.view.format_secondary_text('When a notebook is deleted it\'s permanently gone and can\'t easily be restored.')
+        self.view.add_button('Cancel', Gtk.ResponseType.NO)
+        delete_button = self.view.add_button('Delete', Gtk.ResponseType.YES)
+        delete_button.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
+        self.view.set_default_response(Gtk.ResponseType.NO)
 
 

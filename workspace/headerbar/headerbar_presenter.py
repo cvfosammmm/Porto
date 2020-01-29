@@ -20,7 +20,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gio
 
 from app.service_locator import ServiceLocator
-import worksheet.worksheet as model_worksheet
+import notebook.notebook as model_notebook
 
 
 class HeaderbarPresenter(object):
@@ -43,11 +43,11 @@ class HeaderbarPresenter(object):
 
     def change_notification(self, change_code, notifying_object, parameter):
 
-        if change_code == 'new_worksheet':
-            self.activate_worksheet_mode()
+        if change_code == 'new_notebook':
+            self.activate_notebook_mode()
 
-        if change_code == 'worksheet_removed':
-            if self.workspace.get_active_worksheet() == None:
+        if change_code == 'notebook_removed':
+            if self.workspace.get_active_notebook() == None:
                 headerbar = self.headerbar.hb_right
                 if headerbar.current_save_button != None:
                     headerbar.remove(headerbar.current_save_button)
@@ -66,13 +66,13 @@ class HeaderbarPresenter(object):
                     headerbar.current_eval_box = None
                 self.activate_welcome_page_mode()
 
-        if change_code == 'changed_active_worksheet':
-            worksheet = parameter
-            if worksheet != None:
-                self.activate_worksheet_mode()
-                self.update_title(worksheet)
-                self.update_save_button(worksheet)
-                self.update_controls(worksheet)
+        if change_code == 'changed_active_notebook':
+            notebook = parameter
+            if notebook != None:
+                self.activate_notebook_mode()
+                self.update_title(notebook)
+                self.update_save_button(notebook)
+                self.update_controls(notebook)
 
         if change_code == 'sidebar_state':
             if parameter == True:
@@ -86,34 +86,34 @@ class HeaderbarPresenter(object):
             item = Gio.MenuItem.new(self.kernelspecs.get_displayname(name), 'win.change_kernel::' + name)
             menu.append_item(item)
 
-    def update_title(self, worksheet):
+    def update_title(self, notebook):
         headerbar = self.headerbar.hb_right
-        headerbar.set_custom_title(worksheet.headerbar_controls.title)
+        headerbar.set_custom_title(notebook.headerbar_controls.title)
         
-    def update_controls(self, worksheet):
+    def update_controls(self, notebook):
         headerbar = self.headerbar.hb_right
 
         if headerbar.current_add_cell_box != None:
             headerbar.remove(headerbar.current_add_cell_box)
-        headerbar.current_add_cell_box = worksheet.headerbar_controls.button_box.add_cell_box
-        headerbar.pack_start(worksheet.headerbar_controls.button_box.add_cell_box)
+        headerbar.current_add_cell_box = notebook.headerbar_controls.button_box.add_cell_box
+        headerbar.pack_start(notebook.headerbar_controls.button_box.add_cell_box)
 
         if headerbar.current_move_cell_box != None:
             headerbar.remove(headerbar.current_move_cell_box)
-        headerbar.current_move_cell_box = worksheet.headerbar_controls.button_box.move_cell_box
-        headerbar.pack_start(worksheet.headerbar_controls.button_box.move_cell_box)
+        headerbar.current_move_cell_box = notebook.headerbar_controls.button_box.move_cell_box
+        headerbar.pack_start(notebook.headerbar_controls.button_box.move_cell_box)
 
         if headerbar.current_eval_box != None:
             headerbar.remove(headerbar.current_eval_box)
-        headerbar.current_eval_box = worksheet.headerbar_controls.button_box.eval_box
-        headerbar.pack_start(worksheet.headerbar_controls.button_box.eval_box)
+        headerbar.current_eval_box = notebook.headerbar_controls.button_box.eval_box
+        headerbar.pack_start(notebook.headerbar_controls.button_box.eval_box)
 
-    def update_save_button(self, worksheet):
+    def update_save_button(self, notebook):
         headerbar = self.headerbar.hb_right
         if headerbar.current_save_button != None:
             headerbar.remove(headerbar.current_save_button)
-        headerbar.current_save_button = worksheet.headerbar_controls.save_button
-        headerbar.pack_end(worksheet.headerbar_controls.save_button)
+        headerbar.current_save_button = notebook.headerbar_controls.save_button
+        headerbar.pack_end(notebook.headerbar_controls.save_button)
 
     def activate_welcome_page_mode(self):
         if self.window_mode != 'welcome_page':
@@ -122,18 +122,18 @@ class HeaderbarPresenter(object):
             hb_right.hide_buttons()
             hb_right.set_custom_title(hb_right.welcome_title)
 
-    def activate_worksheet_mode(self):
-        if self.window_mode != 'worksheet':
-            self.window_mode = 'worksheet'
+    def activate_notebook_mode(self):
+        if self.window_mode != 'notebook':
+            self.window_mode = 'notebook'
             hb_right = self.headerbar.hb_right
             hb_right.show_buttons()
 
     def on_show_sidebar(self):
         self.headerbar.hb_left.show_all()
-        self.headerbar.hb_right.open_worksheets_button.hide()
+        self.headerbar.hb_right.open_notebooks_button.hide()
 
     def on_hide_sidebar(self):
         self.headerbar.hb_left.hide()
-        self.headerbar.hb_right.open_worksheets_button.show_all()
+        self.headerbar.hb_right.open_notebooks_button.show_all()
 
 

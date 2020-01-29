@@ -28,7 +28,7 @@ def theme_color_to_rgba(style_context, color_string):
     return style_context.lookup_color(color_string)[1]
 
 
-def get_worksheet_name_from_pathname(pathname):
+def get_notebook_name_from_pathname(pathname):
     return pathname.split('/')[-1].replace('.ipynb', '')
 
 

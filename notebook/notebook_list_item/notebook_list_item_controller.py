@@ -16,9 +16,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
 
-class HeaderbarController(object):
+class NotebookListItemController(object):
 
-    def __init__(self, workspace):
-        self.workspace = workspace
+    def __init__(self, notebook, item, sb_view, hb_view):
+        self.notebook = notebook
+        self.item = item
+        self.sb_view = sb_view
 
 

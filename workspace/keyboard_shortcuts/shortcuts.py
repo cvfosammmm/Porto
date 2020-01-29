@@ -61,92 +61,92 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
 
         self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
-        self.main_window.app.set_accels_for_action('win.open_worksheet', ['<Control>o'])
-        self.main_window.app.set_accels_for_action('win.create_worksheet', ['<Control>n'])
+        self.main_window.app.set_accels_for_action('win.open_notebook', ['<Control>o'])
+        self.main_window.app.set_accels_for_action('win.create_notebook', ['<Control>n'])
         self.main_window.app.set_accels_for_action('win.save_as', ['<Control><Shift>s'])
 
-        self.main_window.worksheet_view_wrapper.connect('key-press-event', self.on_worksheet_key_pressed)
+        self.main_window.notebook_view_wrapper.connect('key-press-event', self.on_notebook_key_pressed)
 
-    def on_worksheet_key_pressed(self, worksheet_wrapper, event, user_data=None):
+    def on_notebook_key_pressed(self, notebook_wrapper, event, user_data=None):
         if event.keyval == Gdk.keyval_from_name('Return') and ((event.state & Gtk.accelerator_get_default_mod_mask()) == 0):
             self.shortcut_edit_markdown()
 
     def shortcut_edit_markdown(self, accel_group=None, window=None, key=None, mask=None):
-        worksheet = self.workspace.active_worksheet
-        if worksheet != None:
-            cell = worksheet.get_active_cell()
+        notebook = self.workspace.active_notebook
+        if notebook != None:
+            cell = notebook.get_active_cell()
             if isinstance(cell, model_cell.MarkdownCell) and cell.get_result() != None:
                 cell.remove_result()
-                worksheet.set_active_cell(cell)
+                notebook.set_active_cell(cell)
                 cell.place_cursor(cell.get_start_iter())
                 return True
         return False
 
     def shortcut_eval(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.evaluate_active_cell()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.evaluate_active_cell()
         return True
 
     def shortcut_eval_go_next(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.evaluate_active_cell_and_go_to_next()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.evaluate_active_cell_and_go_to_next()
         return True
 
     def shortcut_add_codecell_below(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.add_codecell_below_active_cell()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.add_codecell_below_active_cell()
         return True
 
     def shortcut_eval_add(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.evaluate_active_cell()
-            self.workspace.active_worksheet.add_codecell_below_active_cell()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.evaluate_active_cell()
+            self.workspace.active_notebook.add_codecell_below_active_cell()
         return True
 
     def shortcut_add_markdown_cell(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.add_markdowncell_below_active_cell()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.add_markdowncell_below_active_cell()
         return True
 
     def shortcut_stop_computation(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.stop_evaluation()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.stop_evaluation()
         return True
 
     def shortcut_move_cell_up(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.move_cell_up()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.move_cell_up()
         return True
 
     def shortcut_move_cell_down(self, accel_group=None, window=None, key=None, mask=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.move_cell_down()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.move_cell_down()
         return True
 
     def shortcut_restart_kernel(self, accel_group=None, window=None, key=None, mask=None):
         self.workspace.controller.on_wsmenu_restart_kernel()
 
     def shortcut_page_up(self, accel_group=None, window=None, key=None, mask=None):
-        try: worksheet_view = self.main_window.active_worksheet_view
+        try: notebook_view = self.main_window.active_notebook_view
         except AttributeError: pass
         else:
-            scroll_position = worksheet_view.get_vadjustment()
-            window_height = worksheet_view.get_allocated_height()
+            scroll_position = notebook_view.get_vadjustment()
+            window_height = notebook_view.get_allocated_height()
             scroll_position.set_value(scroll_position.get_value() - window_height)
         return True
         
     def shortcut_page_down(self, accel_group=None, window=None, key=None, mask=None):
-        try: worksheet_view = self.main_window.active_worksheet_view
+        try: notebook_view = self.main_window.active_notebook_view
         except AttributeError: pass
         else:
-            scroll_position = worksheet_view.get_vadjustment()
-            window_height = worksheet_view.get_allocated_height()
+            scroll_position = notebook_view.get_vadjustment()
+            window_height = notebook_view.get_allocated_height()
             scroll_position.set_value(scroll_position.get_value() + window_height)
         return True
 
     def shortcut_save(self, accel_group=None, window=None, key=None, mask=None):
-        worksheet = self.workspace.get_active_worksheet()
-        if worksheet != None:
-            worksheet.save_to_disk()
+        notebook = self.workspace.get_active_notebook()
+        if notebook != None:
+            notebook.save_to_disk()
 
 

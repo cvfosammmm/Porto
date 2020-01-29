@@ -43,29 +43,29 @@ class WorkspacePresenter(Observable):
 
     def change_notification(self, change_code, notifying_object, parameter):
 
-        if change_code == 'new_worksheet':
-            self.window_mode = 'worksheet'
+        if change_code == 'new_notebook':
+            self.window_mode = 'notebook'
 
-        if change_code == 'worksheet_removed':
-            worksheet = parameter
-            self.remove_view(worksheet.view)
-            del(worksheet.controller)
-            if self.workspace.get_active_worksheet() == None:
+        if change_code == 'notebook_removed':
+            notebook = parameter
+            self.remove_view(notebook.view)
+            del(notebook.controller)
+            if self.workspace.get_active_notebook() == None:
                 self.activate_welcome_page_mode()
 
-        if change_code == 'changed_active_worksheet':
-            worksheet = parameter
+        if change_code == 'changed_active_notebook':
+            notebook = parameter
 
-            if worksheet != None:
-                self.window_mode = 'worksheet'
+            if notebook != None:
+                self.window_mode = 'notebook'
 
-                kernel_changer_state = GLib.Variant.new_string(worksheet.get_kernelname())
+                kernel_changer_state = GLib.Variant.new_string(notebook.get_kernelname())
                 self.main_window.change_kernel_action.set_state(kernel_changer_state)
 
-                # change worksheet_view
-                self.main_window.active_worksheet_view = worksheet.view
-                self.set_worksheet_view(worksheet.view)
-                if worksheet.get_active_cell() != None: worksheet.set_active_cell(worksheet.get_active_cell())
+                # change notebook_view
+                self.main_window.active_notebook_view = notebook.view
+                self.set_notebook_view(notebook.view)
+                if notebook.get_active_cell() != None: notebook.set_active_cell(notebook.get_active_cell())
 
         if change_code == 'sidebar_state':
             if parameter == True:
@@ -73,17 +73,17 @@ class WorkspacePresenter(Observable):
             else:
                 self.on_hide_sidebar()
 
-    def set_worksheet_view(self, worksheet_view):
-        wswrapper = self.main_window.worksheet_view_wrapper
-        page_index = wswrapper.page_num(worksheet_view)
+    def set_notebook_view(self, notebook_view):
+        wswrapper = self.main_window.notebook_view_wrapper
+        page_index = wswrapper.page_num(notebook_view)
         if page_index == -1:
-            page_index = wswrapper.append_page(worksheet_view)
-        worksheet_view.show_all()
+            page_index = wswrapper.append_page(notebook_view)
+        notebook_view.show_all()
         wswrapper.set_current_page(page_index)
         wswrapper.show_all()
 
     def remove_view(self, view):
-        wswrapper = self.main_window.worksheet_view_wrapper
+        wswrapper = self.main_window.notebook_view_wrapper
         page_index = wswrapper.page_num(view)
         if page_index >= 0:
             wswrapper.remove_page(page_index)
@@ -91,7 +91,7 @@ class WorkspacePresenter(Observable):
     def activate_welcome_page_mode(self):
         if self.window_mode != 'welcome_page':
             self.window_mode = 'welcome_page'
-            self.set_worksheet_view(self.main_window.welcome_page_view)
+            self.set_notebook_view(self.main_window.welcome_page_view)
 
     def on_show_sidebar(self):
         self.main_window.sidebar.show_all()

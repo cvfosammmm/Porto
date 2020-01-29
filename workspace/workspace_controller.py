@@ -20,7 +20,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 
 from app.service_locator import ServiceLocator
-import worksheet.worksheet as model_worksheet
+import notebook.notebook as model_notebook
 
 import os.path
 
@@ -62,90 +62,90 @@ class WorkspaceController(object):
             
     def open_ws_action(self, action=None, pathname=None):
         if pathname == None:
-            pathname = ServiceLocator.get_dialog('open_worksheet').run()
+            pathname = ServiceLocator.get_dialog('open_notebook').run()
         if pathname != None:
-            worksheet = self.workspace.get_worksheet_by_pathname(pathname)
-            if worksheet == None:
+            notebook = self.workspace.get_notebook_by_pathname(pathname)
+            if notebook == None:
                 if pathname.split('.')[-1] == 'ipynb':
-                    worksheet = model_worksheet.Worksheet(pathname)
+                    notebook = model_notebook.Notebook(pathname)
                     try:
-                        worksheet.load_from_disk()
+                        notebook.load_from_disk()
                     except FileNotFoundError:
-                        worksheet = None
-                    except model_worksheet.KernelMissing as e:
+                        notebook = None
+                    except model_notebook.KernelMissing as e:
                         ServiceLocator.get_dialog('kernel_missing').run(str(e))
                     else:
-                        self.workspace.add_worksheet(worksheet)
-            if worksheet != None:
-                self.workspace.set_active_worksheet(worksheet)
+                        self.workspace.add_notebook(notebook)
+            if notebook != None:
+                self.workspace.set_active_notebook(notebook)
 
     def create_ws_action(self, action=None, parameter=None):
-        parameters = ServiceLocator.get_dialog('create_worksheet').run()
+        parameters = ServiceLocator.get_dialog('create_notebook').run()
         if parameters != None:
             pathname, kernelname = parameters
-            self.workspace.recently_opened_worksheets.remove_worksheet_by_pathname(pathname)
-            self.workspace.remove_worksheet_by_pathname(pathname)
+            self.workspace.recently_opened_notebooks.remove_notebook_by_pathname(pathname)
+            self.workspace.remove_notebook_by_pathname(pathname)
 
-            worksheet = model_worksheet.Worksheet(pathname)
-            worksheet.set_kernelname(kernelname)
-            worksheet.create_cell(0, '', activate=True)
-            worksheet.save_to_disk()
-            self.workspace.add_worksheet(worksheet)
-            self.workspace.set_active_worksheet(worksheet)
+            notebook = model_notebook.Notebook(pathname)
+            notebook.set_kernelname(kernelname)
+            notebook.create_cell(0, '', activate=True)
+            notebook.save_to_disk()
+            self.workspace.add_notebook(notebook)
+            self.workspace.set_active_notebook(notebook)
 
     def on_wsmenu_restart_kernel(self, action=None, parameter=None):
-        if self.workspace.active_worksheet != None:
-            self.workspace.active_worksheet.restart_kernel()
+        if self.workspace.active_notebook != None:
+            self.workspace.active_notebook.restart_kernel()
         
     def on_wsmenu_change_kernel(self, action=None, parameter=None):
         if parameter != None:
             self.main_window.change_kernel_action.set_state(parameter)
-            worksheet = self.workspace.active_worksheet
-            if worksheet.get_kernelname() != parameter.get_string():
-                worksheet.set_kernelname(parameter.get_string())
-                worksheet.restart_kernel()
+            notebook = self.workspace.active_notebook
+            if notebook.get_kernelname() != parameter.get_string():
+                notebook.set_kernelname(parameter.get_string())
+                notebook.restart_kernel()
 
     def on_wsmenu_save_as(self, action=None, parameter=None):
-        worksheet = self.workspace.get_active_worksheet()
-        if worksheet != None:
-            ServiceLocator.get_dialog('save_as').run(worksheet)
+        notebook = self.workspace.get_active_notebook()
+        if notebook != None:
+            ServiceLocator.get_dialog('save_as').run(notebook)
 
     def on_wsmenu_save_all(self, action=None, parameter=None):
-        for worksheet in self.workspace.open_worksheets:
-            worksheet.save_to_disk()
+        for notebook in self.workspace.open_notebooks:
+            notebook.save_to_disk()
 
     def on_wsmenu_delete(self, action, parameter=None):
-        self.delete_worksheet(self.workspace.get_active_worksheet())
+        self.delete_notebook(self.workspace.get_active_notebook())
 
     def on_wsmenu_close(self, action=None, parameter=None):
-        worksheet = self.workspace.get_active_worksheet()
-        if worksheet != None:
-            self.close_worksheet_after_modified_check(worksheet)
+        notebook = self.workspace.get_active_notebook()
+        if notebook != None:
+            self.close_notebook_after_modified_check(notebook)
 
     def on_wsmenu_close_all(self, action=None, parameter=None):
-        self.close_all_worksheets_after_modified_check()
+        self.close_all_notebooks_after_modified_check()
 
-    def close_worksheet(self, worksheet, add_to_recently_opened=True):
-        self.workspace.remove_worksheet(worksheet)
-        self.workspace.recently_opened_worksheets.remove_worksheet_by_pathname(worksheet.pathname)
+    def close_notebook(self, notebook, add_to_recently_opened=True):
+        self.workspace.remove_notebook(notebook)
+        self.workspace.recently_opened_notebooks.remove_notebook_by_pathname(notebook.pathname)
         if add_to_recently_opened:
-            pathname = worksheet.get_pathname()
-            kernelname = worksheet.get_kernelname()
+            pathname = notebook.get_pathname()
+            kernelname = notebook.get_kernelname()
             if os.path.isfile(pathname):
-                item = {'pathname': pathname, 'kernelname': kernelname, 'date': worksheet.get_last_saved()}
-                self.workspace.recently_opened_worksheets.add_item(item, notify=True, save=True)        
+                item = {'pathname': pathname, 'kernelname': kernelname, 'date': notebook.get_last_saved()}
+                self.workspace.recently_opened_notebooks.add_item(item, notify=True, save=True)        
 
-    def close_worksheet_after_modified_check(self, worksheet):
-        if worksheet.get_save_state() != 'modified' or ServiceLocator.get_dialog('close_confirmation').run([worksheet])['all_save_to_close']:
-            self.close_worksheet(worksheet)
+    def close_notebook_after_modified_check(self, notebook):
+        if notebook.get_save_state() != 'modified' or ServiceLocator.get_dialog('close_confirmation').run([notebook])['all_save_to_close']:
+            self.close_notebook(notebook)
 
-    def close_all_worksheets_after_modified_check(self):
-        worksheets = self.workspace.get_unsaved_worksheets()
-        active_worksheet = self.workspace.get_active_worksheet()
+    def close_all_notebooks_after_modified_check(self):
+        notebooks = self.workspace.get_unsaved_notebooks()
+        active_notebook = self.workspace.get_active_notebook()
 
-        if len(worksheets) == 0 or active_worksheet == None or ServiceLocator.get_dialog('close_confirmation').run(worksheets)['all_save_to_close']: 
-            for worksheet in list(self.workspace.open_worksheets.values()):
-                self.close_worksheet(worksheet)
+        if len(notebooks) == 0 or active_notebook == None or ServiceLocator.get_dialog('close_confirmation').run(notebooks)['all_save_to_close']: 
+            for notebook in list(self.workspace.open_notebooks.values()):
+                self.close_notebook(notebook)
 
     def toggle_sidebar(self, action, parameter=None):
         show_sidebar = not action.get_state().get_boolean()
@@ -161,9 +161,9 @@ class WorkspaceController(object):
     def show_about_dialog(self, action, parameter=''):
         ServiceLocator.get_dialog('about').run()
 
-    def delete_worksheet(self, worksheet):
-        if ServiceLocator.get_dialog('delete_worksheet').run(worksheet):
-            self.close_worksheet(worksheet, add_to_recently_opened=False)
-            worksheet.remove_from_disk()
+    def delete_notebook(self, notebook):
+        if ServiceLocator.get_dialog('delete_notebook').run(notebook):
+            self.close_notebook(notebook, add_to_recently_opened=False)
+            notebook.remove_from_disk()
 
 

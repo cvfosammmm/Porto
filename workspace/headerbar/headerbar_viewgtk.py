@@ -20,12 +20,12 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gio
 
-import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_viewgtk as viewgtk_worksheet_list
+import workspace.recently_opened_notebooks_list.recently_opened_notebooks_list_viewgtk as viewgtk_notebook_list
 
 
 class HeaderBar(Gtk.Paned):
     ''' Title bar of the app, contains always visible controls, 
-        worksheet title and state (computing, idle, ...) '''
+        notebook title and state (computing, idle, ...) '''
         
     def __init__(self, button_layout):
         Gtk.Paned.__init__(self)
@@ -52,14 +52,14 @@ class HeaderBarLeft(Gtk.HeaderBar):
     def create_buttons(self):
         self.ws_add_wrapper = Gtk.HBox()
         self.create_ws_button = Gtk.Button.new_from_icon_name('document-new-symbolic', Gtk.IconSize.BUTTON)
-        self.create_ws_button.set_tooltip_text('Create new worksheet')
+        self.create_ws_button.set_tooltip_text('Create new notebook')
         self.create_ws_button.set_focus_on_click(False)
-        self.create_ws_button.set_action_name('win.create_worksheet')
+        self.create_ws_button.set_action_name('win.create_notebook')
         self.pack_start(self.create_ws_button)
         self.open_ws_button = Gtk.Button.new_from_icon_name('document-open-symbolic', Gtk.IconSize.BUTTON)
-        self.open_ws_button.set_tooltip_text('Open worksheet')
+        self.open_ws_button.set_tooltip_text('Open notebook')
         self.open_ws_button.set_focus_on_click(False)
-        self.open_ws_button.set_action_name('win.open_worksheet')
+        self.open_ws_button.set_action_name('win.open_notebook')
         self.pack_start(self.open_ws_button)
 
     def do_get_request_mode(self):
@@ -76,7 +76,7 @@ class HeaderBarRight(Gtk.HeaderBar):
 
         self.set_show_close_button(show_close_button)
         self.props.title = ''
-        self.open_worksheets_number = 0
+        self.open_notebooks_number = 0
         self.current_controls = None
         self.current_add_cell_box = None
         self.current_move_cell_box = None
@@ -91,19 +91,19 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.pack_buttons()
 
     def create_buttons(self):
-        self.worksheet_chooser = WorksheetChooser()
-        self.open_worksheets_button_label = Gtk.Label('Worksheets')
-        self.open_worksheets_button_box = Gtk.HBox()
-        self.open_worksheets_button_box.pack_start(Gtk.Image.new_from_icon_name('document-open-symbolic', Gtk.IconSize.MENU), False, False, 0)
-        self.open_worksheets_button_box.pack_start(self.open_worksheets_button_label, False, False, 0)
-        self.open_worksheets_button_box.pack_start(Gtk.Image.new_from_icon_name('pan-down-symbolic', Gtk.IconSize.MENU), False, False, 0)
-        self.open_worksheets_button = Gtk.MenuButton()
-        self.open_worksheets_button.set_can_focus(False)
-        self.open_worksheets_button.set_use_popover(True)
-        self.open_worksheets_button.add(self.open_worksheets_button_box)
-        self.open_worksheets_button.get_style_context().add_class("text-button")
-        self.open_worksheets_button.get_style_context().add_class("image-button")
-        self.open_worksheets_button.set_popover(self.worksheet_chooser)
+        self.notebook_chooser = NotebookChooser()
+        self.open_notebooks_button_label = Gtk.Label('Notebooks')
+        self.open_notebooks_button_box = Gtk.HBox()
+        self.open_notebooks_button_box.pack_start(Gtk.Image.new_from_icon_name('document-open-symbolic', Gtk.IconSize.MENU), False, False, 0)
+        self.open_notebooks_button_box.pack_start(self.open_notebooks_button_label, False, False, 0)
+        self.open_notebooks_button_box.pack_start(Gtk.Image.new_from_icon_name('pan-down-symbolic', Gtk.IconSize.MENU), False, False, 0)
+        self.open_notebooks_button = Gtk.MenuButton()
+        self.open_notebooks_button.set_can_focus(False)
+        self.open_notebooks_button.set_use_popover(True)
+        self.open_notebooks_button.add(self.open_notebooks_button_box)
+        self.open_notebooks_button.get_style_context().add_class("text-button")
+        self.open_notebooks_button.get_style_context().add_class("image-button")
+        self.open_notebooks_button.set_popover(self.notebook_chooser)
 
         self.create_full_hamburger_menu()
         self.create_blank_hamburger_menu()
@@ -127,19 +127,19 @@ class HeaderBarRight(Gtk.HeaderBar):
         item = Gio.MenuItem.new('Save All', 'win.save_all')
         save_section.append_item(item)
 
-        worksheet_section = Gio.Menu()
-        item = Gio.MenuItem.new('Delete Worksheet ...', 'win.delete_worksheet')
-        worksheet_section.append_item(item)
+        notebook_section = Gio.Menu()
+        item = Gio.MenuItem.new('Delete Notebook ...', 'win.delete_notebook')
+        notebook_section.append_item(item)
 
         close_section = Gio.Menu()
-        item = Gio.MenuItem.new('Close', 'win.close_worksheet')
+        item = Gio.MenuItem.new('Close', 'win.close_notebook')
         close_section.append_item(item)
-        item = Gio.MenuItem.new('Close All', 'win.close_all_worksheets')
+        item = Gio.MenuItem.new('Close All', 'win.close_all_notebooks')
         close_section.append_item(item)
 
         self.options_menu.append_section(None, kernel_section)
         self.options_menu.append_section(None, save_section)
-        self.options_menu.append_section(None, worksheet_section)
+        self.options_menu.append_section(None, notebook_section)
         self.options_menu.append_section(None, close_section)
 
         view_section = Gio.Menu()
@@ -190,7 +190,7 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.blank_menu_button.set_menu_model(self.blank_options_menu)
 
     def pack_buttons(self):
-        self.pack_start(self.open_worksheets_button)
+        self.pack_start(self.open_notebooks_button)
         self.pack_end(self.menu_button)
         self.pack_end(self.blank_menu_button)
         self.show_all()
@@ -203,16 +203,16 @@ class HeaderBarRight(Gtk.HeaderBar):
         self.menu_button.hide()
         self.blank_menu_button.show_all()
 
-    def increment_worksheets_number(self):
-        self.open_worksheets_number += 1
-        self.open_worksheets_button_label.set_text('Worksheets (' + str(self.open_worksheets_number) + ')')
+    def increment_notebooks_number(self):
+        self.open_notebooks_number += 1
+        self.open_notebooks_button_label.set_text('Notebooks (' + str(self.open_notebooks_number) + ')')
 
-    def decrement_worksheets_number(self):
-        self.open_worksheets_number -= 1
-        if self.open_worksheets_number == 0:
-            self.open_worksheets_button_label.set_text('Worksheets')
+    def decrement_notebooks_number(self):
+        self.open_notebooks_number -= 1
+        if self.open_notebooks_number == 0:
+            self.open_notebooks_button_label.set_text('Notebooks')
         else:
-            self.open_worksheets_button_label.set_text('Worksheets (' + str(self.open_worksheets_number) + ')')
+            self.open_notebooks_button_label.set_text('Notebooks (' + str(self.open_notebooks_number) + ')')
 
     def do_get_request_mode(self):
         return Gtk.SizeRequestMode.CONSTANT_SIZE
@@ -221,7 +221,7 @@ class HeaderBarRight(Gtk.HeaderBar):
         return 763, 763
 
 
-class WorksheetChooser(Gtk.Popover):
+class NotebookChooser(Gtk.Popover):
     
     def __init__(self):
         Gtk.Popover.__init__(self)
@@ -230,43 +230,43 @@ class WorksheetChooser(Gtk.Popover):
 
         self.box = Gtk.VBox()
 
-        self.open_worksheets_label_revealer = Gtk.Revealer()
-        self.open_worksheets_label = Gtk.Label('Open Worksheets')
-        self.open_worksheets_label.set_xalign(0)
-        self.open_worksheets_label.get_style_context().add_class('wslist_header')
-        self.open_worksheets_label_revealer.add(self.open_worksheets_label)
-        self.open_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
+        self.open_notebooks_label_revealer = Gtk.Revealer()
+        self.open_notebooks_label = Gtk.Label('Open Notebooks')
+        self.open_notebooks_label.set_xalign(0)
+        self.open_notebooks_label.get_style_context().add_class('wslist_header')
+        self.open_notebooks_label_revealer.add(self.open_notebooks_label)
+        self.open_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
         self.get_style_context().add_class('wslist_top')
 
-        self.recent_worksheets_list_view = viewgtk_worksheet_list.WorksheetListRecentView()
-        self.recent_worksheets_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.recent_worksheets_list_view.set_can_focus(False)
-        self.recent_worksheets_label_revealer = Gtk.Revealer()
-        self.recent_worksheets_label = Gtk.Label('Recently Opened Worksheets')
-        self.recent_worksheets_label.set_xalign(0)
-        self.recent_worksheets_label.get_style_context().add_class('wslist_header')
-        self.recent_worksheets_label_revealer.add(self.recent_worksheets_label)
-        self.recent_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
+        self.recent_notebooks_list_view = viewgtk_notebook_list.NotebookListRecentView()
+        self.recent_notebooks_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.recent_notebooks_list_view.set_can_focus(False)
+        self.recent_notebooks_label_revealer = Gtk.Revealer()
+        self.recent_notebooks_label = Gtk.Label('Recently Opened Notebooks')
+        self.recent_notebooks_label.set_xalign(0)
+        self.recent_notebooks_label.get_style_context().add_class('wslist_header')
+        self.recent_notebooks_label_revealer.add(self.recent_notebooks_label)
+        self.recent_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 
-        self.open_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.open_worksheets_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-        self.recent_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.recent_worksheets_list_view_wrapper.add(self.recent_worksheets_list_view)
-        self.recent_worksheets_list_view_wrapper.set_size_request(-1, 247)
+        self.open_notebooks_list_view_wrapper = Gtk.ScrolledWindow()
+        self.open_notebooks_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
+        self.recent_notebooks_list_view_wrapper = Gtk.ScrolledWindow()
+        self.recent_notebooks_list_view_wrapper.add(self.recent_notebooks_list_view)
+        self.recent_notebooks_list_view_wrapper.set_size_request(-1, 247)
         
-        self.box.pack_start(self.open_worksheets_label_revealer, False, False, 0)
-        self.box.pack_start(self.open_worksheets_list_view_wrapper, False, False, 0)
-        self.box.pack_start(self.recent_worksheets_label_revealer, False, False, 0)
-        self.box.pack_start(self.recent_worksheets_list_view_wrapper, True, True, 0)
+        self.box.pack_start(self.open_notebooks_label_revealer, False, False, 0)
+        self.box.pack_start(self.open_notebooks_list_view_wrapper, False, False, 0)
+        self.box.pack_start(self.recent_notebooks_label_revealer, False, False, 0)
+        self.box.pack_start(self.recent_notebooks_list_view_wrapper, True, True, 0)
 
         self.button_box = Gtk.HBox()
         self.button_box.get_style_context().add_class('linked')
         self.button_box.set_margin_top(12)
         self.button_box.set_margin_bottom(3)
-        self.create_button = Gtk.Button.new_with_label('Create Worksheet')
-        self.create_button.set_action_name('win.create_worksheet')
-        self.open_button = Gtk.Button.new_with_label('Open Worksheet')
-        self.open_button.set_action_name('win.open_worksheet')
+        self.create_button = Gtk.Button.new_with_label('Create Notebook')
+        self.create_button.set_action_name('win.create_notebook')
+        self.open_button = Gtk.Button.new_with_label('Open Notebook')
+        self.open_button.set_action_name('win.open_notebook')
         self.button_box.pack_start(self.open_button, False, False, 0)
         self.button_box.pack_start(self.create_button, False, False, 0)
         self.box.pack_start(self.button_box, False, False, 0)

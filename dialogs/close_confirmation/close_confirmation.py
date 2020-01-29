@@ -26,28 +26,28 @@ import os.path
 
 
 class CloseConfirmationDialog(Dialog):
-    ''' This dialog is asking users to save unsaved worksheets or discard their changes. '''
+    ''' This dialog is asking users to save unsaved notebooks or discard their changes. '''
 
     def __init__(self, main_window):
         self.main_window = main_window
 
-    def run(self, worksheets):
-        self.setup(worksheets)
+    def run(self, notebooks):
+        self.setup(notebooks)
 
         response = self.view.run()
         if response == Gtk.ResponseType.NO:
             all_save_to_close = True
         elif response == Gtk.ResponseType.YES:
-            selected_worksheets = list()
-            if len(worksheets) == 1:
-                selected_worksheets.append(worksheets[0])
+            selected_notebooks = list()
+            if len(notebooks) == 1:
+                selected_notebooks.append(notebooks[0])
             else:
                 for child in self.chooser.get_children():
                     if child.get_child().get_active():
                         number = int(child.get_child().get_name()[30:])
-                        selected_worksheets.append(worksheets[number])
-            for worksheet in selected_worksheets:
-                worksheet.save_to_disk()
+                        selected_notebooks.append(notebooks[number])
+            for notebook in selected_notebooks:
+                notebook.save_to_disk()
             all_save_to_close = True
         else:
             all_save_to_close = False
@@ -55,16 +55,16 @@ class CloseConfirmationDialog(Dialog):
         self.close()
         return {'all_save_to_close': all_save_to_close}
 
-    def setup(self, worksheets):
+    def setup(self, notebooks):
         self.view = Gtk.MessageDialog(self.main_window, 0, Gtk.MessageType.QUESTION)
 
-        if len(worksheets) == 1:
-            self.view.set_property('text', 'Worksheet »' + worksheets[0].get_name() + '« has unsaved changes.')
+        if len(notebooks) == 1:
+            self.view.set_property('text', 'Notebook »' + notebooks[0].get_name() + '« has unsaved changes.')
             self.view.format_secondary_markup('If you close Porto without saving, these changes will be lost.')
 
-        if len(worksheets) >= 2:
-            self.view.set_property('text', 'There are ' + str(len(worksheets)) + ' worksheets with unsaved changes.\nSave changes before closing Porto?')
-            self.view.format_secondary_markup('Select the worksheets you want to save:')
+        if len(notebooks) >= 2:
+            self.view.set_property('text', 'There are ' + str(len(notebooks)) + ' notebooks with unsaved changes.\nSave changes before closing Porto?')
+            self.view.format_secondary_markup('Select the notebooks you want to save:')
             label = self.view.get_message_area().get_children()[1]
             label.set_xalign(0)
             label.set_halign(Gtk.Align.START)
@@ -76,9 +76,9 @@ class CloseConfirmationDialog(Dialog):
             self.chooser.set_selection_mode(Gtk.SelectionMode.NONE)
 
             counter = 0
-            for worksheet in worksheets:
-                button = Gtk.CheckButton(worksheet.get_name())
-                button.set_name('worksheet_to_save_checkbutton_' + str(counter))
+            for notebook in notebooks:
+                button = Gtk.CheckButton(notebook.get_name())
+                button.set_name('notebook_to_save_checkbutton_' + str(counter))
                 button.set_active(True)
                 button.set_can_focus(False)
                 self.chooser.add(button)

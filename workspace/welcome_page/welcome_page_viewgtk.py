@@ -33,7 +33,7 @@ class WelcomePageView(Gtk.ScrolledWindow):
         self.viewport = self.get_children().pop()
         
         self.welcome_message = Gtk.Label()
-        self.welcome_message.set_text('Porto is a notebook style interface to many programming\nlanguages. You create worksheets to type in commands for\ncomputation, plotting functions and many more things.\n')
+        self.welcome_message.set_text('Porto is a notebook style interface to many programming\nlanguages. You create notebooks to type in commands for\ncomputation, plotting functions and many more things.\n')
         self.welcome_message.set_line_wrap(True)
         self.welcome_message.set_xalign(0)
         self.welcome_message.set_yalign(0)
@@ -42,12 +42,12 @@ class WelcomePageView(Gtk.ScrolledWindow):
         self.welcome_links = Gtk.HBox()
         #self.welcome_links.set_size_request(400, 50)
         
-        self.create_ws_link = Gtk.LinkButton('action://win.placeholder', 'Create New Worksheet')
-        self.create_ws_link.set_action_name('win.create_worksheet')
+        self.create_ws_link = Gtk.LinkButton('action://win.placeholder', 'Create New Notebook')
+        self.create_ws_link.set_action_name('win.create_notebook')
         self.create_ws_link.set_can_focus(False)
         self.create_ws_link.set_tooltip_text('')
-        self.open_ws_link = Gtk.LinkButton('action://win.placeholder', 'Open Worksheet(s)')
-        self.open_ws_link.set_action_name('win.open_worksheet')
+        self.open_ws_link = Gtk.LinkButton('action://win.placeholder', 'Open Notebook(s)')
+        self.open_ws_link.set_action_name('win.open_notebook')
         self.open_ws_link.set_can_focus(False)
         self.open_ws_link.set_tooltip_text('')
         self.welcome_links.pack_start(self.create_ws_link, False, False, 0)
@@ -71,9 +71,5 @@ class WelcomePageView(Gtk.ScrolledWindow):
 
     def set_sidebar_visible(self, sidebar_visible):
         pass
-        #if sidebar_visible:
-        #    self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the sidebar).')
-        #else:
-        #    self.footer.set_text('Of Note: To get started using Porto consider our "Absolute Beginners\' Guide" (in the "Worksheets" menu above).')
 
 

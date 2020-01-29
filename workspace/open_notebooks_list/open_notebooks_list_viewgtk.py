@@ -15,31 +15,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from dialogs.dialog import Dialog
 
+class OpenNotebooksListView(Gtk.ListBox):
+        
+    def __init__(self):
+        Gtk.ListBox.__init__(self)
 
-class KernelMissingDialog(Dialog):
-    ''' This dialog is asking users to save unsaved notebooks or discard their changes. '''
+        self.items = dict()
+        self.selected_row = None
+        self.visible_items_count = 0
 
-    def __init__(self, main_window):
-        self.main_window = main_window
-
-    def run(self, kernelname):
-        self.setup(kernelname)
-
-        response = self.view.run()
-        self.close()
-
-    def setup(self, kernelname):
-        self.view = Gtk.MessageDialog(self.main_window, 0, Gtk.MessageType.ERROR)
-
-        self.view.set_property('text', 'Kernel »' + kernelname + '« is missing.')
-        self.view.format_secondary_markup('The notebook you want to open uses the »' + kernelname + '« kernel, which does not seem to be installed on this system.')
-        self.view.add_buttons('_Close', Gtk.ResponseType.OK)
+    def add_item(self, item):
+        try: item = self.items[item.get_notebook()]
+        except KeyError:
+            self.items[item.get_notebook()] = item
+            self.prepend(item)
+        else: item.set_last_saved(item.last_saved)
+        self.visible_items_count += 1
+        self.show_all()
+        
+    def remove_item(self, item):
+        del(self.items[item.get_notebook()])
+        self.remove(item)
+        self.visible_items_count -= 1
+        self.show_all()
 
 

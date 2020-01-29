@@ -19,7 +19,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import workspace.recently_opened_worksheets_list.recently_opened_worksheets_list_viewgtk as viewgtk_worksheet_list
+import workspace.recently_opened_notebooks_list.recently_opened_notebooks_list_viewgtk as viewgtk_notebook_list
 
 
 class Sidebar(Gtk.VBox):
@@ -31,32 +31,32 @@ class Sidebar(Gtk.VBox):
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.set_size_request(260, 500)
         
-        self.open_worksheets_label_revealer = Gtk.Revealer()
-        self.open_worksheets_label = Gtk.Label('Open Worksheets')
-        self.open_worksheets_label.set_xalign(0)
-        self.open_worksheets_label.get_style_context().add_class('wslist_header')
-        self.open_worksheets_label_revealer.add(self.open_worksheets_label)
-        self.open_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
+        self.open_notebooks_label_revealer = Gtk.Revealer()
+        self.open_notebooks_label = Gtk.Label('Open Notebooks')
+        self.open_notebooks_label.set_xalign(0)
+        self.open_notebooks_label.get_style_context().add_class('wslist_header')
+        self.open_notebooks_label_revealer.add(self.open_notebooks_label)
+        self.open_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
         self.get_style_context().add_class('wslist_top')
 
-        self.recent_worksheets_list_view = viewgtk_worksheet_list.WorksheetListRecentView()
-        self.recent_worksheets_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.recent_worksheets_list_view.set_can_focus(False)
-        self.recent_worksheets_label_revealer = Gtk.Revealer()
-        self.recent_worksheets_label = Gtk.Label('Recently Opened Worksheets')
-        self.recent_worksheets_label.set_xalign(0)
-        self.recent_worksheets_label.get_style_context().add_class('wslist_header')
-        self.recent_worksheets_label_revealer.add(self.recent_worksheets_label)
-        self.recent_worksheets_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
+        self.recent_notebooks_list_view = viewgtk_notebook_list.NotebookListRecentView()
+        self.recent_notebooks_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.recent_notebooks_list_view.set_can_focus(False)
+        self.recent_notebooks_label_revealer = Gtk.Revealer()
+        self.recent_notebooks_label = Gtk.Label('Recently Opened Notebooks')
+        self.recent_notebooks_label.set_xalign(0)
+        self.recent_notebooks_label.get_style_context().add_class('wslist_header')
+        self.recent_notebooks_label_revealer.add(self.recent_notebooks_label)
+        self.recent_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 
-        self.open_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.open_worksheets_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
-        self.recent_worksheets_list_view_wrapper = Gtk.ScrolledWindow()
-        self.recent_worksheets_list_view_wrapper.add(self.recent_worksheets_list_view)
+        self.open_notebooks_list_view_wrapper = Gtk.ScrolledWindow()
+        self.open_notebooks_list_view_wrapper.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
+        self.recent_notebooks_list_view_wrapper = Gtk.ScrolledWindow()
+        self.recent_notebooks_list_view_wrapper.add(self.recent_notebooks_list_view)
         
-        self.pack_start(self.open_worksheets_label_revealer, False, False, 0)
-        self.pack_start(self.open_worksheets_list_view_wrapper, False, False, 0)
-        self.pack_start(self.recent_worksheets_label_revealer, False, False, 0)
-        self.pack_start(self.recent_worksheets_list_view_wrapper, True, True, 0)
+        self.pack_start(self.open_notebooks_label_revealer, False, False, 0)
+        self.pack_start(self.open_notebooks_list_view_wrapper, False, False, 0)
+        self.pack_start(self.recent_notebooks_label_revealer, False, False, 0)
+        self.pack_start(self.recent_notebooks_list_view_wrapper, True, True, 0)
 
 

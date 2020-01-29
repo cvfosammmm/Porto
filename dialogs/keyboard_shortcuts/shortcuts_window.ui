@@ -11,7 +11,7 @@
         <child>
           <object class="GtkShortcutsGroup">
             <property name="visible">1</property>
-            <property name="title" translatable="yes">Worksheet Functions</property>
+            <property name="title" translatable="yes">Notebook Functions</property>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
@@ -80,26 +80,26 @@
         <child>
           <object class="GtkShortcutsGroup">
             <property name="visible">1</property>
-            <property name="title" translatable="yes">Managing Worksheets</property>
+            <property name="title" translatable="yes">Managing Notebooks</property>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;N</property>
-                <property name="title" translatable="yes">Create new Worksheet</property>
+                <property name="title" translatable="yes">Create new Notebook</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;O</property>
-                <property name="title" translatable="yes">Open a Worksheet</property>
+                <property name="title" translatable="yes">Open a Notebook</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;E</property>
-                <property name="title" translatable="yes">Export the Worksheet</property>
+                <property name="title" translatable="yes">Export the Notebook</property>
               </object>
             </child>
           </object>

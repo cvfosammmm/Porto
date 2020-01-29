@@ -27,12 +27,12 @@ import cell.cell_viewgtk as cell_view
 
 class Cell(GtkSource.Buffer, Observable):
 
-    def __init__(self, worksheet):
+    def __init__(self, notebook):
         GtkSource.Buffer.__init__(self)
         Observable.__init__(self)
 
-        self.worksheet = worksheet
-        self.worksheet_position = None
+        self.notebook = notebook
+        self.notebook_position = None
 
         self.set_modified(False)
         self.set_highlight_matching_brackets(False)
@@ -43,7 +43,7 @@ class Cell(GtkSource.Buffer, Observable):
         self.set_text(text)
         self.place_cursor(self.get_start_iter())
         if activate == True:
-            self.worksheet.set_active_cell(self)
+            self.notebook.set_active_cell(self)
         if set_unmodified == True:
             self.set_modified(False)
 
@@ -71,37 +71,37 @@ class Cell(GtkSource.Buffer, Observable):
         self.add_change_code('new_result', {'result': self.result, 'show_animation': show_animation})
         self.set_modified(True)
     
-    def get_worksheet(self):
-        return self.worksheet
+    def get_notebook(self):
+        return self.notebook
 
-    def get_worksheet_position(self):
-        cells = self.get_worksheet().cells
+    def get_notebook_position(self):
+        cells = self.get_notebook().cells
         try: position = cells.index(self)
-        except ValueError: return self.worksheet_position
+        except ValueError: return self.notebook_position
         else: 
-            self.worksheet_position = position
+            self.notebook_position = position
             return position
         
     def is_active_cell(self):
-        return True if self.get_worksheet().get_active_cell() == self else False
+        return True if self.get_notebook().get_active_cell() == self else False
         
 
 class CodeCell(Cell):
 
-    def __init__(self, worksheet):
-        Cell.__init__(self, worksheet)
-        self.register_observer(worksheet.evaluator)
+    def __init__(self, notebook):
+        Cell.__init__(self, notebook)
+        self.register_observer(notebook.evaluator)
 
         # possible states: idle, ready_for_evaluation, queued_for_evaluation
         # evaluation_in_progress, evaluation_to_stop
         self.state = 'idle'
         
         # syntax highlighting
-        self.set_language(self.get_worksheet().get_source_language_code())
-        self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
+        self.set_language(self.get_notebook().get_source_language_code())
+        self.set_style_scheme(self.get_notebook().get_source_style_scheme())
 
         self.view = cell_view.CellViewCode(self)
-        self.controller = cell_controller.CodeCellController(self, self.view, worksheet)
+        self.controller = cell_controller.CodeCellController(self, self.view, notebook)
 
     def evaluate(self):
         self.remove_result()
@@ -112,29 +112,29 @@ class CodeCell(Cell):
         self.state = state
         self.add_change_code('cell_state_change', self.state)
         
-        # promote info to associated worksheet
+        # promote info to associated notebook
         if self.state != 'idle':
-            self.worksheet.add_busy_cell(self)
+            self.notebook.add_busy_cell(self)
         else:
-            self.worksheet.remove_busy_cell(self)
+            self.notebook.remove_busy_cell(self)
             
 
 class MarkdownCell(Cell):
 
-    def __init__(self, worksheet):
-        Cell.__init__(self, worksheet)
-        self.register_observer(worksheet.evaluator)
+    def __init__(self, notebook):
+        Cell.__init__(self, notebook)
+        self.register_observer(notebook.evaluator)
 
         # possible states: edit, display, ready_for_evaluation, queued_for_evaluation
         # evaluation_in_progress, evaluation_to_stop
         self.state = 'edit'
         
         # syntax highlighting
-        self.set_language(self.get_worksheet().get_source_language_markdown())
-        self.set_style_scheme(self.get_worksheet().get_source_style_scheme())
+        self.set_language(self.get_notebook().get_source_language_markdown())
+        self.set_style_scheme(self.get_notebook().get_source_style_scheme())
 
         self.view = cell_view.CellViewMarkdown(self)
-        self.controller = cell_controller.MarkdownCellController(self, self.view, worksheet)
+        self.controller = cell_controller.MarkdownCellController(self, self.view, notebook)
 
     def evaluate(self):
         self.remove_result()
@@ -150,10 +150,10 @@ class MarkdownCell(Cell):
         self.state = state
         self.add_change_code('cell_state_change', self.state)
         
-        # promote info to associated worksheet
+        # promote info to associated notebook
         if self.state != 'edit' and self.state != 'display':
-            self.worksheet.add_busy_cell(self)
+            self.notebook.add_busy_cell(self)
         else:
-            self.worksheet.remove_busy_cell(self)
+            self.notebook.remove_busy_cell(self)
             
 
