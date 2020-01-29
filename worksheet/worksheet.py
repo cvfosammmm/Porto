@@ -74,8 +74,6 @@ class Worksheet(Observable):
         self.evaluator = worksheet_evaluator.WorksheetEvaluator(self)
         self.headerbar_controls = headerbar_controls.HeaderbarControls(self)
 
-        self.load_from_disk()
-
     def remove_all_cells(self):
         while len(self.cells) > 0:
             self.remove_cell(self.cells[0])

@@ -46,8 +46,7 @@ class WorkspaceController(object):
         self.main_window.close_action.connect('activate', self.on_wsmenu_close)
         self.main_window.close_all_action.connect('activate', self.on_wsmenu_close_all)
         self.main_window.open_action.connect('activate', self.open_ws_action)
-
-        self.main_window.welcome_page_view.create_ws_link.connect('clicked', self.on_create_ws_button_click)
+        self.main_window.create_action.connect('activate', self.create_ws_action)
 
         self.settings.register_observer(self)
 
@@ -68,8 +67,11 @@ class WorkspaceController(object):
             worksheet = self.workspace.get_worksheet_by_pathname(pathname)
             if worksheet == None:
                 if pathname.split('.')[-1] == 'ipynb':
+                    worksheet = model_worksheet.Worksheet(pathname)
                     try:
-                        worksheet = model_worksheet.Worksheet(pathname)
+                        worksheet.load_from_disk()
+                    except FileNotFoundError:
+                        worksheet = None
                     except model_worksheet.KernelMissing as e:
                         ServiceLocator.get_dialog('kernel_missing').run(str(e))
                     else:
@@ -77,11 +79,19 @@ class WorkspaceController(object):
             if worksheet != None:
                 self.workspace.set_active_worksheet(worksheet)
 
-    def on_create_ws_button_click(self, button_object=None):
+    def create_ws_action(self, action=None, parameter=None):
         parameters = ServiceLocator.get_dialog('create_worksheet').run()
         if parameters != None:
             pathname, kernelname = parameters
-            self.workspace.create_worksheet(pathname, kernelname)
+            self.workspace.recently_opened_worksheets.remove_worksheet_by_pathname(pathname)
+            self.workspace.remove_worksheet_by_pathname(pathname)
+
+            worksheet = model_worksheet.Worksheet(pathname)
+            worksheet.set_kernelname(kernelname)
+            worksheet.create_cell(0, '', activate=True)
+            worksheet.save_to_disk()
+            self.workspace.add_worksheet(worksheet)
+            self.workspace.set_active_worksheet(worksheet)
 
     def on_wsmenu_restart_kernel(self, action=None, parameter=None):
         if self.workspace.active_worksheet != None:

@@ -58,12 +58,12 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('r'), c_mask, flags, self.shortcut_restart_kernel)
         self.accel_group.connect(Gdk.keyval_from_name('Page_Up'), 0, flags, self.shortcut_page_up)
         self.accel_group.connect(Gdk.keyval_from_name('Page_Down'), 0, flags, self.shortcut_page_down)
-        self.accel_group.connect(Gdk.keyval_from_name('n'), c_mask, flags, self.shortcut_create_worksheet)
-        self.accel_group.connect(Gdk.keyval_from_name('o'), c_mask, flags, self.shortcut_open_worksheet)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask | s_mask, flags, self.shortcut_save_as)
 
         self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
+        self.main_window.app.set_accels_for_action('win.open_worksheet', ['<Control>o'])
+        self.main_window.app.set_accels_for_action('win.create_worksheet', ['<Control>n'])
 
         self.main_window.worksheet_view_wrapper.connect('key-press-event', self.on_worksheet_key_pressed)
 
@@ -143,12 +143,6 @@ class Shortcuts(object):
             window_height = worksheet_view.get_allocated_height()
             scroll_position.set_value(scroll_position.get_value() + window_height)
         return True
-
-    def shortcut_create_worksheet(self, accel_group=None, window=None, key=None, mask=None):
-        self.workspace.controller.on_create_ws_button_click()
-
-    def shortcut_open_worksheet(self, accel_group=None, window=None, key=None, mask=None):
-        self.workspace.controller.on_open_ws_button_click()
 
     def shortcut_save(self, accel_group=None, window=None, key=None, mask=None):
         worksheet = self.workspace.get_active_worksheet()

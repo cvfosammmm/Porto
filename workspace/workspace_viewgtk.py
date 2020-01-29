@@ -88,6 +88,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.add_action(self.close_all_action)
         self.open_action = Gio.SimpleAction.new('open_worksheet', None)
         self.add_action(self.open_action)
+        self.create_action = Gio.SimpleAction.new('create_worksheet', None)
+        self.add_action(self.create_action)
         sv_default = GLib.Variant.new_boolean(app.settings.get_value('window_state', 'sidebar_visible'))
         self.toggle_sidebar_action = Gio.SimpleAction.new_stateful('toggle-sidebar', None, sv_default)
         self.add_action(self.toggle_sidebar_action)

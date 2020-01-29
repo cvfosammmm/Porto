@@ -29,14 +29,5 @@ class HeaderbarController(object):
 
     def __init__(self, workspace):
         self.workspace = workspace
-        self.view = ServiceLocator.get_main_window().headerbar
-        self.view.hb_left.create_ws_button.connect('clicked', self.on_create_ws_button_click)
-        self.view.hb_right.worksheet_chooser.create_button.connect('clicked', self.on_create_ws_button_click)
-
-    def on_create_ws_button_click(self, button_object=None):
-        parameters = ServiceLocator.get_dialog('create_worksheet').run()
-        if parameters != None:
-            pathname, kernelname = parameters
-            self.workspace.create_worksheet(pathname, kernelname)
 
 

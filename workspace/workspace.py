@@ -60,15 +60,6 @@ class Workspace(Observable):
                 return worksheet
         return None
 
-    def create_worksheet(self, pathname, kernelname):
-        self.recently_opened_worksheets.remove_worksheet_by_pathname(pathname)
-        self.remove_worksheet_by_pathname(pathname)
-
-        worksheet = model_worksheet.Worksheet(pathname)
-        worksheet.set_kernelname(kernelname)
-        worksheet.create_cell(0, '', activate=True)
-        worksheet.save_to_disk()
-
     def set_active_worksheet(self, worksheet):
         if worksheet != self.active_worksheet:
             self.active_worksheet = worksheet
