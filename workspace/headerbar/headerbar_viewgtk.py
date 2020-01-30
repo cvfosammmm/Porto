@@ -54,12 +54,12 @@ class HeaderBarLeft(Gtk.HeaderBar):
         self.create_ws_button = Gtk.Button.new_from_icon_name('document-new-symbolic', Gtk.IconSize.BUTTON)
         self.create_ws_button.set_tooltip_text('Create new notebook')
         self.create_ws_button.set_focus_on_click(False)
-        self.create_ws_button.set_action_name('win.create_notebook')
+        self.create_ws_button.set_action_name('win.create')
         self.pack_start(self.create_ws_button)
         self.open_ws_button = Gtk.Button.new_from_icon_name('document-open-symbolic', Gtk.IconSize.BUTTON)
         self.open_ws_button.set_tooltip_text('Open notebook')
         self.open_ws_button.set_focus_on_click(False)
-        self.open_ws_button.set_action_name('win.open_notebook')
+        self.open_ws_button.set_action_name('win.open')
         self.pack_start(self.open_ws_button)
 
     def do_get_request_mode(self):
@@ -128,13 +128,13 @@ class HeaderBarRight(Gtk.HeaderBar):
         save_section.append_item(item)
 
         notebook_section = Gio.Menu()
-        item = Gio.MenuItem.new('Delete Notebook ...', 'win.delete_notebook')
+        item = Gio.MenuItem.new('Delete Notebook ...', 'win.delete')
         notebook_section.append_item(item)
 
         close_section = Gio.Menu()
-        item = Gio.MenuItem.new('Close', 'win.close_notebook')
+        item = Gio.MenuItem.new('Close', 'win.close')
         close_section.append_item(item)
-        item = Gio.MenuItem.new('Close All', 'win.close_all_notebooks')
+        item = Gio.MenuItem.new('Close All', 'win.close_all')
         close_section.append_item(item)
 
         self.options_menu.append_section(None, kernel_section)
@@ -144,7 +144,7 @@ class HeaderBarRight(Gtk.HeaderBar):
 
         view_section = Gio.Menu()
         view_menu = Gio.Menu()
-        view_menu.append_item(Gio.MenuItem.new('Show Sidebar', 'win.toggle-sidebar'))
+        view_menu.append_item(Gio.MenuItem.new('Show Sidebar', 'win.toggle_sidebar'))
         view_section.append_submenu('View', view_menu)
         self.options_menu.append_section(None, view_section)
         preferences_section = Gio.Menu()
@@ -171,7 +171,7 @@ class HeaderBarRight(Gtk.HeaderBar):
 
         view_section = Gio.Menu()
         view_menu = Gio.Menu()
-        view_menu.append_item(Gio.MenuItem.new('Show Sidebar', 'win.toggle-sidebar'))
+        view_menu.append_item(Gio.MenuItem.new('Show Sidebar', 'win.toggle_sidebar'))
         view_section.append_submenu('View', view_menu)
         self.blank_options_menu.append_section(None, view_section)
         preferences_section = Gio.Menu()
@@ -264,9 +264,9 @@ class NotebookChooser(Gtk.Popover):
         self.button_box.set_margin_top(12)
         self.button_box.set_margin_bottom(3)
         self.create_button = Gtk.Button.new_with_label('Create Notebook')
-        self.create_button.set_action_name('win.create_notebook')
+        self.create_button.set_action_name('win.create')
         self.open_button = Gtk.Button.new_with_label('Open Notebook')
-        self.open_button.set_action_name('win.open_notebook')
+        self.open_button.set_action_name('win.open')
         self.button_box.pack_start(self.open_button, False, False, 0)
         self.button_box.pack_start(self.create_button, False, False, 0)
         self.box.pack_start(self.button_box, False, False, 0)

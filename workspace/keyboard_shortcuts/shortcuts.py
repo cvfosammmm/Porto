@@ -61,8 +61,8 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
 
         self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
-        self.main_window.app.set_accels_for_action('win.open_notebook', ['<Control>o'])
-        self.main_window.app.set_accels_for_action('win.create_notebook', ['<Control>n'])
+        self.main_window.app.set_accels_for_action('win.open', ['<Control>o'])
+        self.main_window.app.set_accels_for_action('win.create', ['<Control>n'])
         self.main_window.app.set_accels_for_action('win.save_as', ['<Control><Shift>s'])
 
         self.main_window.notebook_view_wrapper.connect('key-press-event', self.on_notebook_key_pressed)

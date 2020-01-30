@@ -40,7 +40,7 @@ class RecentlyOpenedNotebooksListController(object):
     def on_recent_notebooks_list_click(self, wslist_view, wslist_item_view):
         if wslist_item_view != None:
             pathname = wslist_item_view.pathname
-            self.workspace.controller.open_ws_action(None, pathname)
+            self.workspace.controller.on_open_action(None, pathname)
             self.hbchooser.popdown()
 
     def select_row_by_notebook(self, notebook):

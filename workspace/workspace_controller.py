@@ -38,15 +38,15 @@ class WorkspaceController(object):
         self.main_window.show_shortcuts_window_action.connect('activate', self.show_shortcuts_window)
         self.main_window.sidebar.connect('size-allocate', self.on_sidebar_size_allocate)
 
-        self.main_window.restart_kernel_action.connect('activate', self.on_wsmenu_restart_kernel)
-        self.main_window.change_kernel_action.connect('activate', self.on_wsmenu_change_kernel)
-        self.main_window.save_all_action.connect('activate', self.on_wsmenu_save_all)
-        self.main_window.save_as_action.connect('activate', self.on_wsmenu_save_as)
-        self.main_window.delete_ws_action.connect('activate', self.on_wsmenu_delete)
-        self.main_window.close_action.connect('activate', self.on_wsmenu_close)
-        self.main_window.close_all_action.connect('activate', self.on_wsmenu_close_all)
-        self.main_window.open_action.connect('activate', self.open_ws_action)
-        self.main_window.create_action.connect('activate', self.create_ws_action)
+        self.main_window.restart_kernel_action.connect('activate', self.on_restart_kernel_action)
+        self.main_window.change_kernel_action.connect('activate', self.on_change_kernel_action)
+        self.main_window.save_all_action.connect('activate', self.on_save_all_action)
+        self.main_window.save_as_action.connect('activate', self.on_save_as_action)
+        self.main_window.delete_action.connect('activate', self.on_delete_action)
+        self.main_window.close_action.connect('activate', self.on_close_action)
+        self.main_window.close_all_action.connect('activate', self.on_close_all_action)
+        self.main_window.open_action.connect('activate', self.on_open_action)
+        self.main_window.create_action.connect('activate', self.on_create_action)
 
         self.settings.register_observer(self)
 
@@ -60,7 +60,7 @@ class WorkspaceController(object):
     def on_sidebar_size_allocate(self, paned, paned_size):
         self.workspace.sidebar_position = self.main_window.paned.get_position()
             
-    def open_ws_action(self, action=None, pathname=None):
+    def on_open_action(self, action=None, pathname=None):
         if pathname == None:
             pathname = ServiceLocator.get_dialog('open_notebook').run()
         if pathname != None:
@@ -79,7 +79,7 @@ class WorkspaceController(object):
             if notebook != None:
                 self.workspace.set_active_notebook(notebook)
 
-    def create_ws_action(self, action=None, parameter=None):
+    def on_create_action(self, action=None, parameter=None):
         parameters = ServiceLocator.get_dialog('create_notebook').run()
         if parameters != None:
             pathname, kernelname = parameters
@@ -93,11 +93,11 @@ class WorkspaceController(object):
             self.workspace.add_notebook(notebook)
             self.workspace.set_active_notebook(notebook)
 
-    def on_wsmenu_restart_kernel(self, action=None, parameter=None):
+    def on_restart_kernel_action(self, action=None, parameter=None):
         if self.workspace.active_notebook != None:
             self.workspace.active_notebook.restart_kernel()
         
-    def on_wsmenu_change_kernel(self, action=None, parameter=None):
+    def on_change_kernel_action(self, action=None, parameter=None):
         if parameter != None:
             self.main_window.change_kernel_action.set_state(parameter)
             notebook = self.workspace.active_notebook
@@ -105,24 +105,24 @@ class WorkspaceController(object):
                 notebook.set_kernelname(parameter.get_string())
                 notebook.restart_kernel()
 
-    def on_wsmenu_save_as(self, action=None, parameter=None):
+    def on_save_as_action(self, action=None, parameter=None):
         notebook = self.workspace.get_active_notebook()
         if notebook != None:
             ServiceLocator.get_dialog('save_as').run(notebook)
 
-    def on_wsmenu_save_all(self, action=None, parameter=None):
+    def on_save_all_action(self, action=None, parameter=None):
         for notebook in self.workspace.open_notebooks:
             notebook.save_to_disk()
 
-    def on_wsmenu_delete(self, action, parameter=None):
+    def on_delete_action(self, action, parameter=None):
         self.delete_notebook(self.workspace.get_active_notebook())
 
-    def on_wsmenu_close(self, action=None, parameter=None):
+    def on_close_action(self, action=None, parameter=None):
         notebook = self.workspace.get_active_notebook()
         if notebook != None:
             self.close_notebook_after_modified_check(notebook)
 
-    def on_wsmenu_close_all(self, action=None, parameter=None):
+    def on_close_all_action(self, action=None, parameter=None):
         self.close_all_notebooks_after_modified_check()
 
     def close_notebook(self, notebook, add_to_recently_opened=True):

@@ -43,11 +43,11 @@ class WelcomePageView(Gtk.ScrolledWindow):
         #self.welcome_links.set_size_request(400, 50)
         
         self.create_ws_link = Gtk.LinkButton('action://win.placeholder', 'Create New Notebook')
-        self.create_ws_link.set_action_name('win.create_notebook')
+        self.create_ws_link.set_action_name('win.create')
         self.create_ws_link.set_can_focus(False)
         self.create_ws_link.set_tooltip_text('')
         self.open_ws_link = Gtk.LinkButton('action://win.placeholder', 'Open Notebook(s)')
-        self.open_ws_link.set_action_name('win.open_notebook')
+        self.open_ws_link.set_action_name('win.open')
         self.open_ws_link.set_can_focus(False)
         self.open_ws_link.set_tooltip_text('')
         self.welcome_links.pack_start(self.create_ws_link, False, False, 0)
