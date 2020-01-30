@@ -36,7 +36,7 @@ class ResultHtml(Result):
         Result.__init__(self)
 
         self.data = data
-        self.html = data.replace('/nbextensions', 'resources/nbextensions')
+        self.html = data.replace('/nbextensions', '/usr/share/jupyter/nbextensions')
 
         self.content = WebKit2.WebView()
         self.content.get_settings().set_enable_webgl(True)
