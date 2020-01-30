@@ -32,19 +32,19 @@ class OpenNotebooksListController(object):
         self.hbchooser = ServiceLocator.get_main_window().headerbar.hb_right.notebook_chooser
         self.main_window = ServiceLocator.get_main_window()
         self.workspace = workspace
-        self.open_ws_should_scroll = False
-        self.open_ws_hb_should_scroll = False
+        self.open_notebook_should_scroll = False
+        self.open_notebook_hb_should_scroll = False
 
-        self.sidebar.connect('size-allocate', self.on_open_ws_view_size_allocate)
-        self.hbchooser.connect('size-allocate', self.on_open_ws_hb_view_size_allocate)
+        self.sidebar.connect('size-allocate', self.on_open_notebook_view_size_allocate)
+        self.hbchooser.connect('size-allocate', self.on_open_notebook_hb_view_size_allocate)
         self.sb_view.connect('row-selected', self.on_open_notebooks_list_selected)
         self.hb_view.connect('row-selected', self.on_open_notebooks_list_selected)
 
-    def on_open_notebooks_list_selected(self, wslist_view, wslist_item_view):
-        if wslist_item_view != None:
-            notebook = wslist_item_view.get_notebook()
+    def on_open_notebooks_list_selected(self, list_view, list_item_view):
+        if list_item_view != None:
+            notebook = list_item_view.get_notebook()
             self.workspace.set_active_notebook(notebook)
-            GLib.idle_add(self.scroll_row_on_screen, wslist_view, wslist_item_view)
+            GLib.idle_add(self.scroll_row_on_screen, list_view, list_item_view)
 
     def scroll_row_on_screen(self, view, row):
         if view == self.sb_view: widget = self.sidebar
@@ -58,28 +58,28 @@ class OpenNotebooksListController(object):
         elif item_offset > (viewport_offset + viewport_height - 48):
             sw.get_vadjustment().set_value(item_offset - viewport_height + 48)
 
-    def on_open_ws_view_size_allocate(self, widget=None, allocation=None):
+    def on_open_notebook_view_size_allocate(self, widget=None, allocation=None):
         sw = self.sidebar.open_notebooks_list_view_wrapper
-        open_ws_height = 48 * self.sb_view.visible_items_count
+        open_notebook_height = 48 * self.sb_view.visible_items_count
         self_height = self.sidebar.get_allocated_height()
-        open_ws_should_scroll = open_ws_height >= self_height / 2
-        if open_ws_should_scroll != self.open_ws_should_scroll:
-            self.open_ws_should_scroll = open_ws_should_scroll
-        if self.open_ws_should_scroll:
+        open_notebook_should_scroll = open_notebook_height >= self_height / 2
+        if open_notebook_should_scroll != self.open_notebook_should_scroll:
+            self.open_notebook_should_scroll = open_notebook_should_scroll
+        if self.open_notebook_should_scroll:
             sw.set_size_request(-1, self_height / 2)
             sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         else:
             sw.set_size_request(-1, -1)
             sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER)
 
-    def on_open_ws_hb_view_size_allocate(self, widget=None, allocation=None):
+    def on_open_notebook_hb_view_size_allocate(self, widget=None, allocation=None):
         sw = self.hbchooser.open_notebooks_list_view_wrapper
-        open_ws_height = 49 * self.hb_view.visible_items_count
+        open_notebook_height = 49 * self.hb_view.visible_items_count
         self_height = 500
-        open_ws_hb_should_scroll = (open_ws_height >= 196)
-        if open_ws_hb_should_scroll != self.open_ws_hb_should_scroll:
-            self.open_ws_hb_should_scroll = open_ws_hb_should_scroll
-        if self.open_ws_hb_should_scroll:
+        open_notebook_hb_should_scroll = (open_notebook_height >= 196)
+        if open_notebook_hb_should_scroll != self.open_notebook_hb_should_scroll:
+            self.open_notebook_hb_should_scroll = open_notebook_hb_should_scroll
+        if self.open_notebook_hb_should_scroll:
             sw.set_size_request(-1, 174)
             sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         else:

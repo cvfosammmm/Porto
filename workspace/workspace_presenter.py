@@ -74,19 +74,19 @@ class WorkspacePresenter(Observable):
                 self.on_hide_sidebar()
 
     def set_notebook_view(self, notebook_view):
-        wswrapper = self.main_window.notebook_view_wrapper
-        page_index = wswrapper.page_num(notebook_view)
+        wrapper = self.main_window.notebook_view_wrapper
+        page_index = wrapper.page_num(notebook_view)
         if page_index == -1:
-            page_index = wswrapper.append_page(notebook_view)
+            page_index = wrapper.append_page(notebook_view)
         notebook_view.show_all()
-        wswrapper.set_current_page(page_index)
-        wswrapper.show_all()
+        wrapper.set_current_page(page_index)
+        wrapper.show_all()
 
     def remove_view(self, view):
-        wswrapper = self.main_window.notebook_view_wrapper
-        page_index = wswrapper.page_num(view)
+        wrapper = self.main_window.notebook_view_wrapper
+        page_index = wrapper.page_num(view)
         if page_index >= 0:
-            wswrapper.remove_page(page_index)
+            wrapper.remove_page(page_index)
 
     def activate_welcome_page_mode(self):
         if self.window_mode != 'welcome_page':

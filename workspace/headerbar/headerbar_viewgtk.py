@@ -50,17 +50,16 @@ class HeaderBarLeft(Gtk.HeaderBar):
         self.create_buttons()
 
     def create_buttons(self):
-        self.ws_add_wrapper = Gtk.HBox()
-        self.create_ws_button = Gtk.Button.new_from_icon_name('document-new-symbolic', Gtk.IconSize.BUTTON)
-        self.create_ws_button.set_tooltip_text('Create new notebook')
-        self.create_ws_button.set_focus_on_click(False)
-        self.create_ws_button.set_action_name('win.create')
-        self.pack_start(self.create_ws_button)
-        self.open_ws_button = Gtk.Button.new_from_icon_name('document-open-symbolic', Gtk.IconSize.BUTTON)
-        self.open_ws_button.set_tooltip_text('Open notebook')
-        self.open_ws_button.set_focus_on_click(False)
-        self.open_ws_button.set_action_name('win.open')
-        self.pack_start(self.open_ws_button)
+        self.create_button = Gtk.Button.new_from_icon_name('document-new-symbolic', Gtk.IconSize.BUTTON)
+        self.create_button.set_tooltip_text('Create new notebook')
+        self.create_button.set_focus_on_click(False)
+        self.create_button.set_action_name('win.create')
+        self.pack_start(self.create_button)
+        self.open_button = Gtk.Button.new_from_icon_name('document-open-symbolic', Gtk.IconSize.BUTTON)
+        self.open_button.set_tooltip_text('Open notebook')
+        self.open_button.set_focus_on_click(False)
+        self.open_button.set_action_name('win.open')
+        self.pack_start(self.open_button)
 
     def do_get_request_mode(self):
         return Gtk.SizeRequestMode.CONSTANT_SIZE
@@ -233,10 +232,10 @@ class NotebookChooser(Gtk.Popover):
         self.open_notebooks_label_revealer = Gtk.Revealer()
         self.open_notebooks_label = Gtk.Label('Open Notebooks')
         self.open_notebooks_label.set_xalign(0)
-        self.open_notebooks_label.get_style_context().add_class('wslist_header')
+        self.open_notebooks_label.get_style_context().add_class('nblist_header')
         self.open_notebooks_label_revealer.add(self.open_notebooks_label)
         self.open_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        self.get_style_context().add_class('wslist_top')
+        self.get_style_context().add_class('nblist_top')
 
         self.recent_notebooks_list_view = viewgtk_notebook_list.NotebookListRecentView()
         self.recent_notebooks_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -244,7 +243,7 @@ class NotebookChooser(Gtk.Popover):
         self.recent_notebooks_label_revealer = Gtk.Revealer()
         self.recent_notebooks_label = Gtk.Label('Recently Opened Notebooks')
         self.recent_notebooks_label.set_xalign(0)
-        self.recent_notebooks_label.get_style_context().add_class('wslist_header')
+        self.recent_notebooks_label.get_style_context().add_class('nblist_header')
         self.recent_notebooks_label_revealer.add(self.recent_notebooks_label)
         self.recent_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 

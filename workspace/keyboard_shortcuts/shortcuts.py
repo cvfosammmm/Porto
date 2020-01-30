@@ -55,7 +55,6 @@ class Shortcuts(object):
         self.accel_group.connect(Gdk.keyval_from_name('h'), c_mask, flags, self.shortcut_stop_computation)
         self.accel_group.connect(Gdk.keyval_from_name('Up'), c_mask, flags, self.shortcut_move_cell_up)
         self.accel_group.connect(Gdk.keyval_from_name('Down'), c_mask, flags, self.shortcut_move_cell_down)
-        self.accel_group.connect(Gdk.keyval_from_name('r'), c_mask, flags, self.shortcut_restart_kernel)
         self.accel_group.connect(Gdk.keyval_from_name('Page_Up'), 0, flags, self.shortcut_page_up)
         self.accel_group.connect(Gdk.keyval_from_name('Page_Down'), 0, flags, self.shortcut_page_down)
         self.accel_group.connect(Gdk.keyval_from_name('s'), c_mask, flags, self.shortcut_save)
@@ -64,6 +63,7 @@ class Shortcuts(object):
         self.main_window.app.set_accels_for_action('win.open', ['<Control>o'])
         self.main_window.app.set_accels_for_action('win.create', ['<Control>n'])
         self.main_window.app.set_accels_for_action('win.save_as', ['<Control><Shift>s'])
+        self.main_window.app.set_accels_for_action('win.restart_kernel', ['<Control>r'])
 
         self.main_window.notebook_view_wrapper.connect('key-press-event', self.on_notebook_key_pressed)
 
@@ -122,9 +122,6 @@ class Shortcuts(object):
         if self.workspace.active_notebook != None:
             self.workspace.active_notebook.move_cell_down()
         return True
-
-    def shortcut_restart_kernel(self, accel_group=None, window=None, key=None, mask=None):
-        self.workspace.controller.on_wsmenu_restart_kernel()
 
     def shortcut_page_up(self, accel_group=None, window=None, key=None, mask=None):
         try: notebook_view = self.main_window.active_notebook_view

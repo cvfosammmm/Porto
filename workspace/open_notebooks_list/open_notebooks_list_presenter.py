@@ -42,8 +42,6 @@ class OpenNotebooksListPresenter(object):
         self.hb_view.set_sort_func(self.sort_func)
         self.hbchooser.open_notebooks_list_view_wrapper.add(self.hb_view)
 
-        self.open_ws_should_scroll = False
-        self.open_ws_hb_should_scroll = False
         self.hbchooser.open_notebooks_list_view_wrapper.hide()
         self.workspace.register_observer(self)
         self.open_notebooks_list.register_observer(self)

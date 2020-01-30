@@ -96,15 +96,15 @@ class Workspace(Observable):
                 self.set_active_notebook(None)
             elif self.get_active_notebook() == notebook:
                 new_active = False
-                def sort_func(ws): return ws.last_saved
-                for ws in sorted(self.open_notebooks, key=sort_func, reverse=True):
-                    if ws.last_saved <= notebook.last_saved:
-                        self.set_active_notebook(ws)
+                def sort_func(nb): return nb.last_saved
+                for nb in sorted(self.open_notebooks, key=sort_func, reverse=True):
+                    if nb.last_saved <= notebook.last_saved:
+                        self.set_active_notebook(nb)
                         new_active = True
                         break
                 if new_active == False:
-                    for ws in sorted(self.open_notebooks, key=sort_func, reverse=False):
-                        self.set_active_notebook(ws)
+                    for nb in sorted(self.open_notebooks, key=sort_func, reverse=False):
+                        self.set_active_notebook(nb)
                         break
             self.add_change_code('notebook_removed', notebook)
         

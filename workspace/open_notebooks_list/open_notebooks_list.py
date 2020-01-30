@@ -19,9 +19,9 @@ import pickle
 import os.path
 
 from helpers.observable import Observable
-import workspace.open_notebooks_list.open_notebooks_list_viewgtk as ows_view
-import workspace.open_notebooks_list.open_notebooks_list_presenter as ows_presenter
-import workspace.open_notebooks_list.open_notebooks_list_controller as ows_controller
+import workspace.open_notebooks_list.open_notebooks_list_viewgtk as onb_view
+import workspace.open_notebooks_list.open_notebooks_list_presenter as onb_presenter
+import workspace.open_notebooks_list.open_notebooks_list_controller as onb_controller
 
 
 class OpenNotebooksList(Observable):
@@ -33,10 +33,10 @@ class OpenNotebooksList(Observable):
         self.sb_items = dict()
         self.hb_items = dict()
 
-        self.sb_view = ows_view.OpenNotebooksListView()
-        self.hb_view = ows_view.OpenNotebooksListView()
-        self.presenter = ows_presenter.OpenNotebooksListPresenter(workspace, self, self.sb_view, self.hb_view)
-        self.controller = ows_controller.OpenNotebooksListController(workspace, self.sb_view, self.hb_view)
+        self.sb_view = onb_view.OpenNotebooksListView()
+        self.hb_view = onb_view.OpenNotebooksListView()
+        self.presenter = onb_presenter.OpenNotebooksListPresenter(workspace, self, self.sb_view, self.hb_view)
+        self.controller = onb_controller.OpenNotebooksListController(workspace, self.sb_view, self.hb_view)
 
     def add_item_by_notebook(self, notebook, notify=True):
         sb_item = notebook.list_item.sb_view

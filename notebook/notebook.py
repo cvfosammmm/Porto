@@ -384,7 +384,7 @@ class Notebook(Observable):
                 self.create_cell('last', '', activate=True)
 
     def stop_evaluation(self):
-        self.add_change_code('ws_evaluation_to_stop', None)
+        self.add_change_code('nb_evaluation_to_stop', None)
         
     def add_busy_cell(self, cell):
         self.busy_cells.add(cell)

@@ -58,7 +58,7 @@ class NotebookEvaluator(object):
         if change_code == 'kernel_to_shutdown_now':
             self.backend_code.shutdown_now()
         
-        if change_code == 'ws_evaluation_to_stop':
+        if change_code == 'nb_evaluation_to_stop':
             self.backend_code.stop_evaluation(self.notebook)
         
         if change_code == 'cell_state_change' and parameter == 'ready_for_evaluation':

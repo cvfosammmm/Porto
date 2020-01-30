@@ -1,6 +1,6 @@
 /*
 
-    worksheet view 
+    notebook view 
 
 */
 
@@ -67,10 +67,10 @@ textview.view border.left {
     color: mix(@theme_fg_color, @theme_bg_color, 0.3);
     font-size: 13px;
 }
-.worksheetview {
+.notebookview {
     background-color: @theme_bg_color;
 }
-.worksheetview viewport {
+.notebookview viewport {
     border: none;
 }
 .welcomepageview {
@@ -122,72 +122,72 @@ textview {
 
 /*
 
-    worksheet list
+    notebook list
 
 */
 
-.wslist_top {
+.nblist_top {
     margin-top: 1px;
 }
-.wslist_top.sidebar {
+.nblist_top.sidebar {
     background-color: @theme_base_color;
 }
-.wslist_top.hb {
+.nblist_top.hb {
     padding: 9px;
 }
-.wslist_top.hb list row > revealer > box {
+.nblist_top.hb list row > revealer > box {
     border-bottom: 1px solid mix(@borders, @theme_base_color, 0.68);
 }
-.wslist_top.hb list row > box {
+.nblist_top.hb list row > box {
     border-bottom: 1px solid mix(@borders, @theme_base_color, 0.68);
 }
-.wslist_top.hb scrolledwindow {
+.nblist_top.hb scrolledwindow {
     border: 1px solid @borders;
 }
-.wslist_wrapper {
+.nblist_wrapper {
     padding-top: 7px;
     padding-bottom: 7px;
 }
-.wslist_name {
+.nblist_name {
 }
-.wslist_state {
+.nblist_state {
     font-size: 12px;
     opacity: 0.5;
 }
-.wslist_folder {
+.nblist_folder {
     font-size: 12px;
     opacity: 0.5;
 }
-.wslist_icon {
+.nblist_icon {
     padding-left: 9px;
     padding-right: 12px;
 }
-.wslist_last_save {
+.nblist_last_save {
     font-size: 12px;
     padding-right: 14px;
     opacity: 0.5;
 }
-.wslist_header {
+.nblist_header {
     font-weight: bold;
     color: mix(@theme_fg_color, @theme_base_color, 0.60);
     padding-left: 9px;
     padding-top: 7px;
     padding-bottom: 6px;
 }
-.sidebar .wslist_header {
+.sidebar .nblist_header {
     background: @theme_base_color;
 }
-.wslist_close_button {
+.nblist_close_button {
     margin-right: 3px;
     border-width: 0px;
     background: none;
     box-shadow: none;
     opacity: 0.5;
 }
-.wslist_close_button:hover {
+.nblist_close_button:hover {
     opacity: 1;
 }
-.wslist_item {
+.nblist_item {
     padding: 0px;
     margin: 0px;
 }

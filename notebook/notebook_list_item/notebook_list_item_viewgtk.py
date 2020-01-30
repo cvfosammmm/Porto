@@ -25,7 +25,7 @@ class OpenNotebookListViewItem(Gtk.ListBoxRow):
 
     def __init__(self, notebook, last_saved):
         Gtk.ListBoxRow.__init__(self)
-        self.get_style_context().add_class('wslist_item')
+        self.get_style_context().add_class('nblist_item')
 
         self.icon_stack = Gtk.Stack()
         self.icon_normal = None
@@ -42,7 +42,7 @@ class OpenNotebookListViewItem(Gtk.ListBoxRow):
         self.name.set_single_line_mode(True)
         self.name.set_max_width_chars(-1)
         self.name.set_ellipsize(Pango.EllipsizeMode.END)
-        self.name.get_style_context().add_class('wslist_name')
+        self.name.get_style_context().add_class('nblist_name')
 
         self.box = Gtk.HBox()
         self.box.pack_start(self.icon_stack, False, False, 0)
@@ -54,12 +54,12 @@ class OpenNotebookListViewItem(Gtk.ListBoxRow):
         self.state.set_justify(Gtk.Justification.LEFT)
         self.state.set_xalign(0)
         self.state.set_hexpand(False)
-        self.state.get_style_context().add_class('wslist_state')
+        self.state.get_style_context().add_class('nblist_state')
         self.statebox.pack_start(self.state, True, True, 0)
 
         self.topbox = Gtk.HBox()
         self.close_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.MENU)
-        self.close_button.get_style_context().add_class('wslist_close_button')
+        self.close_button.get_style_context().add_class('nblist_close_button')
         self.close_button.set_can_focus(False)
         self.close_button.set_tooltip_text('Close Notebook')
         
@@ -71,7 +71,7 @@ class OpenNotebookListViewItem(Gtk.ListBoxRow):
         self.topbox.pack_end(self.close_button, False, False, 0)
 
         self.box.pack_end(self.topbox, True, True, 0)
-        self.box.get_style_context().add_class('wslist_wrapper')
+        self.box.get_style_context().add_class('nblist_wrapper')
         self.add(self.box)
         
         self.set_name(self.notebook_name)

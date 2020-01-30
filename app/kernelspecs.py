@@ -70,17 +70,17 @@ class Kernelspecs():
             filename = './resources/images/' + name + '_icon_2.png'
             if os.path.isfile(filename):
                 icon = self.get_icon_from_filename(filename)
-                icon.get_style_context().add_class('wslist_icon')
+                icon.get_style_context().add_class('nblist_icon')
                 return icon
             filename = self.get_kernelspec_icon_path(name)
             if filename != None and os.path.isfile(filename):
                 icon = self.get_icon_from_resource_dir(filename, 30)
-                icon.get_style_context().add_class('wslist_icon')
+                icon.get_style_context().add_class('nblist_icon')
                 return icon
         else:
             filename = './resources/images/placeholder_icon_2.png'
             icon = self.get_icon_from_filename(filename)
-            icon.get_style_context().add_class('wslist_icon')
+            icon.get_style_context().add_class('nblist_icon')
             return icon
 
     def get_active_sidebar_icon(self, name):
@@ -88,17 +88,17 @@ class Kernelspecs():
             filename = './resources/images/' + name + '_icon_4.png'
             if os.path.isfile(filename):
                 icon = self.get_icon_from_filename(filename)
-                icon.get_style_context().add_class('wslist_icon')
+                icon.get_style_context().add_class('nblist_icon')
                 return icon
             filename = self.get_kernelspec_icon_path(name)
             if filename != None and os.path.isfile(filename):
                 icon = self.get_icon_from_resource_dir(filename, 30)
-                icon.get_style_context().add_class('wslist_icon')
+                icon.get_style_context().add_class('nblist_icon')
                 return icon
         else:
             filename = './resources/images/placeholder_icon_4.png'
             icon = self.get_icon_from_filename(filename)
-            icon.get_style_context().add_class('wslist_icon')
+            icon.get_style_context().add_class('nblist_icon')
             return icon
 
     def get_background_path(self, name):

@@ -34,10 +34,10 @@ class Sidebar(Gtk.VBox):
         self.open_notebooks_label_revealer = Gtk.Revealer()
         self.open_notebooks_label = Gtk.Label('Open Notebooks')
         self.open_notebooks_label.set_xalign(0)
-        self.open_notebooks_label.get_style_context().add_class('wslist_header')
+        self.open_notebooks_label.get_style_context().add_class('nblist_header')
         self.open_notebooks_label_revealer.add(self.open_notebooks_label)
         self.open_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        self.get_style_context().add_class('wslist_top')
+        self.get_style_context().add_class('nblist_top')
 
         self.recent_notebooks_list_view = viewgtk_notebook_list.NotebookListRecentView()
         self.recent_notebooks_list_view.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -45,7 +45,7 @@ class Sidebar(Gtk.VBox):
         self.recent_notebooks_label_revealer = Gtk.Revealer()
         self.recent_notebooks_label = Gtk.Label('Recently Opened Notebooks')
         self.recent_notebooks_label.set_xalign(0)
-        self.recent_notebooks_label.get_style_context().add_class('wslist_header')
+        self.recent_notebooks_label.get_style_context().add_class('nblist_header')
         self.recent_notebooks_label_revealer.add(self.recent_notebooks_label)
         self.recent_notebooks_label_revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
 

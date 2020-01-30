@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
-import notebook.notebook_list_item.notebook_list_item_controller as wsli_controller
-import notebook.notebook_list_item.notebook_list_item_presenter as wsli_presenter
-import notebook.notebook_list_item.notebook_list_item_viewgtk as wsli_view
+import notebook.notebook_list_item.notebook_list_item_controller as nbli_controller
+import notebook.notebook_list_item.notebook_list_item_presenter as nbli_presenter
+import notebook.notebook_list_item.notebook_list_item_viewgtk as nbli_view
 from helpers.observable import Observable
 from app.service_locator import ServiceLocator
 
@@ -29,10 +29,10 @@ class NotebookListItem(Observable):
         self.notebook = notebook
         self.kernelspecs = ServiceLocator.get_kernelspecs()
 
-        self.sb_view = wsli_view.OpenNotebookListViewItem(notebook, notebook.get_last_saved())
-        self.hb_view = wsli_view.OpenNotebookListViewItem(notebook, notebook.get_last_saved())
-        self.presenter = wsli_presenter.NotebookListItemPresenter(notebook, self, self.sb_view, self.hb_view)
-        self.controller = wsli_controller.NotebookListItemController(notebook, self, self.sb_view, self.hb_view)
+        self.sb_view = nbli_view.OpenNotebookListViewItem(notebook, notebook.get_last_saved())
+        self.hb_view = nbli_view.OpenNotebookListViewItem(notebook, notebook.get_last_saved())
+        self.presenter = nbli_presenter.NotebookListItemPresenter(notebook, self, self.sb_view, self.hb_view)
+        self.controller = nbli_controller.NotebookListItemController(notebook, self, self.sb_view, self.hb_view)
 
         self.set_kernel(notebook.get_kernelname())
 

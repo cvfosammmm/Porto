@@ -30,7 +30,7 @@ class HeaderbarControlsController(object):
         self.button_box.eval_button.connect('clicked', self.on_eval_button_click)
         self.button_box.eval_nc_button.connect('clicked', self.on_eval_nc_button_click)
         self.button_box.stop_button.connect('clicked', self.on_stop_button_click)
-        self.save_button.connect('clicked', self.on_save_ws_button_click)
+        self.save_button.connect('clicked', self.on_save_button_click)
 
     def on_add_codecell_button_click(self, button_object=None):
         self.notebook.add_codecell_below_active_cell()
@@ -56,7 +56,7 @@ class HeaderbarControlsController(object):
     def on_stop_button_click(self, button_object=None):
         self.notebook.stop_evaluation()
 
-    def on_save_ws_button_click(self, button_object=None):
+    def on_save_button_click(self, button_object=None):
         self.notebook.save_to_disk()
         
 

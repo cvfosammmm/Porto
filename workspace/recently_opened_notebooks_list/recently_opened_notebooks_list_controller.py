@@ -37,9 +37,9 @@ class RecentlyOpenedNotebooksListController(object):
 
         self.recently_opened_notebooks.populate_from_disk()
 
-    def on_recent_notebooks_list_click(self, wslist_view, wslist_item_view):
-        if wslist_item_view != None:
-            pathname = wslist_item_view.pathname
+    def on_recent_notebooks_list_click(self, list_view, list_item_view):
+        if list_item_view != None:
+            pathname = list_item_view.pathname
             self.workspace.controller.on_open_action(None, pathname)
             self.hbchooser.popdown()
 

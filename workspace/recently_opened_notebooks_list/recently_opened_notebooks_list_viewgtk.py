@@ -94,7 +94,7 @@ class NotebookListViewItem(Gtk.ListBoxRow):
 
     def __init__(self, pathname, kernelname, last_saved=None):
         Gtk.ListBoxRow.__init__(self)
-        self.get_style_context().add_class('wslist_item')
+        self.get_style_context().add_class('nblist_item')
 
         self.icon_stack = Gtk.Stack()
         self.icon_normal = None
@@ -111,7 +111,7 @@ class NotebookListViewItem(Gtk.ListBoxRow):
         self.name.set_single_line_mode(True)
         self.name.set_max_width_chars(-1)
         self.name.set_ellipsize(Pango.EllipsizeMode.END)
-        self.name.get_style_context().add_class('wslist_name')
+        self.name.get_style_context().add_class('nblist_name')
 
         self.box = Gtk.HBox()
         self.box.pack_start(self.icon_stack, False, False, 0)
@@ -144,13 +144,13 @@ class RecentNotebookListViewItem(NotebookListViewItem):
         self.folder.set_justify(Gtk.Justification.LEFT)
         self.folder.set_xalign(0)
         self.folder.set_hexpand(False)
-        self.folder.get_style_context().add_class('wslist_folder')
+        self.folder.get_style_context().add_class('nblist_folder')
         self.last_save = Gtk.Label()
         self.last_save.set_justify(Gtk.Justification.LEFT)
         self.last_save.set_xalign(1)
         self.last_save.set_yalign(0)
         self.last_save.set_hexpand(False)
-        self.last_save.get_style_context().add_class('wslist_last_save')
+        self.last_save.get_style_context().add_class('nblist_last_save')
         self.statebox.pack_start(self.folder, True, True, 0)
         self.statebox.pack_start(self.last_save, True, True, 0)
         
@@ -159,7 +159,7 @@ class RecentNotebookListViewItem(NotebookListViewItem):
         self.textbox.pack_start(self.statebox, True, True, 0)
 
         self.box.pack_end(self.textbox, True, True, 0)
-        self.box.get_style_context().add_class('wslist_wrapper')
+        self.box.get_style_context().add_class('nblist_wrapper')
         self.revealer = Gtk.Revealer()
         self.revealer.add(self.box)
         self.revealer.set_reveal_child(True)
