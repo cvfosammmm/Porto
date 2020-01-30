@@ -62,6 +62,7 @@ class Shortcuts(object):
         self.main_window.app.set_accels_for_action('win.quit', ['<Control>q'])
         self.main_window.app.set_accels_for_action('win.open', ['<Control>o'])
         self.main_window.app.set_accels_for_action('win.create', ['<Control>n'])
+        self.main_window.app.set_accels_for_action('win.close', ['<Control>w'])
         self.main_window.app.set_accels_for_action('win.save_as', ['<Control><Shift>s'])
         self.main_window.app.set_accels_for_action('win.restart_kernel', ['<Control>r'])
 
