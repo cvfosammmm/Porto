@@ -53,7 +53,6 @@ class CreateNotebookDialog(Dialog):
             else:
                 break
         if response == Gtk.ResponseType.APPLY:
-            self.current_name = self.view.name_entry.get_text().strip()
             pathname = self.current_folder + '/' + self.current_filename
             kernelname = self.current_kernelname
             return_value = (pathname, kernelname)
@@ -117,7 +116,11 @@ class CreateNotebookDialog(Dialog):
 
     def on_name_entry(self, buffer, position, chars, n_chars=None):
         self.update_create_button()
-        self.set_current_filename(''.join(self.view.name_entry.get_text().title().split()) + '.ipynb')
+
+        name = ""
+        for part in self.view.name_entry.get_text().split():
+            name += part.strip().title()
+        self.set_current_filename(name + '.ipynb')
 
     def on_entry_activate(self, entry, user_data=None):
         self.view.create_button.clicked()
