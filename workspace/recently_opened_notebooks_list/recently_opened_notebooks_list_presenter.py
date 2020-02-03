@@ -39,11 +39,9 @@ class RecentlyOpenedNotebooksListPresenter(object):
             item = parameter
 
             for widget in [self.sidebar, self.hbchooser]:
-                list_item = viewgtk_notebook_list.RecentNotebookListViewItem(item['pathname'], item['kernelname'], item['date'])
                 icon_normal = self.kernelspecs.get_normal_sidebar_icon(item['kernelname'])
                 icon_active = self.kernelspecs.get_active_sidebar_icon(item['kernelname'])
-                list_item.update_kernel_icons(icon_normal, icon_active)
-                widget.recent_notebooks_list_view.add_item(list_item)
+                widget.recent_notebooks_list_view.add_item(item['pathname'], item['kernelname'], item['date'], icon_normal, icon_active)
                 if widget.recent_notebooks_list_view.visible_items_count >= 1:
                     widget.recent_notebooks_label_revealer.set_reveal_child(True)
                     widget.recent_notebooks_list_view_wrapper.show_all()

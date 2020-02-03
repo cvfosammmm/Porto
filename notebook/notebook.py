@@ -41,8 +41,7 @@ class Notebook(Observable):
         Observable.__init__(self)
 
         self.pathname = pathname
-        self.kernelname = 'python3'
-        self.kernel = 'sage'
+        self.kernelname = None
         self.cells = []
         self.active_cell = None
         self.busy_cells = set()
@@ -283,7 +282,8 @@ class Notebook(Observable):
             self.kernelname = kernelname
             self.set_save_state('modified')
             self.list_item.set_kernel(kernelname)
-    
+            self.add_change_code('kernelname_changed')
+
     def get_cells_in_order(self):
         pass
         

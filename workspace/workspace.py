@@ -46,6 +46,23 @@ class Workspace(Observable):
 
         self.set_pretty_print(self.settings.get_value('preferences', 'pretty_print'))
 
+    def change_notification(self, change_code, notifying_object, parameter):
+
+        if change_code == 'save_state_change' and parameter == 'saved':
+            notebook = notifying_object
+            item = {'pathname': notebook.pathname, 'kernelname': notebook.kernelname, 'date': notebook.get_last_saved()}
+            self.recently_opened_notebooks.update_item(item)
+
+        if change_code == 'kernelname_changed':
+            notebook = notifying_object
+            item = {'pathname': notebook.pathname, 'kernelname': notebook.kernelname, 'date': notebook.get_last_saved()}
+            self.recently_opened_notebooks.update_item(item)
+
+        if change_code == 'pathname_changed':
+            notebook = notifying_object
+            item = {'pathname': notebook.pathname, 'kernelname': notebook.kernelname, 'date': notebook.get_last_saved()}
+            self.recently_opened_notebooks.add_item(item)
+
     def add_notebook(self, notebook):
         if notebook in self.open_notebooks: return False
         self.open_notebooks[notebook] = notebook
@@ -53,6 +70,7 @@ class Workspace(Observable):
         item = {'pathname': notebook.pathname, 'kernelname': notebook.kernelname, 'date': notebook.get_last_saved()}
         self.recently_opened_notebooks.add_item(item)
         self.add_change_code('new_notebook', notebook)
+        notebook.register_observer(self)
 
     def get_notebook_by_pathname(self, pathname):
         for notebook in self.open_notebooks:

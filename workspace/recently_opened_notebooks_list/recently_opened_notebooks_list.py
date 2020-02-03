@@ -30,40 +30,45 @@ class RecentlyOpenedNotebooksList(Observable):
 
         self.workspace = workspace
         self.pathname = os.path.expanduser('~') + '/.porto'
-        self.items = list()
+        self.items = dict()
 
         self.presenter = ro_presenter.RecentlyOpenedNotebooksListPresenter(workspace, self)
         self.controller = ro_controller.RecentlyOpenedNotebooksListController(workspace, self)
 
     def get_by_pathname(self, pathname):
-        for item in self.items:
-            if item['pathname'] == pathname:
-                return item
-        return None
-
-    def already_in_list(self, pathname):
-        for item in self.items:
-            if pathname == item['pathname']: return True
-        return False
+        try:
+            return self.items[pathname]
+        except KeyError:
+            return None
 
     def add_item(self, item, notify=True, save=True):
         if item['pathname'] == None: return
-        if self.already_in_list(item['pathname']):
-            pass
-        else:
-            self.items.append(item)
+        try:
+            self.update_item(item, notify, save)
+        except KeyError:
+            self.items[item['pathname']] = item
             if notify:
                 self.add_change_code('add_recently_opened_notebook', item)
             if save:
                 self.save_to_disk()
 
+    def update_item(self, item, notify=True, save=True):
+        self.items[item['pathname']] = item
+        if notify:
+            self.add_change_code('add_recently_opened_notebook', item)
+        if save:
+            self.save_to_disk()
+
     def remove_notebook_by_pathname(self, pathname):
-        item = self.get_by_pathname(pathname)
-        if item != None:
+        try:
+            item = self.items[pathname]
+        except KeyError:
+            pass
+        else:
             self.remove_item(item)
 
     def remove_item(self, item):
-        self.items.remove(item)
+        del(self.items[item['pathname']])
         self.add_change_code('remove_recently_opened_notebook', item)
         self.save_to_disk()
 
@@ -74,7 +79,7 @@ class RecentlyOpenedNotebooksList(Observable):
             try: data = pickle.load(filehandle)
             except EOFError: pass
             else:
-                for item in data:
+                for item in data.values():
                     if os.path.isfile(item['pathname']):
                         self.add_item(item, notify=True, save=False)
 

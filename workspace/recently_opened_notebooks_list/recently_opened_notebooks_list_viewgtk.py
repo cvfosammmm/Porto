@@ -36,14 +36,19 @@ class NotebookListRecentView(Gtk.ListBox):
         self.selected_row = None
         self.visible_items_count = 0
         
-    def add_item(self, item):
-        try: item = self.items[item.pathname]
+    def add_item(self, pathname, kernelname, date, icon_normal, icon_active):
+        try:
+            item = self.items[pathname]
         except KeyError:
-            self.items[item.pathname] = item
+            item = RecentNotebookListViewItem(pathname, kernelname, date)
+            item.update_kernel_icons(icon_normal, icon_active)
+            self.items[pathname] = item
             self.prepend(item)
             if item.revealer.get_reveal_child() == True:
                 self.visible_items_count += 1
-        else: item.set_last_save(item.last_saved)
+        else:
+            item.set_last_save(date)
+            item.update_kernel_icons(icon_normal, icon_active)
         self.show_all()
         
     def remove_item_by_pathname(self, pathname):

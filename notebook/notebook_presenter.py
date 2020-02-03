@@ -37,17 +37,6 @@ class NotebookPresenter(object):
 
     def change_notification(self, change_code, notifying_object, parameter):
 
-        '''if change_code == 'pathname_changed':
-            notebook = notifying_object
-            old_path = parameter
-            new_path = self.notebook.get_pathname()
-            row = self.main_controller.workspace.recently_opened_notebooks
-
-            for path in [old_path, new_path]:
-                row.remove_notebook_by_pathname(path)
-                item = {'pathname': path, 'kernelname': notebook.kernelname, 'date': notebook.get_last_saved()}
-                row.add_item(item)'''
-            
         if change_code == 'new_cell':
             cell = parameter
             self.add_cell_view(cell)
@@ -88,15 +77,6 @@ class NotebookPresenter(object):
             
             cell_view1.grab_focus()
             GLib.idle_add(lambda: cell_view1.get_source_view().grab_focus())
-
-        '''if change_code == 'save_state_change':
-            save_state = parameter
-            if save_state == 'saved':
-                path = self.notebook.get_pathname()
-                row = self.main_controller.workspace.recently_opened_notebooks
-                row.remove_notebook_by_pathname(path)
-                item = {'pathname': path, 'kernelname': self.notebook.kernelname, 'date': self.notebook.get_last_saved()}
-                row.add_item(item)'''
 
     def add_cell_view(self, cell):
         notebook_position = cell.get_notebook_position()
