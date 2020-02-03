@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.cvfosammmm.Porto</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0+</project_license>
+	<content_rating type="oars-1.1" />
+	<name>Porto</name>
+	<summary>Edit Jupyter notebooks on the desktop</summary>
+    <developer_name>Cvfosammmm</developer_name>
+
+	<description>
+		<p>Run and edit Jupyter notebooks with an elegant and easy to use desktop app.</p>
+		<p>Features include:</p>
+		<ul>
+		    <li>Good content-to-screen ratio</li>
+		    <li>Responsive interface and nice animations</li>
+		    <li>Looks great on the Gnome desktop</li>
+		</ul>
+	</description>
+
+	<launchable type="desktop-id">org.cvfosammmm.Porto.desktop</launchable>
+
+	<screenshots>
+		<screenshot type="default">
+			<image>https://www.cvfosammmm.org/setzer/images/screenshot-sage-appdata.png</image>
+		</screenshot>
+    	<screenshot>
+			<image>https://www.cvfosammmm.org/porto/images/screenshot-3d-appdata.png</image>
+		</screenshot>
+	</screenshots>
+
+	<url type="homepage">https://www.cvfosammmm.org/porto/</url>
+	<url type="bugtracker">https://github.com/cvfosammmm/Porto/issues</url>
+
+	<provides>
+		<id>org.cvfosammmm.Porto.desktop</id>
+	</provides>
+
+    <releases>
+        ​<release version="0.0.1" date="2020-2-8">
+            <description>
+                <p>Initial release</p>
+            </description>
+        </release>
+    </releases>
+</component>
