@@ -190,8 +190,16 @@ class CellViewMarkdown(CellView):
 
         self.text_widget.add(self.text_widget_wrapper)
 
-        self.vbox.pack_start(self.text_widget, False, False, 0)
+        self.hbox = Gtk.HBox()
+        self.border_left = CellBorder()
+        self.border_left.set_size_request(1, -1)
+        self.hbox.pack_start(self.border_left, False, False, 0)
+        self.hbox.pack_start(self.text_widget, False, False, 0)
+        self.border_right = CellBorder()
+        self.border_right.set_size_request(1, -1)
+        self.hbox.pack_start(self.border_right, False, False, 0)
 
+        self.vbox.pack_start(self.hbox, False, False, 0)
         self.result_view_revealer = ResultViewRevealerMarkdown(self)
         self.vbox.pack_start(self.result_view_revealer, False, False, 0)
 
