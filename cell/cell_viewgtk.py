@@ -98,8 +98,8 @@ class CellViewCode(CellView):
         self.text_entry.set_insert_spaces_instead_of_tabs(True)
         self.text_entry.set_left_margin(9)
         self.text_entry.set_right_margin(15)
-        self.text_entry.set_top_margin(11)
-        self.text_entry.set_bottom_margin(11)
+        self.text_entry.set_top_margin(9)
+        self.text_entry.set_bottom_margin(8)
 
         self.box_to_prevent_scrolling.pack_start(self.text_entry, True, True, 0)
         self.text_widget_sw.add(self.box_to_prevent_scrolling)
@@ -177,7 +177,7 @@ class CellViewMarkdown(CellView):
         self.text_entry.set_left_margin(9)
         self.text_entry.set_right_margin(15)
         self.text_entry.set_top_margin(11)
-        self.text_entry.set_bottom_margin(11)
+        self.text_entry.set_bottom_margin(7)
 
         self.box_to_prevent_scrolling.pack_start(self.text_entry, True, True, 0)
         self.text_widget_sw.add(self.box_to_prevent_scrolling)
