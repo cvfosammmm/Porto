@@ -76,7 +76,8 @@ class WorkspaceController(object):
                         ServiceLocator.get_dialog('kernel_missing').run(str(e))
                     else:
                         self.workspace.add_notebook(notebook)
-            if notebook != None:
+                        self.workspace.set_active_notebook(notebook)
+            else:
                 self.workspace.set_active_notebook(notebook)
 
     def on_create_action(self, action=None, parameter=None):
