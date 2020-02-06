@@ -404,6 +404,7 @@ class ResultViewSeparator(Gtk.DrawingArea):
             return True
         else:
             self.opacity = 0
+            self.hide()
             self.queue_draw()
             return False
         
@@ -418,6 +419,7 @@ class ResultViewSeparator(Gtk.DrawingArea):
             return False
 
     def reveal(self, duration=100):
+        self.show_all()
         GObject.timeout_add(duration / 20, self.increase_opacity)
         self.queue_draw()
         return False
