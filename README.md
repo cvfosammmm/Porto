@@ -2,7 +2,7 @@
 
 ![Screenshot](https://github.com/cvfosammmm/Porto/raw/master/resources/images/screenshots/2017-12-25.png)
 
-Porto run Jupyter notebooks on the desktop and is written in Python and Gtk. Report any issues you encounter here on Github. I'm really happy about any feedback I get, be it about code architecture, design, bugs, feature suggestion, ...
+Porto runs Jupyter notebooks on the desktop and is written in Python and Gtk. Report any issues you encounter here on Github. I'm really happy about any feedback I get, be it about code architecture, design, bugs, feature suggestion, ...
 
 ## Installation on Debian (Ubuntu?)
 
