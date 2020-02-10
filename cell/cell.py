@@ -40,12 +40,14 @@ class Cell(GtkSource.Buffer, Observable):
         self.result = None
 
     def first_set_text(self, text, activate=False, set_unmodified=True):
+        self.begin_not_undoable_action()
         self.set_text(text)
         self.place_cursor(self.get_start_iter())
         if activate == True:
             self.notebook.set_active_cell(self)
         if set_unmodified == True:
             self.set_modified(False)
+        self.end_not_undoable_action()
 
     def get_all_text(self):
         return self.get_text(self.get_start_iter(), self.get_end_iter(), False)
