@@ -47,13 +47,13 @@ class NotebookView(Gtk.ScrolledWindow):
         # disable auto scrolling
         self.get_child().set_focus_vadjustment(Gtk.Adjustment())
         self.get_child().set_focus_hadjustment(Gtk.Adjustment())
+        self.show_all()
 
     def add_child_at_position(self, view, position):
         self.children.insert(position, view)
         self.box.pack_start(view, False, False, 0)
         self.box.reorder_child(view, position)
-        self.show_all()
-        
+
     def move_child(self, child, position):
         old_position = self.get_child_position(child)
         self.children[old_position], self.children[position] = self.children[position], self.children[old_position]
@@ -74,7 +74,7 @@ class NotebookView(Gtk.ScrolledWindow):
         self.box.remove(self.children[position])
         del(self.children[position])
         self.show_all()
-        
+
     def scroll(self, amount):
         scroll_position = self.get_vadjustment()
         scroll_position.set_value(scroll_position.get_value() + amount)

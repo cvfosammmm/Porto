@@ -81,6 +81,5 @@ class NotebookPresenter(object):
     def add_cell_view(self, cell):
         notebook_position = cell.get_notebook_position()
         self.notebook_view.add_child_at_position(cell.view, notebook_position)
-        self.notebook_view.show_all()
 
 

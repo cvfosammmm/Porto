@@ -29,7 +29,7 @@ class NotebookEvaluator(object):
 
         self.result_factory = ServiceLocator.get_result_factory()
 
-        self.backend_code = backend_code.BackendCode()
+        self.backend_code = backend_code.BackendCode(notebook)
         self.backend_code.register_observer(self)
 
         self.markdown_compute_queue = backend_markdown.ComputeQueue()
@@ -38,7 +38,7 @@ class NotebookEvaluator(object):
     def change_notification(self, change_code, notifying_object, parameter):
 
         if change_code == 'kernel_state_changed' and parameter == 'kernel_to_start':
-            self.backend_code.start_kernel(self.notebook)
+            self.backend_code.start_kernel()
             self.notebook.set_kernel_state('starting')
 
         '''if change_code == 'set_pretty_print':
@@ -49,26 +49,26 @@ class NotebookEvaluator(object):
             self.notebook.set_kernel_state('running')
             
         if change_code == 'kernel_to_restart':
-            self.backend_code.restart(self.notebook)
+            self.backend_code.restart()
             self.notebook.set_kernel_state('starting')
         
         if change_code == 'kernel_to_shutdown':
-            self.backend_code.shutdown(self.notebook)
+            self.backend_code.shutdown()
         
         if change_code == 'kernel_to_shutdown_now':
             self.backend_code.shutdown_now()
         
         if change_code == 'nb_evaluation_to_stop':
-            self.backend_code.stop_evaluation(self.notebook)
+            self.backend_code.stop_evaluation()
         
         if change_code == 'cell_state_change' and parameter == 'ready_for_evaluation':
             cell = notifying_object
             if isinstance(cell, cell_model.MarkdownCell):
                 query_string = cell.get_text(cell.get_start_iter(), cell.get_end_iter(), False)
-                query = backend_markdown.MarkdownQuery(self.notebook, cell, query_string)
+                query = backend_markdown.MarkdownQuery(cell, query_string)
                 self.markdown_compute_queue.add_query(query)
             else:
-                self.backend_code.run_cell(self.notebook, cell)
+                self.backend_code.run_cell(cell)
 
         if change_code == 'cell_state_change' and parameter == 'ready_for_evaluation_quickly_please':
             cell = notifying_object
@@ -76,14 +76,14 @@ class NotebookEvaluator(object):
                 result_blob = backend_markdown.evaluate_markdown(cell.get_all_text())
                 cell.set_result(self.result_factory.get_markdown_result_from_blob(result_blob))
             else:
-                self.backend_code.run_cell(self.notebook, cell)
+                self.backend_code.run_cell(cell)
 
         if change_code == 'cell_state_change' and parameter == 'evaluation_to_stop':
             cell = notifying_object
             if isinstance(cell, cell_model.MarkdownCell):
                 self.markdown_compute_queue.stop_evaluation_by_cell(cell)
             else:
-                self.backend_code.stop_evaluation_of_cell(self.notebook, cell)
+                self.backend_code.stop_evaluation_of_cell(cell)
 
         if change_code == 'query_queued':
             cell = parameter.cell
@@ -97,6 +97,10 @@ class NotebookEvaluator(object):
             cell = parameter['cell']
             cell.set_result(parameter['result'])
             cell.change_state('idle')
+
+        if change_code == 'stream_output':
+            cell = parameter['cell']
+            cell.add_to_stream(parameter['stream_type'], parameter['text'])
 
         if change_code == 'cell_evaluation_stopped':
             cell = parameter

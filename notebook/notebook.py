@@ -200,9 +200,7 @@ class Notebook(Observable):
                     if is_first_cell == True:
                         is_first_cell = False
                         self.set_active_cell(new_cell)
-                    try: output = cell.outputs[0]
-                    except IndexError: pass
-                    else:
+                    for output in cell.outputs:
                         if output['output_type'] == 'error':
                             result = self.result_factory.get_error_from_nbformat_dict(output)
                             new_cell.set_result(result)
@@ -212,6 +210,8 @@ class Notebook(Observable):
                             else:
                                 result = self.result_factory.get_result_from_blob(data)
                                 new_cell.set_result(result)
+                        elif output['output_type'] == 'stream':
+                            new_cell.add_to_stream(output['name'], output['text'])
         self.set_save_state('saved')
         
     def save_to_disk(self):
@@ -225,10 +225,14 @@ class Notebook(Observable):
                         source=cell.get_all_text(),
                         execution_count=0
                     )
+                    outputs = list()
+                    for stream in cell.get_streams():
+                        outputs.append(stream.export_nbformat())
                     result = cell.get_result()
                     if result != None:
-                        output = result.export_nbformat()
-                        cell_node.outputs = [output]
+                        outputs.append(result.export_nbformat())
+                    if len(outputs):
+                        cell_node.outputs = outputs
 
                 elif isinstance(cell, model_cell.MarkdownCell):
                     result = cell.get_result()

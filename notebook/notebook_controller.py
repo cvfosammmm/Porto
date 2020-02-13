@@ -61,7 +61,7 @@ class NotebookController(object):
         notebook_view = notebook.view
         cell_view_position = cell.get_notebook_position()
         cell_view = notebook_view.get_child_by_position(cell_view_position)
-        result_view = cell_view.result_view_revealer
+        result_view = cell.result_revealer.view
         current_cell_size = cell_view.get_allocation().height
         current_cell_size = cell_view.get_allocation().height + result_view.get_allocation().height
 

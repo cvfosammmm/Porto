@@ -22,7 +22,9 @@ from gi.repository import GtkSource
 from helpers.observable import Observable
 from app.service_locator import ServiceLocator
 import cell.cell_controller as cell_controller
+import cell.cell_presenter as cell_presenter
 import cell.cell_viewgtk as cell_view
+import cell.result_revealer.result_revealer as result_revealer
 
 
 class Cell(GtkSource.Buffer, Observable):
@@ -36,8 +38,6 @@ class Cell(GtkSource.Buffer, Observable):
 
         self.set_modified(False)
         self.set_highlight_matching_brackets(False)
-
-        self.result = None
 
     def first_set_text(self, text, activate=False, set_unmodified=True):
         self.begin_not_undoable_action()
@@ -56,21 +56,26 @@ class Cell(GtkSource.Buffer, Observable):
         if self.state != 'idle':
             self.change_state('evaluation_to_stop')
 
-    def set_result(self, result, show_animation=True):
-        ''' set new result object. '''
+    def reset_streams(self):
+        self.result_revealer.reset_streams()
+        self.set_modified(True)
 
-        self.result = result
-        self.add_change_code('new_result', {'result': self.result, 'show_animation': show_animation})
+    def add_to_stream(self, stream_type, text):
+        self.result_revealer.add_to_stream(stream_type, text)
+        self.set_modified(True)
+
+    def set_result(self, result, show_animation=True):
+        self.result_revealer.set_result(result, show_animation)
         self.set_modified(True)
         
     def get_result(self):
-        return self.result
+        return self.result_revealer.get_result()
+
+    def get_streams(self):
+        return self.result_revealer.streams.values()
         
     def remove_result(self, show_animation=True):
-        ''' remove result including all of it's assets. '''
-        
-        self.result = None
-        self.add_change_code('new_result', {'result': self.result, 'show_animation': show_animation})
+        self.result_revealer.remove_result(show_animation)
         self.set_modified(True)
     
     def get_notebook(self):
@@ -103,9 +108,12 @@ class CodeCell(Cell):
         self.set_style_scheme(self.get_notebook().get_source_style_scheme())
 
         self.view = cell_view.CellViewCode(self)
+        self.result_revealer = result_revealer.CodeResultRevealer(self)
+        self.presenter = cell_presenter.CodeCellPresenter(self)
         self.controller = cell_controller.CodeCellController(self, self.view, notebook)
 
     def evaluate(self):
+        self.reset_streams()
         self.remove_result()
         self.stop_evaluation()
         self.change_state('ready_for_evaluation')
@@ -136,6 +144,8 @@ class MarkdownCell(Cell):
         self.set_style_scheme(self.get_notebook().get_source_style_scheme())
 
         self.view = cell_view.CellViewMarkdown(self)
+        self.result_revealer = result_revealer.MarkdownResultRevealer(self)
+        self.presenter = cell_presenter.MarkdownCellPresenter(self)
         self.controller = cell_controller.MarkdownCellController(self, self.view, notebook)
 
     def evaluate(self):

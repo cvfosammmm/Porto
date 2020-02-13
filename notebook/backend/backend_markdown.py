@@ -209,9 +209,8 @@ class ComputeQueue(object):
 
 class MarkdownQuery():
 
-    def __init__(self, notebook, cell, query_string = ''):
+    def __init__(self, cell, query_string = ''):
         self.set_query_string(query_string)
-        self.notebook = notebook
         self.cell = cell
         self.state = 'idle'
         self.ignore_counter = 0
@@ -223,7 +222,7 @@ class MarkdownQuery():
         self.state = 'busy'
         html = evaluate_markdown(self.query_string)
         self.state = 'idle'
-        return {'notebook': self.notebook, 'cell': self.cell, 'result_blob': html}
+        return {'cell': self.cell, 'result_blob': html}
     
     def stop_evaluation(self):
         if self.state == 'busy':

@@ -110,9 +110,6 @@ class CellViewCode(CellView):
 
         self.vbox.pack_start(self.text_widget, False, False, 0)
 
-        self.result_view_revealer = ResultViewRevealerCode(self)
-        self.vbox.pack_start(self.result_view_revealer, False, False, 0)
-
         self.hbox = Gtk.HBox()
         self.border_left = CellBorder()
         self.border_left.set_size_request(1, -1)
@@ -132,7 +129,7 @@ class CellViewCode(CellView):
 
         self.border_bottom = CellBorder()
         self.border_bottom.set_size_request(-1, 1)
-        self.vbox.pack_start(self.border_bottom, False, False, 0)
+        self.vbox.pack_end(self.border_bottom, False, False, 0)
 
         self.show_all()
 
@@ -186,7 +183,7 @@ class CellViewMarkdown(CellView):
 
         self.border_bottom = CellBorder()
         self.border_bottom.set_size_request(-1, 1)
-        self.text_widget_wrapper.pack_start(self.border_bottom, False, False, 0)
+        self.text_widget_wrapper.pack_end(self.border_bottom, False, False, 0)
 
         self.text_widget.add(self.text_widget_wrapper)
 
@@ -200,8 +197,6 @@ class CellViewMarkdown(CellView):
         self.hbox.pack_start(self.border_right, False, False, 0)
 
         self.vbox.pack_start(self.hbox, False, False, 0)
-        self.result_view_revealer = ResultViewRevealerMarkdown(self)
-        self.vbox.pack_start(self.result_view_revealer, False, False, 0)
 
         self.set_center_widget(self.vbox)
 
@@ -211,8 +206,6 @@ class CellViewMarkdown(CellView):
         self.allocation = self.get_allocation()
         
         self.get_style_context().add_class('cellviewmarkdown')
-
-        self.result_view_revealer.get_style_context().add_class('markdown')
 
         self.show_all()
 
@@ -273,160 +266,6 @@ class CellViewStateDisplay(Gtk.DrawingArea):
         if self.state != 'nothing':
             self.state = 'nothing'
 
-
-class ResultViewRevealer(Gtk.EventBox):
-
-    def __init__(self, cell_view):
-        Gtk.EventBox.__init__(self)
-
-        self.get_style_context().add_class('resultviewrevealer')
-
-        self.cell_view = cell_view
-        self.wrapper = Gtk.HBox()
-        self.revealer = Gtk.Revealer()
-
-        self.superbox = Gtk.VBox()
-
-    def set_result(self, result_view):
-        if self.result_view != None:
-            self.box.remove(self.result_view)
-        
-        self.result_view = result_view
-        self.box.pack_start(self.result_view, True, True, 0)
-    
-    def set_autoscroll_on_reveal(self, value):
-        self.autoscroll_on_reveal = value
-    
-
-class ResultViewRevealerMarkdown(ResultViewRevealer):
-
-    def __init__(self, cell_view):
-        ResultViewRevealer.__init__(self, cell_view)
-        self.box = Gtk.VBox()
-        self.revealer.add(self.box)
-        self.superbox.pack_start(self.revealer, True, True, 0)
-
-        self.wrapper.set_center_widget(self.superbox)
-        self.add(self.wrapper)
-        self.revealer.set_reveal_child(False)
-        
-        self.result_view = None
-        self.allocation = self.get_allocation()
-        self.autoscroll_on_reveal = False
-
-    def reveal(self, show_animation=True, duration=250):
-        self.revealer.set_transition_duration(duration)
-        if show_animation == False:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        else:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
-        self.revealer.set_reveal_child(True)
-        
-    def unreveal(self, show_animation=True, duration=250):
-        self.revealer.set_transition_duration(duration)
-        if show_animation == False:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        else:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
-        self.revealer.set_reveal_child(False)
-        
-
-class ResultViewRevealerCode(ResultViewRevealer):
-
-    def __init__(self, cell_view):
-        ResultViewRevealer.__init__(self, cell_view)
-        self.separator = ResultViewSeparator()
-        self.superbox.pack_start(self.separator, False, False, 0)
-
-        self.box = Gtk.VBox()
-        self.revealer.add(self.box)
-        self.superbox.pack_start(self.revealer, True, True, 0)
-
-        self.wrapper.set_center_widget(self.superbox)
-        self.add(self.wrapper)
-        self.revealer.set_reveal_child(False)
-        
-        self.result_view = None
-        self.allocation = self.get_allocation()
-        self.autoscroll_on_reveal = False
-
-    def reveal(self, show_animation=True, duration=250):
-        self.revealer.set_transition_duration(duration)
-        if show_animation == False:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        else:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
-        self.separator.reveal()
-        self.revealer.set_reveal_child(True)
-        
-    def unreveal(self, show_animation=True, duration=250):
-        self.separator.unreveal(100)
-        self.revealer.set_transition_duration(duration)
-        if show_animation == False:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.NONE)
-        else:
-            self.revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
-        self.revealer.set_reveal_child(False)
-        
-
-class ResultViewSeparator(Gtk.DrawingArea):
-    
-    def __init__(self):
-        Gtk.DrawingArea.__init__(self)
-
-        self.get_style_context().add_class('resultviewseparator')
-
-        self.set_size_request(-1, 1)
-        self.connect('draw', self.draw)
-        self.opacity = 0
-        
-    def draw(self, widget, cr, data = None):
-        width = self.get_allocated_width()
-        height = self.get_allocated_height()
-        context = self.get_style_context()
-        Gtk.render_background(context, cr, 0, 0, width, height)
-        
-        if self.opacity > 0:
-            cr.set_source_rgba(0.86, 0.86, 0.86, self.opacity)
-            i = 0
-            while i < width:
-                cr.rectangle(i, 0, 9, 9)
-                cr.fill()
-                i += 18
-        else:
-            pass
-        return False
-    
-    def reduce_opacity(self):
-        if self.opacity > 0:
-            self.opacity -= 0.05
-            self.queue_draw()
-            return True
-        else:
-            self.opacity = 0
-            self.hide()
-            self.queue_draw()
-            return False
-        
-    def increase_opacity(self):
-        if self.opacity < 1:
-            self.opacity += 0.05
-            self.queue_draw()
-            return True
-        else:
-            self.opacity = 1
-            self.queue_draw()
-            return False
-
-    def reveal(self, duration=100):
-        self.show_all()
-        GObject.timeout_add(duration / 20, self.increase_opacity)
-        self.queue_draw()
-        return False
-    
-    def unreveal(self, duration=100):
-        GObject.timeout_add(duration / 20, self.reduce_opacity)
-        return False
 
 class CellBorder(Gtk.DrawingArea):
     

@@ -78,9 +78,7 @@ class WorkspacePresenter(Observable):
         page_index = wrapper.page_num(notebook_view)
         if page_index == -1:
             page_index = wrapper.append_page(notebook_view)
-        notebook_view.show_all()
         wrapper.set_current_page(page_index)
-        wrapper.show_all()
 
     def remove_view(self, view):
         wrapper = self.main_window.notebook_view_wrapper

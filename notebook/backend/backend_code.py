@@ -30,146 +30,130 @@ from app.service_locator import ServiceLocator
 
 class BackendCode(Observable):
 
-    def __init__(self):
+    def __init__(self, notebook):
         Observable.__init__(self)
-        self.kernels = dict()
+        self.kernel = None
+        self.notebook = notebook
         self.continue_fetching = True
         self.result_factory = ServiceLocator.get_result_factory()
         self.fetch_func_id = GObject.timeout_add(50, self.fetch_results)
 
     def fetch_results(self):
-        for kernel in self.kernels.values():
-            result = kernel.get_result()
-            if result:
-                if result.result_message == 'evaluation_stopped':
-                    self.add_change_code('cell_evaluation_stopped', result.cell)
+        if self.kernel == None: return True
 
-                elif len(result.result_list) > 0:
-                    for result_msg in result.result_list:
-                        msg_type = result_msg['header']['msg_type']
+        result = self.kernel.get_result()
+        if result:
+            if result.result_message == 'evaluation_stopped':
+                self.add_change_code('cell_evaluation_stopped', result.cell)
 
-                        if msg_type == 'error':
-                            result_object = self.result_factory.get_error_from_result_message(result_msg)
-                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
+            elif result.result_msg != None:
+                result_msg = result.result_msg
+                msg_type = result_msg['header']['msg_type']
 
-                        if msg_type == 'execute_input' and result.cell != None:
-                            self.add_change_code('evaluation_started', result)
+                if msg_type == 'error':
+                    result_object = self.result_factory.get_error_from_result_message(result_msg)
+                    self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
 
-                        if msg_type == 'stream':
-                            text = result_msg['content'].get('text', None)
-                            if text != None:
-                                print(text)
+                if msg_type == 'execute_input' and result.cell != None:
+                    self.add_change_code('evaluation_started', result)
 
-                        if msg_type == 'execute_result':
-                            data = result_msg['content'].get('data', None)
-                            result_object = self.result_factory.get_result_from_blob(data)
-                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
+                if msg_type == 'stream':
+                    text = result_msg['content'].get('text', None)
+                    stream_type = result_msg['content'].get('name', None)
+                    if text != None and stream_type != None:
+                        self.add_change_code('stream_output', {'cell': result.cell, 'text': text, 'stream_type': stream_type})
 
-                        if msg_type == 'display_data':
-                            data = result_msg['content'].get('data', None)
-                            result_object = self.result_factory.get_result_from_blob(data)
-                            self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
+                if msg_type == 'execute_result':
+                    data = result_msg['content'].get('data', None)
+                    result_object = self.result_factory.get_result_from_blob(data)
+                    self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
 
-                        if msg_type == 'status':
-                            if result_msg['content'].get('execution_state', '') == 'idle':
-                                self.add_change_code('kernel_started', result.notebook)
-                                if result.cell != None:
-                                    self.add_change_code('cell_evaluation_stopped', result.cell)
-                            elif result_msg['content'].get('execution_state', '') == 'idle':
-                                self.add_change_code('kernel_started', result.notebook)
-                            else:
-                                print(result_msg['content'])
+                if msg_type == 'display_data':
+                    data = result_msg['content'].get('data', None)
+                    result_object = self.result_factory.get_result_from_blob(data)
+                    self.add_change_code('evaluation_result', {'cell': result.cell, 'result': result_object})
+
+                if msg_type == 'status':
+                    if result_msg['content'].get('execution_state', '') == 'idle':
+                        self.add_change_code('kernel_started')
+                        if result.cell != None:
+                            self.add_change_code('cell_evaluation_stopped', result.cell)
+                    else:
+                        print(result_msg['content'])
         return True
 
-    def start_kernel(self, notebook):
-        try: kernel = self.kernels[notebook]
-        except KeyError:
-            kernel = Kernel(notebook.get_kernelname(), notebook)
-            self.kernels[notebook] = kernel
-        else: self.add_change_code('kernel_started', notebook)
+    def start_kernel(self):
+        if self.kernel == None:
+            self.kernel = Kernel(self.notebook.get_kernelname())
+        self.add_change_code('kernel_started')
 
-    def run_cell(self, notebook, cell):
-        try: kernel = self.kernels[notebook]
-        except KeyError:
-            kernel = Kernel(notebook.get_kernelname(), notebook)
-            self.kernels[notebook] = kernel
-        query = Query(notebook, cell, cell.get_all_text().strip())
-        kernel.add_query(query)
+    def run_cell(self, cell):
+        if self.kernel == None:
+            self.start_kernel()
+        query = Query(cell, cell.get_all_text().strip())
+        self.kernel.add_query(query)
         self.add_change_code('query_queued', query)
 
-    def stop_evaluation_of_cell(self, notebook, cell):
-        try: kernel = self.kernels[notebook]
-        except KeyError: return
-        kernel.remove_queries_by_cell(cell)
+    def stop_evaluation_of_cell(self, cell):
+        if self.kernel != None:
+            self.kernel.remove_queries_by_cell(cell)
 
-    def stop_evaluation(self, notebook):
-        try: kernel = self.kernels[notebook]
-        except KeyError: return
+    def stop_evaluation(self):
+        if self.kernel != None:
+            self.kernel.remove_all_queries()
+            self.kernel.kernel_manager.interrupt_kernel()
 
-        kernel.remove_all_queries()
-        kernel.kernel_manager.interrupt_kernel()
-
-    def shutdown_for_real(self, notebook):
-        if notebook.get_busy_cell_count() == 0:
-            try: kernel = self.kernels[notebook]
-            except KeyError: return
-            else:
-                del(self.kernels[notebook])
-                kernel.shutdown()
-                kernel.kernel_manager.finish_shutdown()
+    def shutdown_for_real(self):
+        if self.notebook.get_busy_cell_count() == 0:
+            if self.kernel != None:
+                self.kernel.shutdown()
+                self.kernel.kernel_manager.finish_shutdown()
+                self.kernel = None
             return False
         return True
 
-    def restart_for_real(self, notebook):
-        if notebook.get_busy_cell_count() == 0:
-            try: kernel = self.kernels[notebook]
-            except KeyError: return
-            else:
-                del(self.kernels[notebook])
-                kernel.shutdown()
-                kernel.kernel_manager.finish_shutdown()
-            self.start_kernel(notebook)
+    def restart_for_real(self):
+        if self.notebook.get_busy_cell_count() == 0:
+            if self.kernel != None:
+                self.kernel.shutdown()
+                self.kernel.kernel_manager.finish_shutdown()
+                self.kernel = None
+            self.start_kernel()
             return False
         return True
 
-    def shutdown(self, notebook):
-        self.stop_evaluation(notebook)
-        GObject.timeout_add(50, self.shutdown_for_real, notebook)
+    def shutdown(self):
+        self.stop_evaluation()
+        GObject.timeout_add(50, self.shutdown_for_real)
 
-    def restart(self, notebook):
-        self.stop_evaluation(notebook)
-        shutdown_func_id = GObject.timeout_add(50, self.restart_for_real, notebook)
+    def restart(self):
+        self.stop_evaluation()
+        shutdown_func_id = GObject.timeout_add(50, self.restart_for_real)
 
     def shutdown_now(self):
-        keys = list(self.kernels.keys())
-        for notebook in keys:
-            try: kernel = self.kernels[notebook]
-            except KeyError: return
-            else:
-                del(self.kernels[notebook])
-                kernel.shutdown()
-                kernel.kernel_manager.finish_shutdown()
+        if self.kernel != None:
+            self.kernel.shutdown()
+            self.kernel.kernel_manager.finish_shutdown()
+            self.kernel = None
 
 
 class Query():
 
-    def __init__(self, notebook, cell, code):
-        self.notebook = notebook
+    def __init__(self, cell, code):
         self.cell = cell
         self.code = code
 
 
 class Kernel():
 
-    def __init__(self, kernel_name, notebook):
+    def __init__(self, kernel_name):
         self.query_queue = list()
         self.query_queue_lock = thread.allocate_lock()
-        self.results_temp = dict()
-        self.results_temp_lock = thread.allocate_lock()
+        self.active_queries = dict()
+        self.active_queries_lock = thread.allocate_lock()
         self.result_queue = queue.Queue()
         self.kernel_name = kernel_name
         self.kernel_started = False
-        self.notebook = notebook
         thread.start_new_thread(self.run_queries, ())
 
     def start_kernel(self):
@@ -182,71 +166,73 @@ class Kernel():
         except RuntimeError: pass
         else:
             query_id = self.client.comm_info()
-            self.results_temp_lock.acquire()
-            self.results_temp[query_id] = Result(self.notebook, None)
-            self.results_temp_lock.release()
+            with self.active_queries_lock:
+                self.active_queries[query_id] = None
 
     def start_fetching(self):
         thread.start_new_thread(self.fetch_results, ())
 
     def add_query(self, query):
-        self.query_queue_lock.acquire()
-        self.query_queue.append(query)
-        self.query_queue_lock.release()
+        with self.query_queue_lock:
+            self.query_queue.append(query)
 
     def get_result(self):
-        try: return self.result_queue.get(block=False)
-        except queue.Empty: return None
+        try:
+            result = self.result_queue.get(block=False)
+        except queue.Empty:
+            return None
+        else:
+            if result.query_id in self.active_queries:
+                if result.result_msg['content'].get('execution_state', '') == 'idle':
+                    del(self.active_queries[result.query_id])
+                return result
 
     def run_queries(self):
         while True:
             time.sleep(0.05)
-            self.results_temp_lock.acquire()
-            nothing_running = (len(self.results_temp) == 0)
-            self.results_temp_lock.release()
+            with self.active_queries_lock:
+                nothing_running = (len(self.active_queries) == 0)
             if not self.kernel_started:
                 self.kernel_started = True
                 self.start_kernel()
                 self.start_fetching()
             elif nothing_running:
-                    self.query_queue_lock.acquire()
+                with self.query_queue_lock:
                     try: query = self.query_queue.pop(0)
                     except IndexError: query = None
-                    self.query_queue_lock.release()
-                    if query != None:
-                        query_id = self.client.execute(query.code)
-                        self.results_temp_lock.acquire()
-                        self.results_temp[query_id] = Result(query.notebook, query.cell)
-                        self.results_temp_lock.release()
+                if query != None:
+                    query_id = self.client.execute(query.code)
+                    with self.active_queries_lock:
+                        self.active_queries[query_id] = query
 
     def remove_queries_by_cell(self, cell):
-        self.query_queue_lock.acquire()
-        for query in self.query_queue:
-            if query.cell == cell:
-                self.query_queue.remove(query)
-        self.query_queue_lock.release()
-        self.results_temp_lock.acquire()
-        for result_temp in self.results_temp.values():
-            if result_temp.cell == cell:
-                self.kernel_manager.interrupt_kernel()
-        self.results_temp_lock.release()
+        with self.query_queue_lock:
+            for query in self.query_queue:
+                if query.cell == cell:
+                    self.query_queue.remove(query)
+
+        with self.active_queries_lock:
+            del_ids = list()
+            for query_id, query in self.active_queries.items():
+                if query.cell == cell:
+                    self.kernel_manager.interrupt_kernel()
+                    del_ids.append(query_id)
+            for query_id in del_ids:
+                del(self.active_queries[query_id])
 
     def remove_all_queries(self):
-        self.query_queue_lock.acquire()
-        queue_empty = (len(self.query_queue) == 0)
-        self.query_queue_lock.release()
+        with self.query_queue_lock:
+            queue_empty = (len(self.query_queue) == 0)
         while not queue_empty:
-            self.query_queue_lock.acquire()
-            try: query = self.query_queue.pop(0)
-            except IndexError: query = None
-            self.query_queue_lock.release()
+            with self.query_queue_lock:
+                try: query = self.query_queue.pop(0)
+                except IndexError: query = None
             if query != None:
-                result = Result(query.notebook, query.cell)
+                result = Result(query.cell)
                 result.result_message = 'evaluation_stopped'
                 self.result_queue.put(result)
-                self.query_queue_lock.acquire()
-                queue_empty = (len(self.query_queue) == 0)
-                self.query_queue_lock.release()
+                with self.query_queue_lock:
+                    queue_empty = (len(self.query_queue) == 0)
 
     def fetch_results(self):
         while True:
@@ -263,21 +249,15 @@ class Kernel():
                     if result['parent_header']['msg_type'] == 'shutdown_request':
                         return
                     else:
-                        self.results_temp_lock.acquire()
-                        notebook = self.results_temp[query_id].notebook
-                        cell = self.results_temp[query_id].cell
-                        self.results_temp_lock.release()
-                        if result['msg_type'] == 'execute_input':
-                            eval_started_result = Result(notebook, cell)
-                            eval_started_result.result_list.append(result)
-                            self.result_queue.put(eval_started_result)
-                        else:
-                            self.results_temp_lock.acquire()
-                            self.results_temp[query_id].result_list.append(result)
-                            if result['content'].get('execution_state', '') == 'idle':
-                                self.result_queue.put(self.results_temp[query_id])
-                                del(self.results_temp[query_id])
-                            self.results_temp_lock.release()
+                        with self.active_queries_lock:
+                            if query_id in self.active_queries:
+                                if self.active_queries[query_id] != None:
+                                    cell = self.active_queries[query_id].cell
+                                else:
+                                    cell = None
+                                result_object = Result(cell, query_id)
+                                result_object.result_msg = result
+                                self.result_queue.put(result_object)
 
     def shutdown(self):
         self.client.shutdown()
@@ -285,10 +265,10 @@ class Kernel():
 
 class Result():
 
-    def __init__(self, notebook, cell):
-        self.notebook = notebook
+    def __init__(self, cell, query_id=None):
         self.cell = cell
-        self.result_list = list()
+        self.query_id = query_id
+        self.result_msg = None
         self.result_message = None
 
 

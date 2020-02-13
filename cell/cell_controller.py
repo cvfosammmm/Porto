@@ -22,7 +22,6 @@ from gi.repository import Gdk
 from gi.repository import Gtk
 
 import cell.cell as model_cell
-from app.service_locator import ServiceLocator
 
 
 class CellController(object):
@@ -31,14 +30,7 @@ class CellController(object):
 
         self.cell = cell
         self.cell_view = cell_view
-
         self.notebook = notebook
-
-        # observe cell
-        result = cell.get_result()
-        if result != None:
-            self.add_result_view(result)
-        self.cell.register_observer(self)
 
         self.cell.connect('mark-set', self.on_cursor_movement)
         self.cell.connect('paste-done', self.on_paste)
@@ -50,28 +42,6 @@ class CellController(object):
         self.cell_view.text_widget_sw.connect('scroll-event', self.on_scroll)
         
         self.cell_view.text_entry.connect('key-press-event', self.observe_keyboard_keypress_events)
-
-        self.cell_view.result_view_revealer.connect('button-press-event', self.revealer_on_mouse_click)
-        self.cell_view.result_view_revealer.connect('size-allocate', self.revealer_on_size_allocate)
-
-    def change_notification(self, change_code, notifying_object, parameter):
-
-        if change_code == 'new_result':
-            self.add_result_view(parameter['result'], show_animation=parameter['show_animation'])
-
-        if change_code == 'cell_state_change':
-            try: notebook_view = self.cell.get_notebook().view
-            except KeyError: return
-            child_position = self.cell.get_notebook_position()
-            cell_view = notebook_view.get_child_by_position(child_position)
-
-            if cell_view != None:
-                if parameter == 'idle': cell_view.state_display.show_nothing()
-                elif parameter == 'edit': cell_view.state_display.show_nothing()
-                elif parameter == 'display': cell_view.state_display.show_nothing()
-                elif parameter == 'queued_for_evaluation': cell_view.state_display.show_spinner()
-                elif parameter == 'ready_for_evaluation': cell_view.state_display.show_spinner()
-                elif parameter == 'evaluation_in_progress': cell_view.state_display.show_spinner()
 
     '''
     *** signal handlers: cells
@@ -88,34 +58,6 @@ class CellController(object):
             adjustment.set_value(adjustment.get_value() + event.delta_y*scroll_unit)
 
         return True
-
-    def revealer_on_mouse_click(self, result_view_revealer, click_event):
-        if click_event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-            cell_view = result_view_revealer.cell_view
-            cell = cell_view.get_cell()
-            notebook = cell.get_notebook()
-            cell.remove_result()
-            notebook.set_active_cell(cell)
-        elif click_event.type == Gdk.EventType.BUTTON_PRESS:
-            cell_view = result_view_revealer.cell_view
-            cell = cell_view.get_cell()
-            notebook = cell.get_notebook()
-            notebook.set_active_cell(cell)
-        return False
-
-    def revealer_on_size_allocate(self, result_view_revealer, allocation):
-        cell = self.notebook.get_active_cell()
-        if cell != None and result_view_revealer.autoscroll_on_reveal == True:
-            notebook_view = self.notebook.view
-            cell_view_position = cell.get_notebook_position()
-            cell_view = notebook_view.get_child_by_position(cell_view_position)
-            x, cell_position = cell_view.translate_coordinates(notebook_view.box, 0, 0)
-            x, result_position = result_view_revealer.translate_coordinates(notebook_view.box, 0, 0)
-            
-            last_allocation = result_view_revealer.allocation
-            result_view_revealer.allocation = allocation
-            if cell_position > result_position:
-                notebook_view.scroll(allocation.height - last_allocation.height)
 
     def observe_keyboard_keypress_events(self, widget, event):
 
@@ -234,86 +176,10 @@ class CodeCellController(CellController):
     def __init__(self, cell, cell_view, notebook):
         CellController.__init__(self, cell, cell_view, notebook)
 
-    def add_result_view(self, result, show_animation=False):
-        cell_view_position = self.cell.get_notebook_position()
-                
-        # check if cell view is still present
-        if cell_view_position >= 0:
-
-            # remove previous results
-            revealer = self.cell_view.result_view_revealer
-                
-            # add result
-            if result == None:
-                revealer.unreveal()
-                self.cell_view.text_widget.set_reveal_child(True)
-                self.cell_view.text_entry.set_editable(True)
-            else:
-                revealer.set_result(result)
-                revealer.show_all()
-                GLib.idle_add(lambda: revealer.reveal(show_animation))
-                result.scrolled_window.connect('scroll-event', self.result_on_scroll)
-
-            # enable auto-scrolling for this cell (not enabled on startup)
-            GLib.idle_add(lambda: revealer.set_autoscroll_on_reveal(True))
-
-    def result_on_scroll(self, scrolled_window, event):
-        if(abs(event.delta_y) > 0):
-            adjustment = self.notebook.view.get_vadjustment()
-
-            page_size = adjustment.get_page_size()
-            scroll_unit = pow (page_size, 2.0 / 3.0)
-
-            adjustment.set_value(adjustment.get_value() + event.delta_y*scroll_unit)
-        return True
-
 
 class MarkdownCellController(CellController):
 
     def __init__(self, cell, cell_view, notebook):
         CellController.__init__(self, cell, cell_view, notebook)
-
-    def add_result_view(self, result, show_animation=False):
-        cell_view_position = self.cell.get_notebook_position()
-                
-        # check if cell view is still present
-        if cell_view_position >= 0:
-
-            # remove previous results
-            revealer = self.cell_view.result_view_revealer
-
-            # add result
-            if result == None:
-                revealer.unreveal()
-                self.cell_view.text_widget.set_reveal_child(True)
-                self.cell_view.text_entry.set_editable(True)
-            else:
-                self.cell_view.unreveal(show_animation)
-                self.cell_view.text_entry.set_editable(False)
-                revealer.set_result(result)
-                revealer.show_all()
-                if show_animation == False:
-                    revealer.reveal(show_animation)
-                else:
-                    GLib.idle_add(lambda: revealer.reveal(show_animation))
-                result.content.connect('button-press-event', self.result_on_button_press)
-
-            # enable auto-scrolling for this cell (not enabled on startup)
-            GLib.idle_add(lambda: revealer.set_autoscroll_on_reveal(True))
-
-    def result_on_button_press(self, widget, event, user_data=None):
-        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-            cell_view = self.cell_view
-            cell = cell_view.get_cell()
-            notebook = cell.get_notebook()
-            cell.remove_result()
-            notebook.set_active_cell(cell)
-            return True
-        elif event.type == Gdk.EventType.BUTTON_PRESS:
-            cell_view = self.cell_view
-            cell = cell_view.get_cell()
-            notebook = cell.get_notebook()
-            notebook.set_active_cell(cell)
-            return False
 
 
