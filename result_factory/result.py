@@ -32,8 +32,8 @@ class Result(Gtk.HBox):
         self.innerwrap.set_margin_right(9)
 
         self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_margin_top(10)
-        self.scrolled_window.set_margin_bottom(8)
+        self.scrolled_window.set_margin_top(11)
+        self.scrolled_window.set_margin_bottom(9)
         self.scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         
         self.centerbox = Gtk.HBox()
