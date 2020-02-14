@@ -37,7 +37,12 @@
 	</provides>
 
     <releases>
-        ​<release version="0.0.1" date="2020-2-9">
+        <release version="0.0.2" date="2020-2-14">
+            <description>
+                <p>Support stream results, ...</p>
+            </description>
+        </release>
+        ​<release version="0.0.1" date="2019-10-13">
             <description>
                 <p>Initial release</p>
             </description>

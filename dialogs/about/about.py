@@ -40,7 +40,7 @@ class AboutDialog(Dialog):
         self.view.set_transient_for(self.main_window)
         self.view.set_modal(True)
         self.view.set_program_name('Porto')
-        self.view.set_version('0.0.1')
+        self.view.set_version('0.0.2')
         self.view.set_copyright('Copyright © 2017-2020 - the Porto developers')
         self.view.set_comments('Porto is a notebook style interface to Python and SageMath. It is designed to make exploring mathematics easy and fun.')
         self.view.set_license_type(Gtk.License.GPL_3_0)
