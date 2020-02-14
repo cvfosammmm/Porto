@@ -66,7 +66,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.paned.bind_property('position', self.headerbar, 'position', 1)
 
         self.css_provider = Gtk.CssProvider()
-        self.css_provider.load_from_path(os.getcwd() + '/resources/style_gtk.css')
+        self.css_provider.load_from_path(os.path.dirname(__file__) + '/../resources/style_gtk.css')
         self.style_context = Gtk.StyleContext()
         self.style_context.add_provider_for_screen(self.get_screen(), self.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 

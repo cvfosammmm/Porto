@@ -52,7 +52,7 @@ class Kernelspecs():
 
     def get_menu_icon(self, name):
         if self.is_installed(name):
-            filename = './resources/images/' + name + '_icon_1.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/' + name + '_icon_1.png'
             if os.path.isfile(filename):
                 icon = self.get_icon_from_filename(filename)
                 return icon
@@ -61,13 +61,13 @@ class Kernelspecs():
                 icon = self.get_icon_from_resource_dir(filename, 16)
                 return icon
         else:
-            filename = './resources/images/placeholder_icon_1.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/placeholder_icon_1.png'
             icon = self.get_icon_from_filename(filename)
             return icon
 
     def get_normal_sidebar_icon(self, name):
         if self.is_installed(name):
-            filename = './resources/images/' + name + '_icon_2.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/' + name + '_icon_2.png'
             if os.path.isfile(filename):
                 icon = self.get_icon_from_filename(filename)
                 icon.get_style_context().add_class('nblist_icon')
@@ -78,14 +78,14 @@ class Kernelspecs():
                 icon.get_style_context().add_class('nblist_icon')
                 return icon
         else:
-            filename = './resources/images/placeholder_icon_2.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/placeholder_icon_2.png'
             icon = self.get_icon_from_filename(filename)
             icon.get_style_context().add_class('nblist_icon')
             return icon
 
     def get_active_sidebar_icon(self, name):
         if self.is_installed(name):
-            filename = './resources/images/' + name + '_icon_4.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/' + name + '_icon_4.png'
             if os.path.isfile(filename):
                 icon = self.get_icon_from_filename(filename)
                 icon.get_style_context().add_class('nblist_icon')
@@ -96,13 +96,13 @@ class Kernelspecs():
                 icon.get_style_context().add_class('nblist_icon')
                 return icon
         else:
-            filename = './resources/images/placeholder_icon_4.png'
+            filename = os.path.dirname(__file__) + '/../resources/images/placeholder_icon_4.png'
             icon = self.get_icon_from_filename(filename)
             icon.get_style_context().add_class('nblist_icon')
             return icon
 
     def get_background_path(self, name):
-        return './resources/images/' + name + '_icon_3.png'
+        return os.path.dirname(__file__) + '/../resources/images/' + name + '_icon_3.png'
 
     def get_kernelspec_icon_path(self, name):
         if self.is_installed(name):

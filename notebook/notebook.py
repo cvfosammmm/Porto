@@ -56,12 +56,12 @@ class Notebook(Observable):
         
         # set source language for syntax highlighting
         self.source_language_manager = GtkSource.LanguageManager()
-        self.source_language_manager.set_search_path(('./resources/gtksourceview/language-specs',))
+        self.source_language_manager.set_search_path((os.path.dirname(__file__) + '/../resources/gtksourceview/language-specs',))
         self.source_language_code = self.source_language_manager.get_language('sage')
         self.source_language_markdown = self.source_language_manager.get_language('markdown')
         
         self.source_style_scheme_manager = GtkSource.StyleSchemeManager()
-        self.source_style_scheme_manager.set_search_path(('./resources/gtksourceview/styles',))
+        self.source_style_scheme_manager.set_search_path((os.path.dirname(__file__) + '/../resources/gtksourceview/styles',))
         self.source_style_scheme = self.source_style_scheme_manager.get_scheme('sage')
 
         self.cursor_position = {'cell': None, 'cell_position': None, 'cell_size': None, 'position': None}
