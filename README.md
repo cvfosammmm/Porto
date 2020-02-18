@@ -1,5 +1,11 @@
 # Porto
 
+Run Jupyter notebooks on the desktop.
+
+Website: <a href="https://www.cvfosammmm.org/porto/">https://www.cvfosammmm.org/porto/</a>
+
+<a href="https://flathub.org/apps/details/org.cvfosammmm.Porto"><img src="https://www.cvfosammmm.org/porto/images/flathub-badge-en.svg" width="150" height="50"></a>
+
 ![Screenshot](https://github.com/cvfosammmm/Porto/raw/master/resources/images/screenshots/2017-12-25.png)
 
 Porto runs Jupyter notebooks on the desktop and is written in Python and Gtk. Report any issues you encounter here on Github. I'm really happy about any feedback I get, be it about code architecture, design, bugs, feature suggestion, ...
