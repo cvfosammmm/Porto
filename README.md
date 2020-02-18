@@ -1,6 +1,6 @@
 # Porto
 
-Run Jupyter notebooks on the desktop.
+Run and edit Jupyter notebooks on the desktop, written in Python with Gtk.
 
 Website: <a href="https://www.cvfosammmm.org/porto/">https://www.cvfosammmm.org/porto/</a>
 
