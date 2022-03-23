@@ -23,6 +23,7 @@ import jupyter_client
 import _thread as thread
 import queue
 import time
+import os
 
 from helpers.observable import Observable
 from app.service_locator import ServiceLocator
@@ -34,6 +35,7 @@ class BackendCode(Observable):
         Observable.__init__(self)
         self.kernel = None
         self.notebook = notebook
+        os.chdir(self.notebook.get_folder())
         self.continue_fetching = True
         self.result_factory = ServiceLocator.get_result_factory()
         self.fetch_func_id = GObject.timeout_add(50, self.fetch_results)
