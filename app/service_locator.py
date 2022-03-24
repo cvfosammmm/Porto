@@ -42,7 +42,8 @@ class ServiceLocator(object):
     main_window = None
     kernelspecs = None
     result_factory = None
-    ansi_escape_regex = re.compile('\\x1B\[[0-9]*[;]*[0-9]*m')
+    ansi_escape_regex = re.compile('\\x1B\[[0-9]*[;]*[0-9]*[;]*[0-9]*[;]*[0-9]*[;]*[0-9]*m')
+    ipython_message_escape_regex = re.compile('<ipython-input-[0-9]*-[0-9a-f]*>, ')
     base_path = os.path.dirname(os.path.realpath(__file__ + '/..')) + '/'
 
     def init_dialogs(main_window, workspace, kernelspecs):
@@ -85,6 +86,9 @@ class ServiceLocator(object):
 
     def get_ansi_escape_regex():
         return ServiceLocator.ansi_escape_regex
+    
+    def get_ipython_message_escape_regex():
+        return ServiceLocator.ipython_message_escape_regex
 
     def get_base_path():
         return ServiceLocator.base_path
