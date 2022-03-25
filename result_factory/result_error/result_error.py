@@ -46,8 +46,11 @@ class ResultError(Result):
         self.type_label = Gtk.Label(self.error_type)
         self.type_label.set_selectable(True)
         self.type_label.get_style_context().add_class('type')
-
-        self.message_label = Gtk.Label(': ' + self.error_message)
+        
+        # remove "<ipython-input-0123456789abcde-abcde>, " from the error message 
+        ipython_message_escape_regex = service_locator.ServiceLocator.get_ipython_message_escape_regex()
+        self.message_label = Gtk.Label(': ' + ipython_message_escape_regex.sub('', self.error_message))
+        
         self.message_label.set_single_line_mode(False)
         self.message_label.set_line_wrap_mode(Pango.WrapMode.CHAR)
         self.message_label.set_line_wrap(True)
