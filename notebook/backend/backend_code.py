@@ -46,7 +46,7 @@ class BackendCode(Observable):
             if result.result_message == 'evaluation_stopped':
                 self.add_change_code('cell_evaluation_stopped', result.cell)
 
-            elif result.result_msg != None:
+            elif result.result_msg != None and result.cell != None:
                 result_msg = result.result_msg
                 msg_type = result_msg['header']['msg_type']
 
@@ -84,7 +84,7 @@ class BackendCode(Observable):
 
     def start_kernel(self):
         if self.kernel == None:
-            self.kernel = Kernel(self.notebook.get_kernelname())
+            self.kernel = Kernel(self.notebook.get_kernelname(), self.notebook.get_folder())
         self.add_change_code('kernel_started')
 
     def run_cell(self, cell):
@@ -146,13 +146,14 @@ class Query():
 
 class Kernel():
 
-    def __init__(self, kernel_name):
+    def __init__(self, kernel_name, cwd):
         self.query_queue = list()
         self.query_queue_lock = thread.allocate_lock()
         self.active_queries = dict()
         self.active_queries_lock = thread.allocate_lock()
         self.result_queue = queue.Queue()
         self.kernel_name = kernel_name
+        self.cwd = cwd
         self.kernel_started = False
         thread.start_new_thread(self.run_queries, ())
 
@@ -166,8 +167,12 @@ class Kernel():
         except RuntimeError: pass
         else:
             query_id = self.client.comm_info()
+
             with self.active_queries_lock:
                 self.active_queries[query_id] = None
+
+            self.add_query(Query(None, 'import os'))
+            self.add_query(Query(None, 'os.chdir("' + self.cwd + '")'))
 
     def start_fetching(self):
         thread.start_new_thread(self.fetch_results, ())
