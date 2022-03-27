@@ -14,6 +14,8 @@ Porto runs Jupyter notebooks on the desktop and is written in Python and Gtk. Re
 
 I'm developing Porto on Debian and that's what I exclusively tested it with. Installing on Ubuntu should probably work exactly the same.
 
+[ansifilter](https://gitlab.com/saalen/ansifilter) is an optional dependency that allows colored error messages.
+
 1. Run the following command to install prerequisite Debian packages:
 apt-get install sagemath python3-bleach python3-markdown python3-pypandoc jupyter-client python3-ipykernel python3-nbformat libgtk-3-dev libgtksourceview-3.0-dev
 

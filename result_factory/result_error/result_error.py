@@ -22,6 +22,7 @@ from gi.repository import Gtk, GLib, Pango
 from result_factory.result import Result
 import app.service_locator as service_locator
 
+import subprocess
 import re
 import nbformat
 
@@ -38,9 +39,15 @@ class ResultError(Result):
         self.get_style_context().add_class('resulterrorview')
 
         self.traceback_text = ''
-        ansi_escape_regex = service_locator.ServiceLocator.get_ansi_escape_regex()
+       
         for t_string in self.traceback[2:-1]:
-            self.traceback_text += '\n' + GLib.markup_escape_text(ansi_escape_regex.sub('', t_string).strip())
+            self.traceback_text += '\n' + t_string 
+        try:
+            self.traceback_text = subprocess.check_output('cat <<- "EOF--" | ansifilter -M\n' + self.traceback_text + 
+                    '\nEOF--\n', shell=True).decode('utf-8')
+        except:
+            ansi_escape_regex = service_locator.ServiceLocator.get_ansi_escape_regex()
+            self.traceback_text = GLib.markup_escape_text(ansi_escape_regex.sub('', self.traceback_text))
         self.header_box = Gtk.HBox()
 
         self.type_label = Gtk.Label(self.error_type)
