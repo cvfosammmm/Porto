@@ -19,6 +19,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from appdirs import user_config_dir
 import os.path
 import pickle
 
@@ -33,7 +34,7 @@ class Settings(Observable):
 
         self.gtksettings = Gtk.Settings.get_default()
         
-        self.pathname = os.path.expanduser('~') + '/.porto'
+        self.pathname = user_config_dir("porto")
         
         self.data = dict()
         self.defaults = dict()
