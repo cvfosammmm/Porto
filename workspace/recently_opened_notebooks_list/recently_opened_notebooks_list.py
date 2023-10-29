@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>
 
+from appdirs import user_config_dir
 import pickle
 import os.path
 
@@ -29,7 +30,7 @@ class RecentlyOpenedNotebooksList(Observable):
         Observable.__init__(self)
 
         self.workspace = workspace
-        self.pathname = os.path.expanduser('~') + '/.porto'
+        self.pathname = user_config_dir("porto")
         self.items = dict()
 
         self.presenter = ro_presenter.RecentlyOpenedNotebooksListPresenter(workspace, self)
